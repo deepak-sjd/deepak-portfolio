@@ -1,159 +1,988 @@
 "use client";
 
+import { FormEvent, useState } from "react";
 import { motion } from "framer-motion";
 import {
+  FaArrowRight,
+  FaCheck,
+  FaClock,
   FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
   FaGithub,
+  FaInstagram,
   FaLinkedin,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaPaperPlane,
+  FaSpinner,
 } from "react-icons/fa";
 
 import Button from "@/components/ui/Button";
 
+const contactDetails = [
+  {
+    icon: FaEnvelope,
+    label: "Email",
+    value: "deepakg@gmail.com",
+    href: "mailto:deepakg@gmail.com",
+    description: "Best for professional inquiries",
+  },
+  {
+    icon: FaPhone,
+    label: "Phone",
+    value: "+91 74795 19511",
+    href: "tel:+917479519511",
+    description: "Available for direct conversations",
+  },
+  {
+    icon: FaMapMarkerAlt,
+    label: "Location",
+    value: "Chennai, Tamil Nadu",
+    href: "#",
+    description: "India · IST (UTC+5:30)",
+  },
+];
+
+const socialLinks = [
+  {
+    name: "GitHub",
+    icon: FaGithub,
+    href: "https://github.com/deepak-sjd",
+  },
+  {
+    name: "LinkedIn",
+    icon: FaLinkedin,
+    href: "#",
+  },
+  {
+    name: "Instagram",
+    icon: FaInstagram,
+    href: "#",
+  },
+];
+
+const collaborationTypes = [
+  "Full-time opportunities",
+  "Freelance & client projects",
+  "AI / software collaboration",
+  "Technical networking",
+];
+
+type FormStatus = "idle" | "submitting" | "success" | "error";
+
 export default function Contact() {
+  const [status, setStatus] = useState<FormStatus>("idle");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    // Honeypot field. Real users never see or fill this.
+    if (formData.get("website")) {
+      return;
+    }
+
+    setStatus("submitting");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          subject: formData.get("subject"),
+          message: formData.get("message"),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      form.reset();
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
+  }
+
   return (
     <section
       id="contact"
-      className="bg-white py-28"
+      aria-labelledby="contact-heading"
+      className="
+        relative
+        overflow-hidden
+        border-t
+        border-zinc-200/70
+        bg-white
+        py-24
+        dark:border-zinc-800
+        dark:bg-zinc-950
+        sm:py-28
+        lg:py-32
+      "
     >
-      <div className="mx-auto max-w-7xl px-6">
+      {/* ========================================================= */}
+      {/* BACKGROUND ATMOSPHERE */}
+      {/* ========================================================= */}
 
-        {/* Heading */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -left-40
+          top-20
+          h-[420px]
+          w-[420px]
+          rounded-full
+          bg-blue-500/[0.07]
+          blur-[120px]
+          dark:bg-blue-500/[0.06]
+        "
+      />
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -right-40
+          bottom-0
+          h-[500px]
+          w-[500px]
+          rounded-full
+          bg-cyan-500/[0.06]
+          blur-[130px]
+          dark:bg-cyan-500/[0.05]
+        "
+      />
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          opacity-[0.22]
+          [background-image:linear-gradient(to_right,rgba(24,24,27,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(24,24,27,0.035)_1px,transparent_1px)]
+          [background-size:64px_64px]
+          dark:opacity-0
+        "
+      />
+
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        {/* ========================================================= */}
+        {/* HEADER */}
+        {/* ========================================================= */}
+
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.65, ease: "easeOut" }}
+          className="max-w-3xl"
         >
-          <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
-            CONTACT
-          </span>
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="h-px w-9 bg-blue-600 dark:bg-blue-400"
+            />
 
-          <h2 className="mt-6 text-5xl font-black text-zinc-900">
-            Let's Build Something Amazing
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
+              Contact
+            </span>
+          </div>
+
+          <h2
+            id="contact-heading"
+            className="
+              mt-6
+              max-w-4xl
+              text-4xl
+              font-black
+              leading-[1.06]
+              tracking-[-0.035em]
+              text-zinc-950
+              dark:text-white
+              sm:text-5xl
+              md:text-6xl
+              lg:text-[4rem]
+            "
+          >
+            Let&apos;s build something
+            <span
+              className="
+                block
+                bg-gradient-to-r
+                from-blue-600
+                via-indigo-600
+                to-cyan-600
+                bg-clip-text
+                text-transparent
+                dark:from-blue-400
+                dark:via-indigo-400
+                dark:to-cyan-400
+              "
+            >
+              worth building.
+            </span>
           </h2>
 
-          <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-zinc-600">
-            Interested in AI, Full Stack Development, or collaborating on
-            innovative software solutions? Feel free to reach out.
+          <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 dark:text-zinc-400 md:text-lg">
+            Have an opportunity, a product idea, an AI challenge, or simply
+            want to connect? I&apos;m always open to thoughtful conversations
+            around technology, engineering, and building useful software.
           </p>
         </motion.div>
 
-        <div className="mt-20 grid gap-12 lg:grid-cols-2">
+        {/* ========================================================= */}
+        {/* MAIN CONTENT */}
+        {/* ========================================================= */}
 
-          {/* Left */}
+        <div className="mt-14 grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:gap-16">
+          {/* ======================================================= */}
+          {/* LEFT COLUMN */}
+          {/* ======================================================= */}
+
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.65, ease: "easeOut" }}
+            className="flex flex-col"
           >
+            {/* Direct contact */}
+            <div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-600">
+                  Direct contact
+                </p>
 
-            <div className="rounded-3xl border border-zinc-200 p-8 shadow-sm">
-              <div className="flex items-center gap-4">
-                <FaEnvelope className="text-2xl text-blue-600" />
+                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span
+                    aria-hidden="true"
+                    className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.10)]"
+                  />
+
+                  Open to conversations
+                </div>
+              </div>
+
+              <div className="mt-5 space-y-3">
+                {contactDetails.map((item) => {
+                  const Icon = item.icon;
+                  const isLocation = item.label === "Location";
+
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className="
+                        group
+                        flex
+                        items-center
+                        gap-4
+                        rounded-2xl
+                        border
+                        border-zinc-200/80
+                        bg-white/75
+                        p-4
+                        shadow-[0_8px_30px_-24px_rgba(24,24,27,0.4)]
+                        backdrop-blur-sm
+                        transition-all
+                        duration-300
+                        hover:-translate-y-0.5
+                        hover:border-blue-200
+                        hover:bg-white
+                        hover:shadow-[0_18px_40px_-24px_rgba(37,99,235,0.35)]
+                        focus-visible:outline-none
+                        focus-visible:ring-2
+                        focus-visible:ring-blue-500
+                        focus-visible:ring-offset-4
+                        dark:border-zinc-800
+                        dark:bg-zinc-900/70
+                        dark:hover:border-zinc-700
+                        dark:hover:bg-zinc-900
+                        dark:focus-visible:ring-offset-zinc-950
+                      "
+                    >
+                      <span
+                        className="
+                          flex
+                          h-11
+                          w-11
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-xl
+                          bg-blue-50
+                          text-blue-600
+                          transition-all
+                          duration-300
+                          group-hover:bg-blue-600
+                          group-hover:text-white
+                          dark:bg-blue-950/50
+                          dark:text-blue-400
+                          dark:group-hover:bg-blue-500
+                          dark:group-hover:text-white
+                        "
+                      >
+                        <Icon aria-hidden="true" />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400 dark:text-zinc-600">
+                          {item.label}
+                        </span>
+
+                        <span className="mt-1 block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                          {item.value}
+                        </span>
+
+                        <span className="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-500">
+                          {item.description}
+                        </span>
+                      </span>
+
+                      {!isLocation && (
+                        <FaArrowRight
+                          aria-hidden="true"
+                          className="
+                            shrink-0
+                            text-xs
+                            text-zinc-300
+                            transition-transform
+                            duration-300
+                            group-hover:translate-x-1
+                            group-hover:text-blue-500
+                            dark:text-zinc-700
+                          "
+                        />
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Collaboration */}
+            <div className="mt-9">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-600">
+                Open for
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {collaborationTypes.map((type) => (
+                  <span
+                    key={type}
+                    className="
+                      rounded-full
+                      border
+                      border-zinc-200
+                      bg-zinc-50
+                      px-3.5
+                      py-2
+                      text-xs
+                      font-semibold
+                      text-zinc-600
+                      dark:border-zinc-800
+                      dark:bg-zinc-900
+                      dark:text-zinc-400
+                    "
+                  >
+                    {type}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Social */}
+            <div className="mt-9">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-600">
+                Find me online
+              </p>
+
+              <div className="mt-4 flex gap-3">
+                {socialLinks.map((social) => {
+                  const Icon = social.icon;
+
+                  return (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Visit ${social.name}`}
+                      className="
+                        flex
+                        h-11
+                        w-11
+                        items-center
+                        justify-center
+                        rounded-xl
+                        border
+                        border-zinc-200
+                        bg-white
+                        text-zinc-500
+                        shadow-sm
+                        transition-all
+                        duration-300
+                        hover:-translate-y-1
+                        hover:border-blue-200
+                        hover:bg-blue-50
+                        hover:text-blue-600
+                        focus-visible:outline-none
+                        focus-visible:ring-2
+                        focus-visible:ring-blue-500
+                        focus-visible:ring-offset-4
+                        dark:border-zinc-800
+                        dark:bg-zinc-900
+                        dark:text-zinc-400
+                        dark:hover:border-zinc-700
+                        dark:hover:bg-zinc-800
+                        dark:hover:text-blue-400
+                        dark:focus-visible:ring-offset-zinc-950
+                      "
+                    >
+                      <Icon aria-hidden="true" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Response expectation */}
+            <div
+              className="
+                mt-9
+                rounded-2xl
+                border
+                border-blue-100
+                bg-gradient-to-br
+                from-blue-50
+                to-indigo-50/70
+                p-5
+                dark:border-blue-950/60
+                dark:from-blue-950/30
+                dark:to-indigo-950/20
+              "
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className="
+                    flex
+                    h-9
+                    w-9
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-white
+                    text-blue-600
+                    shadow-sm
+                    dark:bg-zinc-900
+                    dark:text-blue-400
+                  "
+                >
+                  <FaClock aria-hidden="true" className="text-sm" />
+                </span>
+
                 <div>
-                  <h3 className="font-semibold">Email</h3>
-                  <p className="text-zinc-600">
-                    deepak@example.com
+                  <p className="text-sm font-bold text-zinc-900 dark:text-white">
+                    Response time
+                  </p>
+
+                  <p className="mt-1 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+                    I aim to respond to genuine inquiries within 1–2 business
+                    days.
                   </p>
                 </div>
               </div>
             </div>
-
-            <div className="rounded-3xl border border-zinc-200 p-8 shadow-sm">
-              <div className="flex items-center gap-4">
-                <FaPhone className="text-2xl text-blue-600" />
-                <div>
-                  <h3 className="font-semibold">Phone</h3>
-                  <p className="text-zinc-600">
-                    +91 XXXXX XXXXX
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-zinc-200 p-8 shadow-sm">
-              <div className="flex items-center gap-4">
-                <FaMapMarkerAlt className="text-2xl text-blue-600" />
-                <div>
-                  <h3 className="font-semibold">Location</h3>
-                  <p className="text-zinc-600">
-                    Chennai, Tamil Nadu, India
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-5 text-3xl">
-              <a
-                href="https://github.com/deepak-sjd"
-                target="_blank"
-                rel="noreferrer"
-                className="transition hover:text-blue-600"
-              >
-                <FaGithub />
-              </a>
-
-              <a
-                href="https://linkedin.com/in/deepak-sjd"
-                target="_blank"
-                rel="noreferrer"
-                className="transition hover:text-blue-600"
-              >
-                <FaLinkedin />
-              </a>
-            </div>
-
           </motion.div>
 
-          {/* Right */}
+          {/* ======================================================= */}
+          {/* FORM */}
+          {/* ======================================================= */}
+
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.65, ease: "easeOut" }}
           >
-
-            <form className="space-y-6 rounded-3xl border border-zinc-200 bg-white p-10 shadow-lg">
-
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="w-full rounded-xl border border-zinc-300 px-5 py-4 outline-none transition focus:border-blue-600"
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="
+                relative
+                overflow-hidden
+                rounded-[2rem]
+                border
+                border-zinc-200/80
+                bg-white/80
+                p-6
+                shadow-[0_25px_80px_-35px_rgba(24,24,27,0.35)]
+                backdrop-blur-xl
+                dark:border-zinc-800
+                dark:bg-zinc-900/80
+                dark:shadow-black/20
+                md:p-8
+              "
+            >
+              {/* Form accent */}
+              <div
+                aria-hidden="true"
+                className="
+                  absolute
+                  inset-x-0
+                  top-0
+                  h-1
+                  bg-gradient-to-r
+                  from-blue-600
+                  via-indigo-500
+                  to-cyan-500
+                "
               />
 
-              <input
-                type="email"
-                placeholder="Email Address"
-                className="w-full rounded-xl border border-zinc-300 px-5 py-4 outline-none transition focus:border-blue-600"
-              />
+              {/* Header */}
+              <div className="flex items-start justify-between gap-5">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
+                    Start a conversation
+                  </p>
 
-              <input
-                type="text"
-                placeholder="Subject"
-                className="w-full rounded-xl border border-zinc-300 px-5 py-4 outline-none transition focus:border-blue-600"
-              />
+                  <h3 className="mt-2 text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
+                    Tell me what you&apos;re building.
+                  </h3>
 
-              <textarea
-                rows={6}
-                placeholder="Write your message..."
-                className="w-full resize-none rounded-xl border border-zinc-300 px-5 py-4 outline-none transition focus:border-blue-600"
-              />
+                  <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                    Share a little context and I&apos;ll get back to you with
+                    the next steps.
+                  </p>
+                </div>
 
-              <Button className="w-full py-4 text-lg">
-                Send Message
-              </Button>
+                <div
+                  aria-hidden="true"
+                  className="
+                    hidden
+                    h-11
+                    w-11
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-blue-50
+                    text-blue-600
+                    sm:flex
+                    dark:bg-blue-950/50
+                    dark:text-blue-400
+                  "
+                >
+                  <FaPaperPlane />
+                </div>
+              </div>
 
+              {/* Fields */}
+              <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                {/* Name */}
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-200"
+                  >
+                    Name
+                    <span className="ml-1 text-blue-500">*</span>
+                  </label>
+
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    minLength={2}
+                    maxLength={100}
+                    autoComplete="name"
+                    placeholder="Your name"
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-zinc-200
+                      bg-zinc-50/70
+                      px-4
+                      py-3.5
+                      text-sm
+                      text-zinc-900
+                      outline-none
+                      transition
+                      placeholder:text-zinc-400
+                      focus:border-blue-500
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-500/10
+                      dark:border-zinc-700
+                      dark:bg-zinc-950/70
+                      dark:text-white
+                      dark:placeholder:text-zinc-600
+                      dark:focus:bg-zinc-950
+                    "
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-200"
+                  >
+                    Email
+                    <span className="ml-1 text-blue-500">*</span>
+                  </label>
+
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    maxLength={254}
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-zinc-200
+                      bg-zinc-50/70
+                      px-4
+                      py-3.5
+                      text-sm
+                      text-zinc-900
+                      outline-none
+                      transition
+                      placeholder:text-zinc-400
+                      focus:border-blue-500
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-blue-500/10
+                      dark:border-zinc-700
+                      dark:bg-zinc-950/70
+                      dark:text-white
+                      dark:placeholder:text-zinc-600
+                      dark:focus:bg-zinc-950
+                    "
+                  />
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div className="mt-5">
+                <label
+                  htmlFor="subject"
+                  className="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-200"
+                >
+                  Subject
+                  <span className="ml-1 text-blue-500">*</span>
+                </label>
+
+                <input
+                  id="subject"
+                  name="subject"
+                  type="text"
+                  required
+                  minLength={3}
+                  maxLength={150}
+                  placeholder="What would you like to discuss?"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-zinc-200
+                    bg-zinc-50/70
+                    px-4
+                    py-3.5
+                    text-sm
+                    text-zinc-900
+                    outline-none
+                    transition
+                    placeholder:text-zinc-400
+                    focus:border-blue-500
+                    focus:bg-white
+                    focus:ring-4
+                    focus:ring-blue-500/10
+                    dark:border-zinc-700
+                    dark:bg-zinc-950/70
+                    dark:text-white
+                    dark:placeholder:text-zinc-600
+                    dark:focus:bg-zinc-950
+                  "
+                />
+              </div>
+
+              {/* Message */}
+              <div className="mt-5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="message"
+                    className="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-200"
+                  >
+                    Message
+                    <span className="ml-1 text-blue-500">*</span>
+                  </label>
+
+                  <span className="text-[11px] text-zinc-400">
+                    Be as detailed as you like
+                  </span>
+                </div>
+
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  minLength={20}
+                  maxLength={5000}
+                  rows={7}
+                  placeholder="Tell me about the opportunity, project, technical challenge, or idea..."
+                  className="
+                    w-full
+                    resize-none
+                    rounded-xl
+                    border
+                    border-zinc-200
+                    bg-zinc-50/70
+                    px-4
+                    py-3.5
+                    text-sm
+                    leading-6
+                    text-zinc-900
+                    outline-none
+                    transition
+                    placeholder:text-zinc-400
+                    focus:border-blue-500
+                    focus:bg-white
+                    focus:ring-4
+                    focus:ring-blue-500/10
+                    dark:border-zinc-700
+                    dark:bg-zinc-950/70
+                    dark:text-white
+                    dark:placeholder:text-zinc-600
+                    dark:focus:bg-zinc-950
+                  "
+                />
+              </div>
+
+              {/* Honeypot */}
+              <div
+                aria-hidden="true"
+                className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
+              >
+                <label htmlFor="website">Website</label>
+
+                <input
+                  id="website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Status */}
+              {status === "success" && (
+                <div
+                  role="status"
+                  className="
+                    mt-5
+                    flex
+                    items-start
+                    gap-3
+                    rounded-xl
+                    border
+                    border-emerald-200
+                    bg-emerald-50
+                    p-4
+                    dark:border-emerald-900/50
+                    dark:bg-emerald-950/30
+                  "
+                >
+                  <span
+                    className="
+                      flex
+                      h-7
+                      w-7
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-full
+                      bg-emerald-500
+                      text-white
+                    "
+                  >
+                    <FaCheck className="text-xs" />
+                  </span>
+
+                  <div>
+                    <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                      Message sent successfully.
+                    </p>
+
+                    <p className="mt-0.5 text-xs leading-5 text-emerald-700/80 dark:text-emerald-400/80">
+                      Thanks for reaching out. I&apos;ll get back to you as
+                      soon as possible.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {status === "error" && (
+                <div
+                  role="alert"
+                  className="
+                    mt-5
+                    rounded-xl
+                    border
+                    border-red-200
+                    bg-red-50
+                    p-4
+                    text-sm
+                    text-red-700
+                    dark:border-red-900/50
+                    dark:bg-red-950/30
+                    dark:text-red-400
+                  "
+                >
+                  Something went wrong while sending your message. Please try
+                  again or email me directly.
+                </div>
+              )}
+
+              {/* Submit */}
+              <div className="mt-6">
+                <Button
+                  type="submit"
+                  disabled={status === "submitting"}
+                  className="
+                    group
+                    w-full
+                    justify-center
+                    py-4
+                    text-sm
+                    font-semibold
+                    shadow-lg
+                    shadow-blue-500/15
+                    disabled:cursor-not-allowed
+                    disabled:opacity-70
+                  "
+                >
+                  {status === "submitting" ? (
+                    <>
+                      <FaSpinner
+                        aria-hidden="true"
+                        className="mr-2 animate-spin"
+                      />
+
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+
+                      <FaArrowRight
+                        aria-hidden="true"
+                        className="
+                          ml-2
+                          text-xs
+                          transition-transform
+                          duration-300
+                          group-hover:translate-x-1
+                        "
+                      />
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <p className="mt-4 text-center text-[11px] leading-5 text-zinc-400 dark:text-zinc-600">
+                Your information is used only to respond to your inquiry.
+              </p>
             </form>
-
           </motion.div>
-
         </div>
 
+        {/* ========================================================= */}
+        {/* BOTTOM CTA */}
+        {/* ========================================================= */}
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="
+            mt-16
+            flex
+            flex-col
+            items-start
+            justify-between
+            gap-6
+            border-t
+            border-zinc-200/80
+            pt-8
+            sm:flex-row
+            sm:items-center
+            dark:border-zinc-800
+          "
+        >
+          <div>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+              Prefer email?
+            </p>
+
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
+              You can always reach me directly.
+            </p>
+          </div>
+
+          <a
+            href="mailto:deepakg@gmail.com"
+            className="
+              group
+              inline-flex
+              items-center
+              gap-2
+              text-sm
+              font-bold
+              text-blue-600
+              transition-colors
+              hover:text-blue-700
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-blue-500
+              focus-visible:ring-offset-4
+              dark:text-blue-400
+              dark:hover:text-blue-300
+              dark:focus-visible:ring-offset-zinc-950
+            "
+          >
+            deepakg@gmail.com
+
+            <FaArrowRight
+              aria-hidden="true"
+              className="
+                text-xs
+                transition-transform
+                duration-300
+                group-hover:translate-x-1
+              "
+            />
+          </a>
+        </motion.div>
       </div>
     </section>
   );
