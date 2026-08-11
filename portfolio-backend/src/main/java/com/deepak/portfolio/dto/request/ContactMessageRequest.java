@@ -20,8 +20,11 @@ public record ContactMessageRequest(
         String subject,
 
         @NotBlank(message = "Message is required")
-        @Size(min = 10, max = 5000, message = "Message must be between 10 and 5000 characters")
+        @Size(
+                min = 10,
+                max = 5000,
+                message = "Message must be between 10 and 5000 characters"
+        )
         String message
-
 ) {
 }
