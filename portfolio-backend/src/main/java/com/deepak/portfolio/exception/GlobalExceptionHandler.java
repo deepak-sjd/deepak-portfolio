@@ -68,6 +68,29 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+
+// ============================================================
+// CONFLICT
+// ============================================================
+
+@ExceptionHandler(IllegalArgumentException.class)
+public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+        IllegalArgumentException exception
+) {
+
+    ErrorResponse response = new ErrorResponse(
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            "Conflict",
+            exception.getMessage(),
+            Map.of()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(response);
+}
+
     // ============================================================
     // UNEXPECTED EXCEPTION
     // ============================================================

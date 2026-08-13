@@ -1,15 +1,16 @@
 package com.deepak.portfolio.service;
 
-import java.util.List;
-
 import com.deepak.portfolio.dto.request.ProjectRequest;
+import com.deepak.portfolio.dto.response.PageResponse;
 import com.deepak.portfolio.dto.response.ProjectResponse;
 import com.deepak.portfolio.entity.Project;
 import com.deepak.portfolio.exception.ResourceNotFoundException;
 import com.deepak.portfolio.repository.ProjectRepository;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ProjectService {
@@ -46,14 +47,38 @@ public class ProjectService {
     // READ ALL
     // ============================================================
 
-    @Transactional(readOnly = true)
-    public List<ProjectResponse> getAllProjects() {
+   @Transactional(readOnly = true)
+public PageResponse<ProjectResponse> getAllProjects(
+        Boolean featured,
+        Pageable pageable
+) {
 
-        return projectRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    Page<Project> projectPage;
+
+    if (featured == null) {
+        projectPage = projectRepository.findAll(pageable);
+    } else {
+        projectPage = projectRepository.findByFeatured(
+                featured,
+                pageable
+        );
     }
+
+    List<ProjectResponse> projects = projectPage.getContent()
+            .stream()
+            .map(this::toResponse)
+            .toList();
+
+    return new PageResponse<>(
+            projects,
+            projectPage.getNumber(),
+            projectPage.getSize(),
+            projectPage.getTotalElements(),
+            projectPage.getTotalPages(),
+            projectPage.isFirst(),
+            projectPage.isLast()
+    );
+}
 
     // ============================================================
     // READ BY ID

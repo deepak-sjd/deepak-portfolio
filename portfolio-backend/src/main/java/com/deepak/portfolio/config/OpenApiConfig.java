@@ -17,8 +17,9 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Deepak Portfolio API")
                         .description(
-                                "REST API for Deepak's developer portfolio, " +
-                                "including projects and contact messages."
+                                "Production REST API for Deepak Kumar's professional portfolio, "
+                                + "including projects, experience, skills, notes, about information, "
+                                + "resume, professional services, and contact messages."
                         )
                         .version("v1.0.0")
                         .contact(new Contact()
