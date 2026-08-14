@@ -6,11 +6,12 @@ import com.deepak.portfolio.dto.response.ProjectResponse;
 import com.deepak.portfolio.entity.Project;
 import com.deepak.portfolio.exception.ResourceNotFoundException;
 import com.deepak.portfolio.repository.ProjectRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ProjectService {
@@ -35,7 +36,8 @@ public class ProjectService {
                 request.githubUrl(),
                 request.liveUrl(),
                 request.imageUrl(),
-                request.featured()
+                request.featured(),
+                request.displayOrder()
         );
 
         Project savedProject = projectRepository.save(project);
@@ -47,38 +49,38 @@ public class ProjectService {
     // READ ALL
     // ============================================================
 
-   @Transactional(readOnly = true)
-public PageResponse<ProjectResponse> getAllProjects(
-        Boolean featured,
-        Pageable pageable
-) {
+    @Transactional(readOnly = true)
+    public PageResponse<ProjectResponse> getAllProjects(
+            Boolean featured,
+            Pageable pageable
+    ) {
 
-    Page<Project> projectPage;
+        Page<Project> projectPage;
 
-    if (featured == null) {
-        projectPage = projectRepository.findAll(pageable);
-    } else {
-        projectPage = projectRepository.findByFeatured(
-                featured,
-                pageable
+        if (featured == null) {
+            projectPage = projectRepository.findAll(pageable);
+        } else {
+            projectPage = projectRepository.findByFeatured(
+                    featured,
+                    pageable
+            );
+        }
+
+        List<ProjectResponse> projects = projectPage.getContent()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new PageResponse<>(
+                projects,
+                projectPage.getNumber(),
+                projectPage.getSize(),
+                projectPage.getTotalElements(),
+                projectPage.getTotalPages(),
+                projectPage.isFirst(),
+                projectPage.isLast()
         );
     }
-
-    List<ProjectResponse> projects = projectPage.getContent()
-            .stream()
-            .map(this::toResponse)
-            .toList();
-
-    return new PageResponse<>(
-            projects,
-            projectPage.getNumber(),
-            projectPage.getSize(),
-            projectPage.getTotalElements(),
-            projectPage.getTotalPages(),
-            projectPage.isFirst(),
-            projectPage.isLast()
-    );
-}
 
     // ============================================================
     // READ BY ID
@@ -121,6 +123,7 @@ public PageResponse<ProjectResponse> getAllProjects(
         project.setLiveUrl(request.liveUrl());
         project.setImageUrl(request.imageUrl());
         project.setFeatured(request.featured());
+        project.setDisplayOrder(request.displayOrder());
 
         Project updatedProject = projectRepository.save(project);
 
@@ -158,7 +161,8 @@ public PageResponse<ProjectResponse> getAllProjects(
                 project.getGithubUrl(),
                 project.getLiveUrl(),
                 project.getImageUrl(),
-                project.isFeatured()
+                project.isFeatured(),
+                project.getDisplayOrder()
         );
     }
 }

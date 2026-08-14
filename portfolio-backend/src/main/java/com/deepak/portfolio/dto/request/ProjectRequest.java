@@ -26,6 +26,8 @@ public record ProjectRequest(
         @Size(max = 500, message = "Image URL must not exceed 500 characters")
         String imageUrl,
 
-        boolean featured
+        boolean featured,
+
+        Integer displayOrder
 ) {
 }

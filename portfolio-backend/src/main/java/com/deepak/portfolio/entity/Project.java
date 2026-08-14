@@ -1,5 +1,5 @@
 package com.deepak.portfolio.entity;
-
+import java.time.OffsetDateTime;
 import jakarta.persistence.*;
 
 @Entity
@@ -31,27 +31,50 @@ public class Project {
     @Column(nullable = false)
     private boolean featured;
 
+    @Column(nullable = false)
+private Integer displayOrder;
+
+@Column(nullable = false, updatable = false)
+private OffsetDateTime createdAt;
+
+@Column(nullable = false)
+private OffsetDateTime updatedAt;
+
     protected Project() {
         // Required by JPA
     }
 
     public Project(
-            String title,
-            String description,
-            String technologies,
-            String githubUrl,
-            String liveUrl,
-            String imageUrl,
-            boolean featured
-    ) {
-        this.title = title;
-        this.description = description;
-        this.technologies = technologies;
-        this.githubUrl = githubUrl;
-        this.liveUrl = liveUrl;
-        this.imageUrl = imageUrl;
-        this.featured = featured;
-    }
+        String title,
+        String description,
+        String technologies,
+        String githubUrl,
+        String liveUrl,
+        String imageUrl,
+        boolean featured,
+        Integer displayOrder
+) {
+    this.title = title;
+    this.description = description;
+    this.technologies = technologies;
+    this.githubUrl = githubUrl;
+    this.liveUrl = liveUrl;
+    this.imageUrl = imageUrl;
+    this.featured = featured;
+    this.displayOrder = displayOrder;
+}
+
+@PrePersist
+protected void onCreate() {
+    OffsetDateTime now = OffsetDateTime.now();
+    createdAt = now;
+    updatedAt = now;
+}
+
+@PreUpdate
+protected void onUpdate() {
+    updatedAt = OffsetDateTime.now();
+}
 
     public Long getId() {
         return id;
@@ -84,6 +107,22 @@ public class Project {
     public boolean isFeatured() {
         return featured;
     }
+
+    public Integer getDisplayOrder() {
+    return displayOrder;
+}
+
+public void setDisplayOrder(Integer displayOrder) {
+    this.displayOrder = displayOrder;
+}
+
+public OffsetDateTime getCreatedAt() {
+    return createdAt;
+}
+
+public OffsetDateTime getUpdatedAt() {
+    return updatedAt;
+}
 
     public void setTitle(String title) {
         this.title = title;
