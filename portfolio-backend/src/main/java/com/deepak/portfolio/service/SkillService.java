@@ -32,7 +32,6 @@ public class SkillService {
                 skill.getId(),
                 skill.getName(),
                 skill.getCategory(),
-                skill.getProficiency(),
                 skill.getDisplayOrder()
         );
     }

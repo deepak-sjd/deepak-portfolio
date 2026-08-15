@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ExperienceRepository extends JpaRepository<Experience, Long> {
 
-    List<Experience> findAllByOrderByDisplayOrderAsc();
+    List<Experience> findAllByOrderByDisplayOrderAscStartDateDesc();
 }

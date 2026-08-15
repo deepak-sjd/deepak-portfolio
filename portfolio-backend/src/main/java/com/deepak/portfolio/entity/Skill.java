@@ -17,9 +17,6 @@ public class Skill {
     private String category;
 
     @Column(nullable = false)
-    private Integer proficiency;
-
-    @Column(nullable = false)
     private Integer displayOrder;
 
     /**
@@ -31,12 +28,10 @@ public class Skill {
     public Skill(
             String name,
             String category,
-            Integer proficiency,
             Integer displayOrder
     ) {
         this.name = name;
         this.category = category;
-        this.proficiency = proficiency;
         this.displayOrder = displayOrder;
     }
 
@@ -52,10 +47,6 @@ public class Skill {
         return category;
     }
 
-    public Integer getProficiency() {
-        return proficiency;
-    }
-
     public Integer getDisplayOrder() {
         return displayOrder;
     }
@@ -66,10 +57,6 @@ public class Skill {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public void setProficiency(Integer proficiency) {
-        this.proficiency = proficiency;
     }
 
     public void setDisplayOrder(Integer displayOrder) {

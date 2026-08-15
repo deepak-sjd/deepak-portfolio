@@ -68,28 +68,27 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    // ============================================================
+    // CONFLICT
+    // ============================================================
 
-// ============================================================
-// CONFLICT
-// ============================================================
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception
+    ) {
 
-@ExceptionHandler(IllegalArgumentException.class)
-public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-        IllegalArgumentException exception
-) {
+        ErrorResponse response = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                exception.getMessage(),
+                Map.of()
+        );
 
-    ErrorResponse response = new ErrorResponse(
-            Instant.now(),
-            HttpStatus.CONFLICT.value(),
-            "Conflict",
-            exception.getMessage(),
-            Map.of()
-    );
-
-    return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(response);
-}
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
 
     // ============================================================
     // UNEXPECTED EXCEPTION
@@ -100,11 +99,21 @@ public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             Exception exception
     ) {
 
+        // IMPORTANT:
+        // Temporarily print the real exception in the backend terminal.
+        // This helps us identify the actual cause of HTTP 500 errors.
+        exception.printStackTrace();
+
         ErrorResponse response = new ErrorResponse(
                 Instant.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                "An unexpected error occurred.",
+
+                // TEMPORARY DEBUG MESSAGE
+                exception.getMessage() != null
+                        ? exception.getMessage()
+                        : exception.getClass().getSimpleName(),
+
                 Map.of()
         );
 
