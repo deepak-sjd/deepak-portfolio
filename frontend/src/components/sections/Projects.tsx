@@ -1,6 +1,18 @@
 "use client";
 
+import {
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+
 import { motion } from "framer-motion";
+
+import {
+  getProjects,
+  type ProjectApiResponse,
+} from "@/lib/api/projects";
+
 import {
   FaArrowRight,
   FaExternalLinkAlt,
@@ -20,151 +32,93 @@ type Project = {
   status: "Production Focus" | "Engineering Project" | "Concept";
 };
 
-const projects: Project[] = [
-  {
-    title: "Smart Manufacturing Time Study AI",
+const projectMetadata: Record<
+  string,
+  Pick<Project, "category" | "eyebrow" | "status">
+> = {
+  "Smart Manufacturing Time Study AI": {
     category: "Computer Vision",
     eyebrow: "Industrial AI · Activity Recognition",
-    description:
-      "AI-powered manufacturing activity recognition system that analyzes video workflows, identifies activities, generates timestamped timelines, and transforms operational data into productivity and bottleneck insights.",
-    technologies: [
-      "Python",
-      "PyTorch",
-      "VideoMAE",
-      "OpenCV",
-      "FastAPI",
-      "Pandas",
-    ],
-    github: "#",
-    demo: "#",
-    featured: true,
     status: "Production Focus",
   },
-  {
-    title: "Enterprise RAG Document Assistant",
+
+  "Enterprise RAG Document Assistant": {
     category: "Generative AI",
     eyebrow: "RAG · Enterprise Knowledge",
-    description:
-      "Retrieval-augmented document intelligence system designed to retrieve relevant enterprise knowledge and generate grounded responses from technical documentation.",
-    technologies: [
-      "Python",
-      "LangChain",
-      "LLM",
-      "RAG",
-      "Milvus",
-      "Docker",
-    ],
-    github: "#",
-    demo: "#",
-    featured: true,
     status: "Engineering Project",
   },
-  {
-    title: "AI Fault Investigation Assistant",
+
+  "AI Fault Investigation Assistant": {
     category: "Enterprise AI",
     eyebrow: "RAG · Engineering Intelligence",
-    description:
-      "Engineering assistant for investigating machine faults by retrieving relevant maintenance knowledge and generating contextual answers from technical documentation.",
-    technologies: [
-      "Python",
-      "RAG",
-      "LLM",
-      "FastAPI",
-      "Vector DB",
-    ],
-    github: "#",
-    demo: "#",
     status: "Engineering Project",
   },
-  {
-    title: "Natural Language → SQL Assistant",
+
+  "Natural Language → SQL Assistant": {
     category: "AI + Backend",
     eyebrow: "LLM · Data Applications",
-    description:
-      "Natural-language interface for relational databases that translates business questions into SQL, validates generated queries, executes them, and returns structured results through an application backend.",
-    technologies: [
-      "Python",
-      "LLM",
-      "SQL",
-      "Spring Boot",
-      "PostgreSQL",
-      "REST API",
-    ],
-    github: "#",
-    demo: "#",
     status: "Engineering Project",
   },
-  {
-    title: "AI Customer Support Assistant",
+
+  "AI Customer Support Assistant": {
     category: "AI + Full Stack",
     eyebrow: "Conversational AI · Full Stack",
-    description:
-      "Full-stack customer support application combining conversational AI and retrieval-based context to help users resolve product and service-related questions.",
-    technologies: [
-      "Python",
-      "LLM",
-      "RAG",
-      "Java",
-      "Spring Boot",
-      "React",
-    ],
-    github: "#",
-    demo: "#",
     status: "Engineering Project",
   },
-  {
-    title: "AI Resume Analyzer",
+
+  "AI Resume Analyzer": {
     category: "Generative AI",
     eyebrow: "NLP · Document Intelligence",
-    description:
-      "AI-powered resume analysis application that extracts structured candidate information, identifies relevant skills, and produces useful insights through an LLM-based processing pipeline.",
-    technologies: [
-      "Python",
-      "LLM",
-      "NLP",
-      "React",
-      "FastAPI",
-    ],
-    github: "#",
-    demo: "#",
     status: "Concept",
   },
-  {
-    title: "Invoice Intelligence System",
+
+  "Invoice Intelligence System": {
     category: "Document AI",
     eyebrow: "OCR · Intelligent Extraction",
-    description:
-      "Document processing workflow for extracting structured invoice information from unstructured documents and preparing normalized data for downstream business workflows.",
-    technologies: [
-      "Python",
-      "OCR",
-      "LLM",
-      "FastAPI",
-      "RAG",
-    ],
-    github: "#",
-    demo: "#",
     status: "Concept",
   },
-  {
-    title: "Electronic Store",
+
+  "Electronic Store": {
     category: "Java Full Stack",
     eyebrow: "Backend · E-Commerce",
-    description:
-      "Backend-focused e-commerce application built around REST APIs, authentication, authorization, product management, and relational persistence using a modern Java backend stack.",
-    technologies: [
-      "Java",
-      "Spring Boot",
-      "Spring Security",
-      "JWT",
-      "REST API",
-      "SQL",
-    ],
-    github: "#",
-    demo: "#",
     status: "Engineering Project",
   },
-];
+};
+
+function mapApiProject(project: ProjectApiResponse): Project {
+  const metadata = projectMetadata[project.title];
+
+  return {
+    title: project.title,
+
+    category:
+      metadata?.category ?? "Engineering Project",
+
+    eyebrow:
+      metadata?.eyebrow ?? "Software Engineering",
+
+    description:
+      project.description,
+
+    technologies:
+      project.technologies
+        .split(",")
+        .map((technology) => technology.trim())
+        .filter(Boolean),
+
+    github:
+      project.githubUrl || undefined,
+
+    demo:
+      project.liveUrl || undefined,
+
+    featured:
+      project.featured,
+
+    status:
+      metadata?.status ?? "Engineering Project",
+  };
+}
 
 const categoryStyles: Record<string, string> = {
   "Computer Vision":
@@ -198,7 +152,7 @@ function ProjectAction({
 }: {
   href?: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   primary?: boolean;
   projectTitle: string;
 }) {
@@ -279,7 +233,6 @@ function ProjectVisual({
         ${featured ? "h-48" : "h-36"}
       `}
     >
-      {/* Grid */}
       <div
         className="
           absolute inset-0
@@ -290,7 +243,6 @@ function ProjectVisual({
         "
       />
 
-      {/* Ambient glow */}
       <div
         className="
           absolute
@@ -304,7 +256,6 @@ function ProjectVisual({
         "
       />
 
-      {/* System representation */}
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <div className="flex w-full max-w-sm items-center justify-center gap-2">
           <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_14px_rgba(59,130,246,0.6)]" />
@@ -356,7 +307,6 @@ function ProjectVisual({
         </div>
       </div>
 
-      {/* Project index */}
       <div
         className="
           absolute left-4 top-4
@@ -369,7 +319,6 @@ function ProjectVisual({
         {project.category}
       </div>
 
-      {/* Decorative corner */}
       <div
         className="
           absolute bottom-4 right-4
@@ -424,7 +373,6 @@ function ProjectCard({
       <ProjectVisual project={project} />
 
       <div className="mt-6 flex flex-1 flex-col">
-        {/* Category */}
         <div className="flex items-center justify-between gap-3">
           <span
             className={`
@@ -458,7 +406,6 @@ function ProjectCard({
           </span>
         </div>
 
-        {/* Eyebrow */}
         <p
           className="
             mt-5
@@ -473,7 +420,6 @@ function ProjectCard({
           {project.eyebrow}
         </p>
 
-        {/* Title */}
         <h3
           className="
             mt-2
@@ -487,7 +433,6 @@ function ProjectCard({
           {project.title}
         </h3>
 
-        {/* Description */}
         <p
           className="
             mt-4
@@ -500,7 +445,6 @@ function ProjectCard({
           {project.description}
         </p>
 
-        {/* Stack */}
         <div className="mt-6">
           <p
             className="
@@ -543,7 +487,6 @@ function ProjectCard({
           </div>
         </div>
 
-        {/* Status */}
         <div
           className="
             mt-6
@@ -569,7 +512,6 @@ function ProjectCard({
           {project.status}
         </div>
 
-        {/* Actions */}
         <div className="mt-auto flex flex-wrap gap-3 pt-7">
           <ProjectAction
             href={project.github}
@@ -766,6 +708,33 @@ function FeaturedProject({
 }
 
 export default function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getProjects();
+
+        setProjects(data.map(mapApiProject));
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load projects."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProjects();
+  }, []);
+
   const featuredProjects = projects.filter(
     (project) => project.featured
   );
@@ -789,10 +758,6 @@ export default function Projects() {
         lg:py-32
       "
     >
-      {/* ========================================================= */}
-      {/* BACKGROUND */}
-      {/* ========================================================= */}
-
       <div
         aria-hidden="true"
         className="
@@ -819,9 +784,8 @@ export default function Projects() {
       />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        {/* ========================================================= */}
+
         {/* HEADER */}
-        {/* ========================================================= */}
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -904,80 +868,150 @@ export default function Projects() {
           </p>
         </motion.div>
 
-        {/* ========================================================= */}
-        {/* FEATURED PROJECTS */}
-        {/* ========================================================= */}
+        {/* LOADING */}
 
-        <div className="mt-14 space-y-6 lg:mt-16">
-          {featuredProjects.map((project, index) => (
-            <FeaturedProject
-              key={project.title}
-              project={project}
-              index={index}
-            />
-          ))}
-        </div>
+        {loading && (
+          <div
+            className="
+              mt-14
+              rounded-2xl
+              border border-zinc-200
+              bg-white
+              p-8
+              text-center
+              text-sm
+              text-zinc-500
+              dark:border-zinc-800
+              dark:bg-zinc-900
+              dark:text-zinc-400
+            "
+          >
+            Loading projects...
+          </div>
+        )}
 
-        {/* ========================================================= */}
-        {/* OTHER PROJECTS */}
-        {/* ========================================================= */}
+        {/* ERROR */}
 
-        <div className="mt-16">
-          <div className="mb-7 flex items-end justify-between gap-5">
-            <div>
-              <p
+        {!loading && error && (
+          <div
+            className="
+              mt-14
+              rounded-2xl
+              border border-red-200
+              bg-red-50
+              p-8
+              text-center
+              text-sm
+              text-red-600
+              dark:border-red-900/50
+              dark:bg-red-950/20
+              dark:text-red-400
+            "
+          >
+            {error}
+          </div>
+        )}
+
+        {/* PROJECT CONTENT */}
+
+        {!loading && !error && (
+          <>
+            {/* FEATURED PROJECTS */}
+
+            {featuredProjects.length > 0 && (
+              <div className="mt-14 space-y-6 lg:mt-16">
+                {featuredProjects.map((project, index) => (
+                  <FeaturedProject
+                    key={project.title}
+                    project={project}
+                    index={index}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* OTHER PROJECTS */}
+
+            {standardProjects.length > 0 && (
+              <div className="mt-16">
+                <div className="mb-7 flex items-end justify-between gap-5">
+                  <div>
+                    <p
+                      className="
+                        text-[10px]
+                        font-bold
+                        uppercase
+                        tracking-[0.2em]
+                        text-zinc-400
+                      "
+                    >
+                      More Engineering Work
+                    </p>
+
+                    <h3
+                      className="
+                        mt-2
+                        text-2xl
+                        font-bold
+                        tracking-tight
+                        text-zinc-950
+                        dark:text-white
+                      "
+                    >
+                      Other projects
+                    </h3>
+                  </div>
+
+                  <span
+                    className="
+                      hidden
+                      text-xs
+                      font-medium
+                      text-zinc-400
+                      sm:block
+                    "
+                  >
+                    {standardProjects.length} projects
+                  </span>
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {standardProjects.map((project, index) => (
+                    <ProjectCard
+                      key={project.title}
+                      project={project}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* EMPTY STATE */}
+
+            {projects.length === 0 && (
+              <div
                 className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.2em]
-                  text-zinc-400
+                  mt-14
+                  rounded-2xl
+                  border border-zinc-200
+                  bg-white
+                  p-8
+                  text-center
+                  text-sm
+                  text-zinc-500
+                  dark:border-zinc-800
+                  dark:bg-zinc-900
+                  dark:text-zinc-400
                 "
               >
-                More Engineering Work
-              </p>
+                No projects available.
+              </div>
+            )}
+          </>
+        )}
 
-              <h3
-                className="
-                  mt-2
-                  text-2xl
-                  font-bold
-                  tracking-tight
-                  text-zinc-950
-                  dark:text-white
-                "
-              >
-                Other projects
-              </h3>
-            </div>
-
-            <span
-              className="
-                hidden
-                text-xs
-                font-medium
-                text-zinc-400
-                sm:block
-              "
-            >
-              {standardProjects.length} projects
-            </span>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {standardProjects.map((project, index) => (
-              <ProjectCard
-                key={project.title}
-                project={project}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ========================================================= */}
         {/* BOTTOM CTA */}
-        {/* ========================================================= */}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
