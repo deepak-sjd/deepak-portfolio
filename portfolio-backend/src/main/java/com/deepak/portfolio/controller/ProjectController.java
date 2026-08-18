@@ -1,7 +1,4 @@
 package com.deepak.portfolio.controller;
-
-import java.util.List;
-
 import com.deepak.portfolio.dto.request.ProjectRequest;
 import com.deepak.portfolio.dto.response.ProjectResponse;
 import com.deepak.portfolio.service.ProjectService;

@@ -533,9 +533,10 @@ export default function About() {
 
             {/* Actions */}
             <div className="mt-10 flex flex-wrap items-center gap-5">
-              <Button href="/resume.pdf">
+              <Button href="/resume.pdf"
+               className="..."
+               >
                 Download Resume
-
                 <FaArrowRight
                   aria-hidden="true"
                   className="ml-2 text-xs"
