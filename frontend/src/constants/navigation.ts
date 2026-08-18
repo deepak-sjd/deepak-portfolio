@@ -15,6 +15,13 @@ export const NAV_ITEMS = [
     label: "Projects",
     href: "#projects",
   },
+
+   { label: "Services", 
+    href: "#services" 
+  },
+
+  { label: "Notes",
+     href: "#notes" },
   {
     label: "Experience",
     href: "#experience",

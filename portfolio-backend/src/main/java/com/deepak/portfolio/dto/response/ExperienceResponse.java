@@ -13,7 +13,8 @@ public record ExperienceResponse(
         LocalDate endDate,
         boolean current,
         String description,
-        Integer displayOrder
+        Integer displayOrder,
+        String cgpa
 
 ) {
 }

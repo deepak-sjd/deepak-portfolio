@@ -35,7 +35,8 @@ public class ExperienceService {
                 request.endDate(),
                 request.current(),
                 request.description(),
-                request.displayOrder()
+                request.displayOrder(),
+                request.cgpa()
         );
 
         Experience savedExperience = experienceRepository.save(experience);
@@ -90,6 +91,7 @@ public class ExperienceService {
         experience.setCurrent(request.current());
         experience.setDescription(request.description());
         experience.setDisplayOrder(request.displayOrder());
+        experience.setCgpa(request.cgpa());
 
         Experience updatedExperience = experienceRepository.save(experience);
 
@@ -138,7 +140,8 @@ public class ExperienceService {
                 experience.getEndDate(),
                 experience.isCurrent(),
                 experience.getDescription(),
-                experience.getDisplayOrder()
+                experience.getDisplayOrder(),
+                experience.getCgpa()
         );
     }
 }

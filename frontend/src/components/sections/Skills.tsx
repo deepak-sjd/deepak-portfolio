@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaDocker,
@@ -20,115 +21,175 @@ import {
   SiTypescript,
 } from "react-icons/si";
 
+import {
+  getSkills,
+  type SkillApiResponse,
+} from "@/lib/api/skills";
+
 type SkillCategory =
-  | "AI & Machine Learning"
-  | "Backend Engineering"
-  | "Frontend Engineering"
-  | "Data & Infrastructure";
+  | "AI/ML"
+  | "Generative AI"
+  | "Backend"
+  | "Frontend"
+  | "Database"
+  | "DevOps";
 
 type Skill = {
+  id: number;
   name: string;
   icon: React.ReactNode;
   category: SkillCategory;
   description: string;
   featured?: boolean;
+  displayOrder: number;
 };
 
-const skills: Skill[] = [
+/*
+|--------------------------------------------------------------------------
+| UI metadata
+|--------------------------------------------------------------------------
+| The backend currently stores only:
+| id, name, category, displayOrder
+|
+| These values are presentation metadata and therefore remain in the
+| frontend for now.
+|--------------------------------------------------------------------------
+*/
+
+const skillMetadata: Record<
+  string,
   {
-    name: "Python",
+    description: string;
+    featured?: boolean;
+    icon: React.ReactNode;
+  }
+> = {
+  Python: {
     icon: <FaPython aria-hidden="true" />,
-    category: "AI & Machine Learning",
-    description: "AI pipelines, data processing and model development",
+    description:
+      "AI pipelines, data processing and model development",
     featured: true,
   },
-  {
-    name: "PyTorch",
+
+  PyTorch: {
     icon: <SiPytorch aria-hidden="true" />,
-    category: "AI & Machine Learning",
-    description: "Deep learning and computer vision",
+    description:
+      "Deep learning and computer vision",
     featured: true,
   },
-  {
-    name: "TensorFlow",
+
+  TensorFlow: {
     icon: <SiTensorflow aria-hidden="true" />,
-    category: "AI & Machine Learning",
-    description: "Machine learning and neural networks",
+    description:
+      "Machine learning and neural networks",
   },
-  {
-    name: "LangChain",
+
+  LangChain: {
     icon: <SiLangchain aria-hidden="true" />,
-    category: "AI & Machine Learning",
-    description: "LLM applications and retrieval pipelines",
+    description:
+      "LLM applications and retrieval pipelines",
     featured: true,
   },
-  {
-    name: "Java",
+
+  Java: {
     icon: <FaJava aria-hidden="true" />,
-    category: "Backend Engineering",
-    description: "Object-oriented and enterprise application development",
+    description:
+      "Object-oriented and enterprise application development",
     featured: true,
   },
-  {
-    name: "Spring Boot",
+
+  "Spring Boot": {
     icon: <SiSpringboot aria-hidden="true" />,
-    category: "Backend Engineering",
-    description: "REST APIs, services and backend systems",
+    description:
+      "REST APIs, services and backend systems",
     featured: true,
   },
-  {
-    name: "FastAPI",
+
+  FastAPI: {
     icon: <SiFastapi aria-hidden="true" />,
-    category: "Backend Engineering",
-    description: "High-performance Python APIs and AI services",
+    description:
+      "High-performance Python APIs and AI services",
   },
-  {
-    name: "React",
+
+  React: {
     icon: <FaReact aria-hidden="true" />,
-    category: "Frontend Engineering",
-    description: "Component-based application interfaces",
+    description:
+      "Component-based application interfaces",
     featured: true,
   },
-  {
-    name: "Next.js",
+
+  "Next.js": {
     icon: <SiNextdotjs aria-hidden="true" />,
-    category: "Frontend Engineering",
-    description: "Production-ready React applications",
+    description:
+      "Production-ready React applications",
     featured: true,
   },
-  {
-    name: "TypeScript",
+
+  TypeScript: {
     icon: <SiTypescript aria-hidden="true" />,
-    category: "Frontend Engineering",
-    description: "Type-safe modern web development",
+    description:
+      "Type-safe modern web development",
   },
-  {
-    name: "PostgreSQL",
+
+  PostgreSQL: {
     icon: <SiPostgresql aria-hidden="true" />,
-    category: "Data & Infrastructure",
-    description: "Relational data modeling and persistence",
+    description:
+      "Relational data modeling and persistence",
     featured: true,
   },
-  {
-    name: "MySQL",
+
+  MySQL: {
     icon: <SiMysql aria-hidden="true" />,
-    category: "Data & Infrastructure",
-    description: "Relational databases and SQL",
+    description:
+      "Relational databases and SQL",
   },
-  {
-    name: "Docker",
+
+  Docker: {
     icon: <FaDocker aria-hidden="true" />,
-    category: "Data & Infrastructure",
-    description: "Containerization and reproducible environments",
+    description:
+      "Containerization and reproducible environments",
     featured: true,
   },
-  {
-    name: "Git",
+
+  Git: {
     icon: <FaGitAlt aria-hidden="true" />,
-    category: "Data & Infrastructure",
-    description: "Version control and collaborative development",
+    description:
+      "Version control and collaborative development",
   },
-];
+};
+
+/*
+|--------------------------------------------------------------------------
+| API → UI mapping
+|--------------------------------------------------------------------------
+*/
+
+function mapApiSkill(skill: SkillApiResponse): Skill {
+  const metadata = skillMetadata[skill.name];
+
+  return {
+    id: skill.id,
+    name: skill.name,
+    category: skill.category as SkillCategory,
+    displayOrder: skill.displayOrder,
+
+    icon:
+      metadata?.icon ?? (
+        <span
+          aria-hidden="true"
+          className="text-sm font-bold"
+        >
+          {skill.name.charAt(0)}
+        </span>
+      ),
+
+    description:
+      metadata?.description ??
+      "Technology used in software engineering and application development.",
+
+    featured: metadata?.featured ?? false,
+  };
+}
 
 const categories: {
   name: SkillCategory;
@@ -136,32 +197,71 @@ const categories: {
   description: string;
 }[] = [
   {
-    name: "AI & Machine Learning",
+    name: "AI/ML",
     eyebrow: "01 / INTELLIGENCE",
     description:
-      "Building intelligent applications, ML pipelines and LLM-powered systems.",
+      "Machine learning, deep learning and computer vision systems.",
   },
   {
-    name: "Backend Engineering",
-    eyebrow: "02 / SERVICES",
+    name: "Generative AI",
+    eyebrow: "02 / GENERATION",
+    description:
+      "LLMs, RAG and modern generative AI applications.",
+  },
+  {
+    name: "Backend",
+    eyebrow: "03 / SERVICES",
     description:
       "Designing APIs, services and maintainable backend architectures.",
   },
   {
-    name: "Frontend Engineering",
-    eyebrow: "03 / INTERFACES",
+    name: "Frontend",
+    eyebrow: "04 / INTERFACES",
     description:
       "Creating responsive, accessible and production-quality web experiences.",
   },
   {
-    name: "Data & Infrastructure",
-    eyebrow: "04 / PLATFORM",
+    name: "Database",
+    eyebrow: "05 / DATA",
     description:
-      "Working with data persistence, containers and development infrastructure.",
+      "Relational databases and reliable data persistence.",
+  },
+  {
+    name: "DevOps",
+    eyebrow: "06 / PLATFORM",
+    description:
+      "Containerization, version control and development infrastructure.",
   },
 ];
 
 export default function Skills() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadSkills() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getSkills();
+
+        setSkills(data.map(mapApiSkill));
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load skills."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadSkills();
+  }, []);
+
   return (
     <section
       id="skills"
@@ -186,6 +286,7 @@ export default function Skills() {
       />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -244,111 +345,150 @@ export default function Skills() {
           ))}
         </motion.div>
 
+        {/* Loading */}
+        {loading && (
+          <div className="mt-14 rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+            Loading skills...
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="mt-14 rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+            {error}
+          </div>
+        )}
+
         {/* Categories */}
-        <div className="mt-16 space-y-14">
-          {categories.map((category, categoryIndex) => {
-            const categorySkills = skills.filter(
-              (skill) => skill.category === category.name,
-            );
+        {!loading && !error && (
+          <div className="mt-16 space-y-14">
+            {categories.map((category, categoryIndex) => {
+              const categorySkills = skills
+                .filter(
+                  (skill) => skill.category === category.name
+                )
+                .sort(
+                  (a, b) =>
+                    a.displayOrder - b.displayOrder
+                );
 
-            return (
-              <motion.section
-                key={category.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.12 }}
-                transition={{
-                  duration: 0.55,
-                  delay: categoryIndex * 0.06,
-                  ease: "easeOut",
-                }}
-                aria-labelledby={`skill-category-${categoryIndex}`}
-              >
-                {/* Category heading */}
-                <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end">
-                  <div className="min-w-0">
-                    <p className="font-mono text-[10px] font-bold tracking-[0.2em] text-blue-600 dark:text-blue-400">
-                      {category.eyebrow}
-                    </p>
+              return (
+                <motion.section
+                  key={category.name}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{
+                    once: true,
+                    amount: 0.12,
+                  }}
+                  transition={{
+                    duration: 0.55,
+                    delay: categoryIndex * 0.06,
+                    ease: "easeOut",
+                  }}
+                  aria-labelledby={`skill-category-${categoryIndex}`}
+                >
+                  {/* Category heading */}
+                  <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end">
+                    <div className="min-w-0">
+                      <p className="font-mono text-[10px] font-bold tracking-[0.2em] text-blue-600 dark:text-blue-400">
+                        {category.eyebrow}
+                      </p>
 
-                    <h3
-                      id={`skill-category-${categoryIndex}`}
-                      className="mt-2 text-xl font-bold tracking-tight text-zinc-950 dark:text-white"
-                    >
-                      {category.name}
-                    </h3>
+                      <h3
+                        id={`skill-category-${categoryIndex}`}
+                        className="mt-2 text-xl font-bold tracking-tight text-zinc-950 dark:text-white"
+                      >
+                        {category.name}
+                      </h3>
 
-                    <p className="mt-1.5 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-                      {category.description}
-                    </p>
+                      <p className="mt-1.5 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                        {category.description}
+                      </p>
+                    </div>
+
+                    <div
+                      aria-hidden="true"
+                      className="hidden h-px flex-1 bg-zinc-200 dark:bg-zinc-800 lg:block"
+                    />
+
+                    <span className="font-mono text-xs font-medium text-zinc-400 dark:text-zinc-600">
+                      {String(categorySkills.length).padStart(
+                        2,
+                        "0"
+                      )}{" "}
+                      technologies
+                    </span>
                   </div>
 
-                  <div
-                    aria-hidden="true"
-                    className="hidden h-px flex-1 bg-zinc-200 dark:bg-zinc-800 lg:block"
-                  />
+                  {/* Technology grid */}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {categorySkills.map(
+                      (skill, index) => (
+                        <motion.div
+                          key={skill.id}
+                          initial={{
+                            opacity: 0,
+                            y: 14,
+                          }}
+                          whileInView={{
+                            opacity: 1,
+                            y: 0,
+                          }}
+                          viewport={{
+                            once: true,
+                            amount: 0.1,
+                          }}
+                          transition={{
+                            duration: 0.4,
+                            delay: index * 0.05,
+                            ease: "easeOut",
+                          }}
+                          whileHover={{ y: -3 }}
+                          className="group relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-white/80 p-5 shadow-[0_8px_30px_-24px_rgba(24,24,27,0.35)] backdrop-blur-sm transition-all duration-300 hover:border-blue-200 hover:shadow-[0_18px_40px_-24px_rgba(37,99,235,0.25)] dark:border-zinc-800 dark:bg-zinc-900/70 dark:hover:border-blue-900/70"
+                        >
+                          {/* Top accent */}
+                          <div
+                            aria-hidden="true"
+                            className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 transition-transform duration-300 group-hover:scale-x-100"
+                          />
 
-                  <span className="font-mono text-xs font-medium text-zinc-400 dark:text-zinc-600">
-                    {String(categorySkills.length).padStart(2, "0")}{" "}
-                    technologies
-                  </span>
-                </div>
+                          <div className="flex items-start gap-4">
 
-                {/* Technology grid */}
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {categorySkills.map((skill, index) => (
-                    <motion.div
-                      key={skill.name}
-                      initial={{ opacity: 0, y: 14 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.1 }}
-                      transition={{
-                        duration: 0.4,
-                        delay: index * 0.05,
-                        ease: "easeOut",
-                      }}
-                      whileHover={{ y: -3 }}
-                      className="group relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-white/80 p-5 shadow-[0_8px_30px_-24px_rgba(24,24,27,0.35)] backdrop-blur-sm transition-all duration-300 hover:border-blue-200 hover:shadow-[0_18px_40px_-24px_rgba(37,99,235,0.25)] dark:border-zinc-800 dark:bg-zinc-900/70 dark:hover:border-blue-900/70"
-                    >
-                      {/* Top accent */}
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 transition-transform duration-300 group-hover:scale-x-100"
-                      />
+                            {/* Icon */}
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-xl text-zinc-700 transition-all duration-300 group-hover:border-blue-200 group-hover:bg-blue-50 group-hover:text-blue-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:group-hover:border-blue-900 dark:group-hover:bg-blue-950/40 dark:group-hover:text-blue-400">
+                              {skill.icon}
+                            </div>
 
-                      <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-xl text-zinc-700 transition-all duration-300 group-hover:border-blue-200 group-hover:bg-blue-50 group-hover:text-blue-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:group-hover:border-blue-900 dark:group-hover:bg-blue-950/40 dark:group-hover:text-blue-400">
-                          {skill.icon}
-                        </div>
+                            {/* Content */}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="truncate text-sm font-bold text-zinc-950 dark:text-white">
+                                  {skill.name}
+                                </h4>
 
-                        {/* Content */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="truncate text-sm font-bold text-zinc-950 dark:text-white">
-                              {skill.name}
-                            </h4>
+                                {skill.featured && (
+                                  <span
+                                    aria-label="Core technology"
+                                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
+                                  />
+                                )}
+                              </div>
 
-                            {skill.featured && (
-                              <span
-                                aria-label="Core technology"
-                                className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
-                              />
-                            )}
+                              <p className="mt-1.5 text-xs leading-5 text-zinc-500 dark:text-zinc-500">
+                                {skill.description}
+                              </p>
+                            </div>
                           </div>
-
-                          <p className="mt-1.5 text-xs leading-5 text-zinc-500 dark:text-zinc-500">
-                            {skill.description}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-            );
-          })}
-        </div>
+                        </motion.div>
+                      )
+                    )}
+                  </div>
+                </motion.section>
+              );
+            })}
+          </div>
+        )}
 
         {/* Closing statement */}
         <motion.div
@@ -370,6 +510,7 @@ export default function Skills() {
             </span>
           </div>
         </motion.div>
+
       </div>
     </section>
   );

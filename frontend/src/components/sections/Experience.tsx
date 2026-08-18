@@ -1,66 +1,112 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
+  FaArrowRight,
   FaBriefcase,
   FaGraduationCap,
   FaMapMarkerAlt,
-  FaArrowRight,
-  FaCircle,
 } from "react-icons/fa";
 
+import {
+  getExperiences,
+  type ExperienceApiResponse,
+} from "@/lib/api/experiences";
+
+/* ==========================================================================
+   Types
+   ========================================================================== */
+
 type TimelineItem = {
+  id: number;
   year: string;
   title: string;
   organization: string;
   location: string;
   type: string;
   description: string;
-  technologies: string[];
+  cgpa: string | null;
   icon: typeof FaBriefcase;
-  current?: boolean;
+  current: boolean;
 };
 
-const timeline: TimelineItem[] = [
-  {
-    year: "2025 — Present",
-    title: "AI Engineer",
-    organization: "L&T Technology Services (LTTS)",
-    location: "Chennai, India",
-    type: "Professional Experience",
-    description:
-      "Working on enterprise AI initiatives spanning retrieval-augmented generation, computer vision, and intelligent manufacturing solutions. Focused on translating AI capabilities into practical engineering systems with reliable backend services, data pipelines, and usable applications.",
-    technologies: [
-      "Python",
-      "Generative AI",
-      "RAG",
-      "Computer Vision",
-      "Deep Learning",
-      "FastAPI",
-    ],
-    icon: FaBriefcase,
-    current: true,
-  },
-  {
-    year: "2021 — 2025",
-    title: "Bachelor of Engineering in Computer Science",
-    organization: "Chandigarh University",
-    location: "Chandigarh, India",
-    type: "Education",
-    description:
-      "Developed a strong foundation in computer science and software engineering through coursework and hands-on projects spanning algorithms, databases, Java, web development, artificial intelligence, and machine learning.",
-    technologies: [
-      "Java",
-      "Python",
-      "SQL",
-      "Data Structures",
-      "AI / ML",
-    ],
-    icon: FaGraduationCap,
-  },
-];
+/* ==========================================================================
+   API → UI Mapping
+   ========================================================================== */
+
+function mapApiExperience(
+  experience: ExperienceApiResponse,
+): TimelineItem {
+  const startYear = new Date(
+    experience.startDate,
+  ).getFullYear();
+
+  const endYear = experience.current
+    ? "Present"
+    : experience.endDate
+      ? new Date(experience.endDate).getFullYear().toString()
+      : "";
+
+  return {
+    id: experience.id,
+    year: `${startYear} — ${endYear}`,
+    title: experience.role,
+    organization: experience.company,
+    location: experience.location,
+    type: experience.employmentType,
+    description: experience.description,
+    cgpa:experience.cgpa,
+    icon: experience.current
+      ? FaBriefcase
+      : FaGraduationCap,
+    current: experience.current,
+  };
+}
+
+/* ==========================================================================
+   Experience Section
+   ========================================================================== */
 
 export default function Experience() {
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  /* ------------------------------------------------------------------------
+     Load experiences from backend
+     ------------------------------------------------------------------------ */
+
+  useEffect(() => {
+    async function loadExperiences() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getExperiences();
+
+        const mappedExperiences = data
+          .map(mapApiExperience)
+          .sort(
+            (a, b) =>
+              a.id - b.id,
+          );
+
+        setTimeline(mappedExperiences);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load experiences.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadExperiences();
+  }, []);
+
   return (
     <section
       id="experience"
@@ -106,6 +152,7 @@ export default function Experience() {
       />
 
       {/* Subtle engineering grid */}
+
       <div
         aria-hidden="true"
         className="
@@ -123,9 +170,18 @@ export default function Experience() {
         {/* ========================================================= */}
 
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
+          initial={{
+            opacity: 0,
+            y: 24,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.3,
+          }}
           transition={{
             duration: 0.65,
             ease: "easeOut",
@@ -196,8 +252,9 @@ export default function Experience() {
               md:text-lg
             "
           >
-            A snapshot of the professional experience and academic foundation
-            behind my work across AI engineering and software development.
+            A snapshot of the professional experience and
+            academic foundation behind my work across AI
+            engineering and software development.
           </p>
         </motion.div>
 
@@ -206,9 +263,18 @@ export default function Experience() {
         {/* ========================================================= */}
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.25,
+          }}
           transition={{
             duration: 0.6,
             delay: 0.1,
@@ -234,7 +300,14 @@ export default function Experience() {
               dark:bg-zinc-900/90
             "
           >
-            <div className="px-6 py-5 sm:border-r sm:border-zinc-200 dark:sm:border-zinc-800">
+            <div
+              className="
+                px-6 py-5
+                sm:border-r
+                sm:border-zinc-200
+                dark:sm:border-zinc-800
+              "
+            >
               <p
                 className="
                   text-[10px] font-bold uppercase
@@ -256,7 +329,16 @@ export default function Experience() {
               </p>
             </div>
 
-            <div className="border-t border-zinc-200 px-6 py-5 sm:border-t-0 sm:border-r dark:border-zinc-800">
+            <div
+              className="
+                border-t
+                border-zinc-200
+                px-6 py-5
+                sm:border-t-0
+                sm:border-r
+                dark:border-zinc-800
+              "
+            >
               <p
                 className="
                   text-[10px] font-bold uppercase
@@ -278,7 +360,15 @@ export default function Experience() {
               </p>
             </div>
 
-            <div className="border-t border-zinc-200 px-6 py-5 sm:border-t-0 dark:border-zinc-800">
+            <div
+              className="
+                border-t
+                border-zinc-200
+                px-6 py-5
+                sm:border-t-0
+                dark:border-zinc-800
+              "
+            >
               <p
                 className="
                   text-[10px] font-bold uppercase
@@ -303,138 +393,238 @@ export default function Experience() {
         </motion.div>
 
         {/* ========================================================= */}
+        {/* LOADING STATE */}
+        {/* ========================================================= */}
+
+        {loading && (
+          <div
+            className="
+              mt-14
+              rounded-2xl
+              border border-zinc-200
+              bg-white
+              p-8
+              text-center
+              text-sm
+              text-zinc-500
+              dark:border-zinc-800
+              dark:bg-zinc-900
+              dark:text-zinc-400
+            "
+          >
+            Loading experience...
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* ERROR STATE */}
+        {/* ========================================================= */}
+
+        {error && (
+          <div
+            className="
+              mt-14
+              rounded-2xl
+              border border-red-200
+              bg-red-50
+              p-8
+              text-center
+              text-sm
+              text-red-600
+              dark:border-red-900/50
+              dark:bg-red-950/20
+              dark:text-red-400
+            "
+          >
+            {error}
+          </div>
+        )}
+
+        {/* ========================================================= */}
         {/* TIMELINE */}
         {/* ========================================================= */}
 
-        <div className="relative mt-16 lg:mt-20">
-          {/* Desktop timeline */}
-          <motion.div
-            initial={{ scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{
-              duration: 1.2,
-              ease: "easeOut",
-            }}
-            aria-hidden="true"
-            className="
-              absolute
-              left-[24px]
-              top-0
-              h-full
-              w-px
-              origin-top
-              bg-gradient-to-b
-              from-blue-500
-              via-indigo-400
-              to-transparent
-              md:left-1/2
-              md:-translate-x-1/2
-            "
-          />
+        {!loading && !error && timeline.length > 0 && (
+          <div className="relative mt-16 lg:mt-20">
+            {/* Desktop timeline */}
 
-          <div className="space-y-14 md:space-y-20">
-            {timeline.map((item, index) => {
-              const Icon = item.icon;
-              const isLeft = index % 2 === 0;
+            <motion.div
+              initial={{
+                scaleY: 0,
+              }}
+              whileInView={{
+                scaleY: 1,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.1,
+              }}
+              transition={{
+                duration: 1.2,
+                ease: "easeOut",
+              }}
+              aria-hidden="true"
+              className="
+                absolute
+                left-[24px]
+                top-0
+                h-full
+                w-px
+                origin-top
+                bg-gradient-to-b
+                from-blue-500
+                via-indigo-400
+                to-transparent
+                md:left-1/2
+                md:-translate-x-1/2
+              "
+            />
 
-              return (
-                <motion.article
-                  key={`${item.year}-${item.title}`}
-                  initial={{
-                    opacity: 0,
-                    y: 35,
-                    x: isLeft ? -15 : 15,
-                  }}
-                  whileInView={{
-                    opacity: 1,
-                    y: 0,
-                    x: 0,
-                  }}
-                  viewport={{
-                    once: true,
-                    amount: 0.18,
-                  }}
-                  transition={{
-                    duration: 0.65,
-                    delay: index * 0.1,
-                    ease: "easeOut",
-                  }}
-                  className="relative md:grid md:grid-cols-2 md:gap-16"
-                >
-                  {/* ================================================= */}
-                  {/* TIMELINE NODE */}
-                  {/* ================================================= */}
+            <div className="space-y-14 md:space-y-20">
+              {timeline.map((item, index) => {
+                const Icon = item.icon;
+                const isLeft = index % 2 === 0;
 
-                  <div
+                return (
+                  <motion.article
+                    key={item.id}
+                    initial={{
+                      opacity: 0,
+                      y: 35,
+                      x: isLeft ? -15 : 15,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      y: 0,
+                      x: 0,
+                    }}
+                    viewport={{
+                      once: true,
+                      amount: 0.18,
+                    }}
+                    transition={{
+                      duration: 0.65,
+                      delay: index * 0.1,
+                      ease: "easeOut",
+                    }}
                     className="
-                      absolute left-[24px] top-7
-                      z-20 -translate-x-1/2
-                      md:left-1/2
+                      relative
+                      md:grid
+                      md:grid-cols-2
+                      md:gap-16
                     "
                   >
+                    {/* ================================================= */}
+                    {/* TIMELINE NODE */}
+                    {/* ================================================= */}
+
                     <div
-                      className={`
-                        relative flex h-11 w-11
-                        items-center justify-center
-                        rounded-full
-                        border-[5px]
-                        border-white
-                        shadow-lg
-                        dark:border-zinc-950
-                        ${
-                          item.current
-                            ? "bg-blue-600 text-white shadow-blue-500/30"
-                            : "bg-zinc-100 text-blue-600 shadow-zinc-900/10 dark:bg-zinc-900 dark:text-blue-400"
-                        }
-                      `}
+                      className="
+                        absolute
+                        left-[24px]
+                        top-7
+                        z-20
+                        -translate-x-1/2
+                        md:left-1/2
+                      "
                     >
-                      <Icon
-                        aria-hidden="true"
-                        className="text-sm"
-                      />
-
-                      {item.current && (
-                        <span
+                      <div
+                        className={`
+                          relative
+                          flex h-11 w-11
+                          items-center justify-center
+                          rounded-full
+                          border-[5px]
+                          border-white
+                          shadow-lg
+                          dark:border-zinc-950
+                          ${
+                            item.current
+                              ? "bg-blue-600 text-white shadow-blue-500/30"
+                              : "bg-zinc-100 text-blue-600 shadow-zinc-900/10 dark:bg-zinc-900 dark:text-blue-400"
+                          }
+                        `}
+                      >
+                        <Icon
                           aria-hidden="true"
-                          className="
-                            absolute inset-0
-                            rounded-full
-                            animate-ping
-                            bg-blue-500/20
-                          "
+                          className="text-sm"
                         />
-                      )}
+
+                        {item.current && (
+                          <span
+                            aria-hidden="true"
+                            className="
+                              absolute inset-0
+                              animate-ping
+                              rounded-full
+                              bg-blue-500/20
+                            "
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* ================================================= */}
-                  {/* CARD */}
-                  {/* ================================================= */}
+                    {/* ================================================= */}
+                    {/* EXPERIENCE CARD */}
+                    {/* ================================================= */}
 
-                  <div
-                    className={
-                      isLeft
-                        ? "pl-14 md:pr-8 md:pl-0"
-                        : "pl-14 md:col-start-2 md:pl-8"
-                    }
-                  >
-                    <ExperienceCard item={item} />
-                  </div>
-                </motion.article>
-              );
-            })}
+                    <div
+                      className={
+                        isLeft
+                          ? "pl-14 md:pr-8 md:pl-0"
+                          : "pl-14 md:col-start-2 md:pl-8"
+                      }
+                    >
+                      <ExperienceCard item={item} />
+                    </div>
+                  </motion.article>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* EMPTY STATE */}
+        {/* ========================================================= */}
+
+        {!loading && !error && timeline.length === 0 && (
+          <div
+            className="
+              mt-14
+              rounded-2xl
+              border border-zinc-200
+              bg-zinc-50
+              p-8
+              text-center
+              text-sm
+              text-zinc-500
+              dark:border-zinc-800
+              dark:bg-zinc-900/50
+              dark:text-zinc-400
+            "
+          >
+            No experience records found.
+          </div>
+        )}
 
         {/* ========================================================= */}
         {/* BOTTOM CTA */}
         {/* ========================================================= */}
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.3,
+          }}
           transition={{
             duration: 0.6,
             delay: 0.15,
@@ -474,7 +664,8 @@ export default function Experience() {
                 dark:text-zinc-400
               "
             >
-              Explore the projects and systems behind my work.
+              Explore the projects and systems behind my
+              work.
             </p>
           </div>
 
@@ -524,6 +715,10 @@ export default function Experience() {
   );
 }
 
+/* ==========================================================================
+   Experience Card
+   ========================================================================== */
+
 function ExperienceCard({
   item,
 }: {
@@ -552,6 +747,7 @@ function ExperienceCard({
       "
     >
       {/* Top accent */}
+
       <div
         aria-hidden="true"
         className="
@@ -631,7 +827,29 @@ function ExperienceCard({
         {item.title}
       </h3>
 
+       {item.cgpa && (
+  <div
+    className="
+      mt-3
+      inline-flex items-center
+      rounded-lg
+      border border-blue-100
+      bg-blue-50
+      px-3 py-1.5
+      text-xs font-bold
+      text-blue-700
+      dark:border-blue-900/50
+      dark:bg-blue-950/30
+      dark:text-blue-400
+    "
+  >
+    CGPA: {item.cgpa}
+  </div>
+)}
+
+
       {/* Organization */}
+
       <p
         className="
           mt-2
@@ -669,13 +887,20 @@ function ExperienceCard({
 
         <span
           aria-hidden="true"
-          className="hidden h-1 w-1 rounded-full bg-zinc-300 sm:block dark:bg-zinc-700"
+          className="
+            hidden h-1 w-1
+            rounded-full
+            bg-zinc-300
+            sm:block
+            dark:bg-zinc-700
+          "
         />
 
         <span>{item.type}</span>
       </div>
 
       {/* Divider */}
+
       <div className="my-6 h-px bg-zinc-100 dark:bg-zinc-800" />
 
       {/* ======================================================= */}
@@ -692,49 +917,6 @@ function ExperienceCard({
       >
         {item.description}
       </p>
-
-      {/* ======================================================= */}
-      {/* TECHNOLOGIES */}
-      {/* ======================================================= */}
-
-      <div className="mt-6">
-        <p
-          className="
-            mb-3
-            text-[10px] font-bold
-            uppercase tracking-[0.18em]
-            text-zinc-400
-          "
-        >
-          Core technologies
-        </p>
-
-        <div className="flex flex-wrap gap-2">
-          {item.technologies.map((technology) => (
-            <span
-              key={technology}
-              className="
-                rounded-lg
-                border border-zinc-200
-                bg-zinc-50
-                px-2.5 py-1.5
-                text-[11px] font-semibold
-                text-zinc-600
-                transition-all duration-200
-                group-hover:border-blue-100
-                group-hover:text-blue-600
-                dark:border-zinc-700
-                dark:bg-zinc-950
-                dark:text-zinc-400
-                dark:group-hover:border-blue-900
-                dark:group-hover:text-blue-400
-              "
-            >
-              {technology}
-            </span>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

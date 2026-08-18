@@ -11,12 +11,13 @@ import {
   FaInstagram,
   FaLinkedin,
   FaMapMarkerAlt,
-  FaPhone,
   FaPaperPlane,
+  FaPhone,
   FaSpinner,
 } from "react-icons/fa";
 
 import Button from "@/components/ui/Button";
+import { submitContactMessage } from "@/lib/api/contact";
 
 const contactDetails = [
   {
@@ -73,42 +74,33 @@ export default function Contact() {
   const [status, setStatus] = useState<FormStatus>("idle");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
+  const form = event.currentTarget;
+  const formData = new FormData(form);
 
-    // Honeypot field. Real users never see or fill this.
-    if (formData.get("website")) {
-      return;
-    }
-
-    setStatus("submitting");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          subject: formData.get("subject"),
-          message: formData.get("message"),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      form.reset();
-      setStatus("success");
-    } catch {
-      setStatus("error");
-    }
+  // Honeypot field.
+  if (formData.get("website")) {
+    return;
   }
+
+  setStatus("submitting");
+
+  try {
+    await submitContactMessage({
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      subject: String(formData.get("subject") ?? ""),
+      message: String(formData.get("message") ?? ""),
+    });
+
+    form.reset();
+    setStatus("success");
+  } catch (error) {
+    console.error("Contact form submission failed:", error);
+    setStatus("error");
+  }
+}
 
   return (
     <section

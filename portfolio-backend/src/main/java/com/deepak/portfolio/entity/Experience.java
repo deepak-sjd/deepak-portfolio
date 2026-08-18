@@ -16,6 +16,7 @@ public class Experience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
 
     @Column(nullable = false, length = 150)
     private String company;
@@ -44,6 +45,9 @@ public class Experience {
     @Column(nullable = false)
     private Integer displayOrder;
 
+    @Column(length = 20)
+private String cgpa;
+
     /**
      * Required by JPA.
      */
@@ -59,7 +63,8 @@ public class Experience {
             LocalDate endDate,
             boolean current,
             String description,
-            Integer displayOrder
+            Integer displayOrder,
+            String cgpa
     ) {
         this.company = company;
         this.role = role;
@@ -70,6 +75,7 @@ public class Experience {
         this.current = current;
         this.description = description;
         this.displayOrder = displayOrder;
+        this.cgpa = cgpa;
     }
 
     public Long getId() {
@@ -112,6 +118,10 @@ public class Experience {
         return displayOrder;
     }
 
+    public String getCgpa() {
+    return cgpa;
+}
+
     public void setCompany(String company) {
         this.company = company;
     }
@@ -147,4 +157,8 @@ public class Experience {
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
     }
+
+    public void setCgpa(String cgpa) {
+    this.cgpa = cgpa;
+}
 }

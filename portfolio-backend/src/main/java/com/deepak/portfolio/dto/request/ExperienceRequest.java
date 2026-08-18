@@ -38,7 +38,10 @@ public record ExperienceRequest(
 
         @NotNull(message = "Display order is required")
         @PositiveOrZero(message = "Display order must be zero or greater")
-        Integer displayOrder
+        Integer displayOrder,
+
+        @Size(max = 20, message = "CGPA must not exceed 20 characters")
+        String cgpa
 
 ) {
 }
