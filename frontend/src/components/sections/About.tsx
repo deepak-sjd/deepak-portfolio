@@ -530,49 +530,60 @@ export default function About() {
                 );
               })}
             </div>
-
+            
             {/* Actions */}
-            <div className="mt-10 flex flex-wrap items-center gap-5">
-              <Button href="/resume.pdf"
-               className="..."
-               >
-                Download Resume
-                <FaArrowRight
-                  aria-hidden="true"
-                  className="ml-2 text-xs"
-                />
-              </Button>
+<div className="mt-10 flex flex-wrap items-center gap-5">
+  <Button
+    href="/resume"
+    className="
+      inline-flex
+      items-center
+    "
+  >
+    View Resume
 
-              <a
-                href="#contact"
-                className="
-                  group
-                  inline-flex items-center gap-2
-                  text-sm font-semibold
-                  text-zinc-700
-                  transition-colors duration-200
-                  hover:text-blue-600
-                  focus-visible:outline-none
-                  focus-visible:ring-2
-                  focus-visible:ring-blue-500
-                  focus-visible:ring-offset-4
-                  dark:text-zinc-300
-                  dark:hover:text-blue-400
-                  dark:focus-visible:ring-offset-zinc-950
-                "
-              >
-                Let's work together
+    <FaArrowRight
+      aria-hidden="true"
+      className="ml-2 text-xs"
+    />
+  </Button>
 
-                <FaArrowRight
-                  aria-hidden="true"
-                  className="
-                    text-xs
-                    transition-transform duration-300
-                    group-hover:translate-x-1
-                  "
-                />
-              </a>
-            </div>
+  <a
+    href="#contact"
+    className="
+      group
+      inline-flex
+      items-center
+      gap-2
+      text-sm
+      font-semibold
+      text-zinc-700
+      transition-colors
+      duration-200
+      hover:text-blue-600
+      focus-visible:outline-none
+      focus-visible:ring-2
+      focus-visible:ring-blue-500
+      focus-visible:ring-offset-4
+      dark:text-zinc-300
+      dark:hover:text-blue-400
+      dark:focus-visible:ring-offset-zinc-950
+    "
+  >
+    Let&apos;s work together
+
+    <FaArrowRight
+      aria-hidden="true"
+      className="
+        text-xs
+        transition-transform
+        duration-300
+        group-hover:translate-x-1
+      "
+    />
+  </a>
+</div>
+           
           </motion.div>
         </div>
       </div>
