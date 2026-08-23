@@ -1,201 +1,214 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
+  FaArrowDown,
+  FaArrowRight,
   FaGithub,
   FaLinkedin,
-  FaJava,
-  FaReact,
-  FaDocker,
-  FaPython,
-  FaGitAlt,
+  FaInstagram,
 } from "react-icons/fa";
-import {
-  SiSpringboot,
-  SiPostgresql,
-  SiMysql,
-  SiPytorch,
-  SiFastapi,
-} from "react-icons/si";
 
 import Button from "@/components/ui/Button";
 
-const technologies = [
-  { icon: FaPython, name: "Python" },
-  { icon: FaJava, name: "Java" },
-  { icon: SiSpringboot, name: "Spring Boot" },
-  { icon: FaReact, name: "React" },
-  { icon: FaDocker, name: "Docker" },
-  { icon: SiFastapi, name: "FastAPI" },
-  { icon: SiPytorch, name: "PyTorch" },
-  { icon: SiPostgresql, name: "PostgreSQL" },
-  { icon: SiMysql, name: "MySQL" },
-  { icon: FaGitAlt, name: "Git" },
-];
-
-const focusAreas = [
-  "Generative AI",
-  "RAG Systems",
-  "Computer Vision",
-  "Full Stack Development",
-];
-
-const engineeringFocus = [
-  { value: "AI", label: "Engineering" },
-  { value: "Java", label: "Backend" },
-  { value: "Full", label: "Stack" },
+const profilePoints = [
+  {
+    value: "AI",
+    label: "Engineering",
+  },
+  {
+    value: "Java",
+    label: "Backend",
+  },
+  {
+    value: "Web",
+    label: "Products",
+  },
 ];
 
 export default function Hero() {
+  const shouldReduceMotion = useReducedMotion();
+
+  const reveal = {
+    initial: {
+      opacity: 0,
+      y: shouldReduceMotion ? 0 : 18,
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+    },
+  };
+
   return (
     <section
       id="home"
+      aria-labelledby="hero-heading"
       className="
-        relative min-h-screen
+        relative
+        min-h-[calc(100vh-72px)]
         overflow-hidden
-        border-b border-zinc-100
+        border-b border-zinc-200/70
         bg-white
         dark:border-zinc-900
         dark:bg-zinc-950
       "
     >
       {/* ========================================================= */}
-      {/* BACKGROUND ATMOSPHERE */}
+      {/* BACKGROUND */}
       {/* ========================================================= */}
 
       <div
         aria-hidden="true"
         className="
-          absolute inset-0 opacity-[0.025]
-          [background-image:linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)]
-          [background-size:64px_64px]
-          dark:opacity-[0.035]
-          dark:[background-image:linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)]
+          pointer-events-none
+          absolute inset-0
+          opacity-[0.35]
+          [background-image:linear-gradient(to_right,rgba(24,24,27,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(24,24,27,0.035)_1px,transparent_1px)]
+          [background-size:48px_48px]
+          dark:opacity-0
         "
       />
 
-      {/* Ambient gradient */}
       <div
         aria-hidden="true"
         className="
+          pointer-events-none
           absolute
-          left-1/2
-          top-[-20%]
-          h-[500px]
-          w-[700px]
+          left-[48%]
+          top-[-180px]
+          h-[520px]
+          w-[720px]
           -translate-x-1/2
           rounded-full
-          bg-blue-500/[0.06]
-          blur-3xl
-          dark:bg-blue-500/[0.08]
+          bg-blue-500/[0.055]
+          blur-[120px]
+          dark:bg-blue-500/[0.07]
+        "
+      />
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          bottom-[-220px]
+          right-[-120px]
+          h-[420px]
+          w-[420px]
+          rounded-full
+          bg-indigo-500/[0.035]
+          blur-[120px]
+          dark:bg-indigo-500/[0.04]
         "
       />
 
       {/* ========================================================= */}
-      {/* MAIN CONTAINER */}
+      {/* CONTENT */}
       {/* ========================================================= */}
 
       <div
         className="
           relative
-          mx-auto flex min-h-screen
-          max-w-7xl items-center
-          px-6 py-20
-          lg:px-8 lg:py-24
+          mx-auto
+          flex
+          min-h-[calc(100vh-72px)]
+          max-w-7xl
+          items-center
+          px-6
+          py-20
+          sm:py-24
+          lg:px-8
+          lg:py-28
         "
       >
         <div
           className="
-            grid w-full
+            grid
+            w-full
             items-center
             gap-16
-            lg:grid-cols-[1.15fr_0.85fr]
+            lg:grid-cols-[1.12fr_0.88fr]
             lg:gap-20
           "
         >
           {/* ===================================================== */}
-          {/* LEFT CONTENT */}
+          {/* LEFT — PRIMARY INTRODUCTION */}
           {/* ===================================================== */}
 
           <motion.div
-            initial={{ opacity: 0, x: -35 }}
-            animate={{ opacity: 1, x: 0 }}
+            {...reveal}
             transition={{
-              duration: 0.75,
+              duration: 0.65,
               ease: "easeOut",
             }}
             className="max-w-3xl"
           >
-            {/* Status badge */}
+            {/* Role indicator */}
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              {...reveal}
               transition={{
-                duration: 0.5,
-                delay: 0.15,
+                duration: 0.45,
+                delay: 0.05,
+                ease: "easeOut",
               }}
               className="
-                inline-flex items-center gap-2
+                inline-flex
+                items-center
+                gap-2.5
                 rounded-full
-                border border-zinc-200
-                bg-zinc-50/80
-                px-4 py-2
-                text-xs font-semibold
-                tracking-wide
+                border
+                border-zinc-200
+                bg-white/80
+                px-4
+                py-2
+                text-xs
+                font-semibold
                 text-zinc-600
+                shadow-sm
                 backdrop-blur
                 dark:border-zinc-800
                 dark:bg-zinc-900/70
-                dark:text-zinc-400
+                dark:text-zinc-300
               "
             >
-              <span className="relative flex h-2 w-2">
-                <span
-                  aria-hidden="true"
-                  className="
-                    absolute inline-flex
-                    h-full w-full
-                    animate-ping
-                    rounded-full
-                    bg-emerald-400
-                    opacity-60
-                  "
-                />
+              <span
+                aria-hidden="true"
+                className="
+                  h-2
+                  w-2
+                  rounded-full
+                  bg-emerald-500
+                  shadow-[0_0_0_4px_rgba(16,185,129,0.10)]
+                "
+              />
 
-                <span
-                  aria-hidden="true"
-                  className="
-                    relative inline-flex
-                    h-2 w-2
-                    rounded-full
-                    bg-emerald-500
-                  "
-                />
-              </span>
-
-              AI Engineer · Software Developer
+              AI Engineer
             </motion.div>
 
             {/* Main heading */}
 
             <h1
+              id="hero-heading"
               className="
                 mt-7
                 max-w-4xl
-                text-4xl font-black
-                leading-[1.05]
-                tracking-[-0.035em]
+                text-[2.8rem]
+                font-black
+                leading-[0.98]
+                tracking-[-0.045em]
                 text-zinc-950
                 dark:text-white
                 sm:text-5xl
                 md:text-6xl
-                lg:text-7xl
+                lg:text-[4.5rem]
+                xl:text-[5rem]
               "
             >
-              Building software
+              I build software
               <span className="block">
-                with{" "}
+                that puts{" "}
                 <span
                   className="
                     bg-gradient-to-r
@@ -209,108 +222,127 @@ export default function Hero() {
                     dark:to-blue-400
                   "
                 >
-                  intelligence.
-                </span>
+                  intelligence
+                </span>{" "}
+                to work.
               </span>
             </h1>
 
-            {/* Professional role */}
+            {/* Positioning */}
 
             <p
               className="
                 mt-7
-                text-lg font-semibold
-                text-zinc-700
-                dark:text-zinc-300
-                md:text-xl
+                max-w-2xl
+                text-lg
+                font-semibold
+                leading-8
+                text-zinc-800
+                dark:text-zinc-200
+                sm:text-xl
               "
             >
-              AI Engineer · Java Full Stack Developer
+              AI engineering with strong software foundations.
             </p>
 
-            {/* Short introduction */}
+            {/* Short value proposition */}
 
             <p
               className="
-                mt-5 max-w-2xl
-                text-base leading-8
+                mt-4
+                max-w-2xl
+                text-base
+                leading-8
                 text-zinc-600
                 dark:text-zinc-400
-                md:text-lg
+                sm:text-lg
               "
             >
-              I build AI-powered applications and modern software systems,
-              combining machine learning with reliable backend and frontend
-              engineering to solve practical problems.
+              I design and build practical AI applications, backend systems,
+              and modern web products with a focus on reliability,
+              maintainability, and real-world use.
             </p>
 
-            {/* Focus areas */}
-
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3">
-              {focusAreas.map((area, index) => (
-                <motion.span
-                  key={area}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: 0.35 + index * 0.08,
-                  }}
-                  className="
-                    inline-flex items-center gap-2
-                    text-sm font-medium
-                    text-zinc-500
-                    dark:text-zinc-400
-                  "
-                >
-                  <span
-                    aria-hidden="true"
-                    className="h-1.5 w-1.5 rounded-full bg-blue-500"
-                  />
-
-                  {area}
-                </motion.span>
-              ))}
-            </div>
-
-            {/* Primary actions */}
+            {/* Actions */}
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href="#contact">
+              <a href="#projects">
                 <Button
                   className="
-                    px-7 py-3.5 text-base
-                    shadow-lg shadow-blue-500/20
-                    transition-transform
-                    hover:scale-[1.02]
+                    group
+                    px-6
+                    py-3.5
+                    text-sm
+                    font-semibold
+                    shadow-lg
+                    shadow-blue-600/15
+                    transition-all
+                    duration-200
+                    hover:-translate-y-0.5
                   "
                 >
-                  Let&apos;s Connect
+                  Explore my work
+
+                  <FaArrowRight
+                    aria-hidden="true"
+                    className="
+                      ml-2
+                      text-xs
+                      transition-transform
+                      duration-200
+                      group-hover:translate-x-1
+                    "
+                  />
                 </Button>
               </a>
 
-              <a href="#projects">
-                <Button
-                  variant="secondary"
-                  className="
-                    px-7 py-3.5 text-base
-                    transition-transform
-                    hover:scale-[1.02]
-                  "
-                >
-                  View Projects
-                </Button>
+              <a
+                href="#contact"
+                className="
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-xl
+                  border
+                  border-zinc-200
+                  bg-white/80
+                  px-6
+                  py-3.5
+                  text-sm
+                  font-semibold
+                  text-zinc-700
+                  shadow-sm
+                  backdrop-blur
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                  hover:border-zinc-300
+                  hover:text-zinc-950
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-blue-500
+                  focus-visible:ring-offset-4
+                  dark:border-zinc-800
+                  dark:bg-zinc-900/70
+                  dark:text-zinc-300
+                  dark:hover:border-zinc-700
+                  dark:hover:text-white
+                  dark:focus-visible:ring-offset-zinc-950
+                "
+              >
+                Let&apos;s connect
               </a>
             </div>
 
-            {/* Social links */}
+            {/* Social / professional links */}
 
-            <div className="mt-9 flex items-center gap-3">
+            <div className="mt-10 flex items-center gap-4">
               <span
                 className="
-                  mr-2
-                  text-xs font-medium
-                  uppercase tracking-wider
+                  text-xs
+                  font-semibold
+                  uppercase
+                  tracking-[0.18em]
                   text-zinc-400
                   dark:text-zinc-600
                 "
@@ -319,181 +351,210 @@ export default function Hero() {
               </span>
 
               <a
-                href="#"
+                href="https://github.com/deepak-sjd"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GitHub"
+                aria-label="GitHub profile"
                 className="
-                  flex h-10 w-10 items-center justify-center
+                  inline-flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
                   rounded-full
-                  border border-zinc-200
+                  border
+                  border-zinc-200
                   bg-white
-                  text-lg text-zinc-500
-                  transition-all duration-300
-                  hover:-translate-y-1
+                  text-sm
+                  text-zinc-500
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
                   hover:border-zinc-400
                   hover:text-zinc-950
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-blue-500
+                  focus-visible:ring-offset-2
                   dark:border-zinc-800
                   dark:bg-zinc-900
                   dark:text-zinc-400
                   dark:hover:border-zinc-600
                   dark:hover:text-white
+                  dark:focus-visible:ring-offset-zinc-950
                 "
               >
-                <FaGithub />
+                <FaGithub aria-hidden="true" />
               </a>
 
               <a
-                href="#"
+                href="https://www.linkedin.com/in/deepak-sjd/"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="LinkedIn"
+                aria-label="LinkedIn profile"
                 className="
-                  flex h-10 w-10 items-center justify-center
+                  inline-flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
                   rounded-full
-                  border border-zinc-200
+                  border
+                  border-zinc-200
                   bg-white
-                  text-lg text-zinc-500
-                  transition-all duration-300
-                  hover:-translate-y-1
+                  text-sm
+                  text-zinc-500
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
                   hover:border-blue-300
                   hover:text-blue-600
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-blue-500
+                  focus-visible:ring-offset-2
                   dark:border-zinc-800
                   dark:bg-zinc-900
                   dark:text-zinc-400
                   dark:hover:border-blue-800
                   dark:hover:text-blue-400
+                  dark:focus-visible:ring-offset-zinc-950
                 "
               >
-                <FaLinkedin />
+                <FaLinkedin aria-hidden="true" />
               </a>
+
+              {/* Instagram */}
+              <a
+                 href="https://www.instagram.com/gupta_deepak_74/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram profile"
+                    className="
+                      inline-flex
+                      h-9
+                      w-9
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-zinc-200
+                      bg-white
+                      text-sm
+                      text-zinc-500
+                      transition-all
+                      duration-200
+                      hover:-translate-y-0.5
+                      hover:border-pink-300
+                      hover:text-pink-600
+                      focus-visible:outline-none
+                      focus-visible:ring-2
+                      focus-visible:ring-pink-500
+                      focus-visible:ring-offset-2
+                      dark:border-zinc-800
+                      dark:bg-zinc-900
+                      dark:text-zinc-400
+                      dark:hover:border-pink-800
+                      dark:hover:text-pink-400
+                      dark:focus-visible:ring-offset-zinc-950
+                    "
+>
+  <FaInstagram aria-hidden="true" />
+</a>
             </div>
 
-            {/* Core technology stack */}
+            {/* Scroll cue */}
 
-            <div className="mt-12">
-              <div className="mb-4 flex items-center gap-3">
-                <span
-                  className="
-                    text-xs font-bold
-                    uppercase tracking-[0.18em]
-                    text-zinc-400
-                    dark:text-zinc-600
-                  "
-                >
-                  Core Stack
-                </span>
+            <a
+              href="#about"
+              className="
+                mt-14
+                inline-flex
+                items-center
+                gap-2
+                text-xs
+                font-semibold
+                uppercase
+                tracking-[0.16em]
+                text-zinc-400
+                transition-colors
+                hover:text-blue-600
+                dark:text-zinc-600
+                dark:hover:text-blue-400
+              "
+            >
+              <FaArrowDown
+                aria-hidden="true"
+                className="text-[10px]"
+              />
 
-                <span
-                  aria-hidden="true"
-                  className="h-px w-12 bg-zinc-200 dark:bg-zinc-800"
-                />
-              </div>
-
-              <div className="flex max-w-2xl flex-wrap gap-2.5">
-                {technologies.map((tech) => {
-                  const Icon = tech.icon;
-
-                  return (
-                    <motion.div
-                      key={tech.name}
-                      whileHover={{ y: -3 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 20,
-                      }}
-                      className="
-                        group flex items-center gap-2
-                        rounded-xl
-                        border border-zinc-200/80
-                        bg-white/80
-                        px-3.5 py-2.5
-                        shadow-sm
-                        backdrop-blur
-                        dark:border-zinc-800
-                        dark:bg-zinc-900/70
-                      "
-                    >
-                      <Icon
-                        aria-hidden="true"
-                        className="
-                          text-base
-                          text-zinc-500
-                          transition-colors
-                          group-hover:text-blue-600
-                          dark:text-zinc-500
-                          dark:group-hover:text-blue-400
-                        "
-                      />
-
-                      <span
-                        className="
-                          text-xs font-semibold
-                          text-zinc-600
-                          dark:text-zinc-400
-                        "
-                      >
-                        {tech.name}
-                      </span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
+              More about my work
+            </a>
           </motion.div>
 
           {/* ===================================================== */}
-          {/* RIGHT ENGINEERING SNAPSHOT */}
+          {/* RIGHT — ENGINEERING IDENTITY CARD */}
           {/* ===================================================== */}
 
           <motion.div
-            initial={{ opacity: 0, x: 35 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{
+              opacity: 0,
+              x: shouldReduceMotion ? 0 : 28,
+            }}
+            animate={{
+              opacity: 1,
+              x: 0,
+            }}
             transition={{
-              duration: 0.75,
-              delay: 0.15,
+              duration: 0.7,
+              delay: 0.12,
               ease: "easeOut",
             }}
             className="flex justify-center lg:justify-end"
           >
-            <div className="relative w-full max-w-[410px]">
-              {/* Ambient glow */}
+            <div className="relative w-full max-w-[390px]">
+              {/* Card atmosphere */}
 
               <div
                 aria-hidden="true"
                 className="
-                  absolute -inset-8
-                  rounded-[40px]
-                  bg-blue-500/10
+                  absolute
+                  -inset-6
+                  rounded-[2.5rem]
+                  bg-blue-500/[0.08]
                   blur-3xl
-                  dark:bg-blue-500/10
+                  dark:bg-blue-500/[0.08]
                 "
               />
 
-              {/* Main card */}
+              {/* Card */}
 
               <div
                 className="
-                  relative overflow-hidden
-                  rounded-[32px]
-                  border border-zinc-200/80
+                  relative
+                  overflow-hidden
+                  rounded-[2rem]
+                  border
+                  border-zinc-200/80
                   bg-white/90
                   p-7
-                  shadow-2xl shadow-zinc-900/5
+                  shadow-[0_30px_80px_-35px_rgba(24,24,27,0.30)]
                   backdrop-blur-xl
                   dark:border-zinc-800
                   dark:bg-zinc-900/90
-                  dark:shadow-black/20
-                  md:p-8
+                  dark:shadow-black/30
+                  sm:p-8
                 "
               >
-                {/* Decorative top line */}
+                {/* Top accent */}
 
                 <div
                   aria-hidden="true"
                   className="
-                    absolute inset-x-0 top-0 h-px
+                    absolute
+                    inset-x-0
+                    top-0
+                    h-px
                     bg-gradient-to-r
                     from-transparent
                     via-blue-500
@@ -501,110 +562,91 @@ export default function Hero() {
                   "
                 />
 
-                {/* Card header */}
+                {/* Header */}
 
                 <div className="flex items-start justify-between">
                   <div>
                     <p
                       className="
-                        text-xs font-bold
-                        uppercase tracking-[0.18em]
+                        text-[11px]
+                        font-bold
+                        uppercase
+                        tracking-[0.2em]
                         text-zinc-400
                         dark:text-zinc-600
                       "
                     >
-                      Engineering
+                      Engineering profile
                     </p>
 
                     <p
                       className="
                         mt-2
-                        text-sm font-medium
+                        text-sm
                         text-zinc-500
                         dark:text-zinc-400
                       "
                     >
-                      AI · Software · Systems
+                      AI · Systems · Products
                     </p>
                   </div>
 
-                  <div
+                  <span
                     className="
-                      flex items-center gap-2
                       rounded-full
-                      border border-emerald-200
-                      bg-emerald-50
-                      px-3 py-1.5
-                      dark:border-emerald-900/50
-                      dark:bg-emerald-950/30
+                      border
+                      border-blue-100
+                      bg-blue-50
+                      px-3
+                      py-1.5
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-wide
+                      text-blue-600
+                      dark:border-blue-900/50
+                      dark:bg-blue-950/30
+                      dark:text-blue-400
                     "
                   >
-                    <span
-                      aria-hidden="true"
-                      className="
-                        h-1.5 w-1.5
-                        animate-pulse
-                        rounded-full
-                        bg-emerald-500
-                      "
-                    />
-
-                    <span
-                      className="
-                        text-[11px] font-semibold
-                        text-emerald-700
-                        dark:text-emerald-400
-                      "
-                    >
-                      Open to connect
-                    </span>
-                  </div>
+                    AI Engineer
+                  </span>
                 </div>
 
                 {/* Identity */}
 
-                <div className="mt-9 flex flex-col items-center text-center">
-                  <div className="relative">
-                    {/* Avatar glow */}
-
-                    <div
-                      aria-hidden="true"
-                      className="
-                        absolute -inset-2
-                        rounded-full
-                        bg-gradient-to-br
-                        from-blue-500/30
-                        to-indigo-500/30
-                        blur-xl
-                      "
-                    />
-
-                    {/* Avatar */}
-
-                    <div
-                      className="
-                        relative flex h-28 w-28
-                        items-center justify-center
-                        rounded-full
-                        bg-gradient-to-br
-                        from-blue-600
-                        via-indigo-600
-                        to-violet-600
-                        text-3xl font-black
-                        tracking-tight text-white
-                        shadow-xl shadow-blue-500/20
-                      "
-                    >
-                      DK
-                    </div>
+                <div className="mt-10 text-center">
+                  <div
+                    className="
+                      mx-auto
+                      flex
+                      h-24
+                      w-24
+                      items-center
+                      justify-center
+                      rounded-[1.75rem]
+                      bg-gradient-to-br
+                      from-blue-600
+                      via-indigo-600
+                      to-violet-600
+                      text-2xl
+                      font-black
+                      tracking-tight
+                      text-white
+                      shadow-xl
+                      shadow-blue-500/20
+                    "
+                  >
+                    DK
                   </div>
 
                   <h2
                     className="
                       mt-6
-                      text-2xl font-bold
+                      text-2xl
+                      font-bold
                       tracking-tight
-                      text-zinc-900
+                      text-zinc-950
                       dark:text-white
                     "
                   >
@@ -614,24 +656,13 @@ export default function Hero() {
                   <p
                     className="
                       mt-2
-                      text-sm font-semibold
+                      text-sm
+                      font-semibold
                       text-blue-600
                       dark:text-blue-400
                     "
                   >
-                    AI Engineer
-                  </p>
-
-                  <p
-                    className="
-                      mt-4 max-w-xs
-                      text-sm leading-6
-                      text-zinc-500
-                      dark:text-zinc-400
-                    "
-                  >
-                    Building practical AI systems and dependable software
-                    with modern engineering practices.
+                    AI Engineer · Software Developer
                   </p>
                 </div>
 
@@ -639,28 +670,36 @@ export default function Hero() {
 
                 <div
                   aria-hidden="true"
-                  className="my-8 h-px bg-zinc-200 dark:bg-zinc-800"
+                  className="
+                    my-8
+                    h-px
+                    bg-zinc-200
+                    dark:bg-zinc-800
+                  "
                 />
 
-                {/* Engineering focus */}
+                {/* Three engineering dimensions */}
 
                 <div className="grid grid-cols-3 gap-2.5">
-                  {engineeringFocus.map((item) => (
+                  {profilePoints.map((item) => (
                     <div
                       key={item.value}
                       className="
                         rounded-2xl
-                        border border-zinc-200/70
-                        bg-zinc-50
-                        px-3 py-4
+                        border
+                        border-zinc-200/80
+                        bg-zinc-50/80
+                        px-3
+                        py-4
                         text-center
                         dark:border-zinc-800
-                        dark:bg-zinc-950
+                        dark:bg-zinc-950/70
                       "
                     >
                       <p
                         className="
-                          text-lg font-bold
+                          text-base
+                          font-bold
                           text-zinc-900
                           dark:text-white
                         "
@@ -671,9 +710,12 @@ export default function Hero() {
                       <p
                         className="
                           mt-1
-                          text-[10px] font-medium
-                          uppercase tracking-wide
-                          text-zinc-500
+                          text-[9px]
+                          font-semibold
+                          uppercase
+                          tracking-[0.12em]
+                          text-zinc-400
+                          dark:text-zinc-600
                         "
                       >
                         {item.label}
@@ -682,39 +724,31 @@ export default function Hero() {
                   ))}
                 </div>
 
-                {/* Location / availability */}
+                {/* Closing statement */}
 
                 <div
                   className="
-                    mt-5 flex items-center
-                    justify-between
+                    mt-5
                     rounded-2xl
-                    border border-zinc-200/70
-                    bg-zinc-50
-                    px-4 py-3
+                    border
+                    border-zinc-200/80
+                    bg-zinc-50/80
+                    p-4
                     dark:border-zinc-800
-                    dark:bg-zinc-950
+                    dark:bg-zinc-950/70
                   "
                 >
-                  <span
+                  <p
                     className="
-                      text-xs font-medium
-                      text-zinc-500
-                      dark:text-zinc-500
+                      text-sm
+                      leading-6
+                      text-zinc-600
+                      dark:text-zinc-400
                     "
                   >
-                    Chennai, India
-                  </span>
-
-                  <span
-                    className="
-                      text-xs font-semibold
-                      text-blue-600
-                      dark:text-blue-400
-                    "
-                  >
-                    Building & shipping
-                  </span>
+                    Turning ideas into useful software through thoughtful
+                    engineering and applied AI.
+                  </p>
                 </div>
               </div>
             </div>
