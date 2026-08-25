@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -10,38 +11,74 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
-const quickLinks = [
-  { name: "Home", href: "#home" },
-  { name: "About", href: "#about" },
-  { name: "Skills", href: "#skills" },
-  { name: "Experience", href: "#experience" },
-  { name: "Projects", href: "#projects" },
-  { name: "Contact", href: "#contact" },
-];
+/* -------------------------------------------------------------------------- */
+/* Navigation                                                                 */
+/* -------------------------------------------------------------------------- */
+
+const navigation = {
+  explore: [
+    { name: "Home", href: "#home" },
+    { name: "About", href: "#about" },
+    { name: "Skills", href: "#skills" },
+    { name: "Experience", href: "#experience" },
+  ],
+
+  work: [
+    { name: "Projects", href: "#projects" },
+    { name: "Notes", href: "#notes" },
+    { name: "Contact", href: "#contact" },
+  ],
+
+  connect: [
+    {
+      name: "GitHub",
+      href: "https://github.com/deepak-sjd",
+      external: true,
+    },
+    {
+      name: "LinkedIn",
+      href: "https://linkedin.com/in/deepak-sjd",
+      external: true,
+    },
+    {
+      name: "Instagram",
+      href: "https://www.instagram.com/gupta_deepak_74/",
+      external: true,
+    },
+  ],
+};
+
+/* -------------------------------------------------------------------------- */
+/* Social Links                                                               */
+/* -------------------------------------------------------------------------- */
 
 const socialLinks = [
   {
     name: "GitHub",
     href: "https://github.com/deepak-sjd",
     icon: FaGithub,
-    className:
+    hover:
       "hover:border-zinc-600 hover:bg-zinc-800 hover:text-white",
   },
   {
     name: "LinkedIn",
     href: "https://linkedin.com/in/deepak-sjd",
     icon: FaLinkedin,
-    className:
+    hover:
       "hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-blue-400",
   },
   {
     name: "Instagram",
-    href: "#",
+    href: "https://www.instagram.com/gupta_deepak_74/",
     icon: FaInstagram,
-    className:
-      "cursor-not-allowed opacity-50",
+    hover:
+      "hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-pink-400",
   },
 ];
+
+/* -------------------------------------------------------------------------- */
+/* Focus Areas                                                                */
+/* -------------------------------------------------------------------------- */
 
 const expertise = [
   "AI & Machine Learning",
@@ -50,6 +87,76 @@ const expertise = [
   "Java Backend Engineering",
   "Full Stack Applications",
 ];
+
+/* -------------------------------------------------------------------------- */
+/* Footer Link                                                                */
+/* -------------------------------------------------------------------------- */
+
+function FooterLink({
+  name,
+  href,
+  external = false,
+}: {
+  name: string;
+  href: string;
+  external?: boolean;
+}) {
+  const className = `
+    group
+    inline-flex
+    items-center
+    text-sm
+    text-zinc-400
+    transition-colors
+    duration-200
+    hover:text-white
+    focus:outline-none
+    focus-visible:text-white
+  `;
+
+  const content = (
+    <>
+      <span
+        aria-hidden="true"
+        className="
+          mr-2
+          h-px
+          w-0
+          bg-blue-500
+          transition-all
+          duration-300
+          group-hover:w-4
+          group-focus-visible:w-4
+        "
+      />
+
+      <span>{name}</span>
+    </>
+  );
+
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className}>
+      {content}
+    </Link>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Footer                                                                     */
+/* -------------------------------------------------------------------------- */
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -72,7 +179,10 @@ export default function Footer() {
         dark:border-zinc-800
       "
     >
-      {/* Ambient background */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Ambient background                                                  */}
+      {/* ------------------------------------------------------------------ */}
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -80,13 +190,13 @@ export default function Footer() {
         <div
           className="
             absolute
-            left-[15%]
+            left-[10%]
             top-0
             h-72
             w-72
             -translate-y-1/2
             rounded-full
-            bg-blue-600/[0.08]
+            bg-blue-600/[0.07]
             blur-3xl
           "
         />
@@ -94,13 +204,13 @@ export default function Footer() {
         <div
           className="
             absolute
-            right-[15%]
+            right-[10%]
             bottom-0
             h-72
             w-72
             translate-y-1/2
             rounded-full
-            bg-indigo-600/[0.07]
+            bg-indigo-600/[0.06]
             blur-3xl
           "
         />
@@ -118,17 +228,23 @@ export default function Footer() {
           lg:py-20
         "
       >
-        {/* Main footer */}
+        {/* ---------------------------------------------------------------- */}
+        {/* Main Footer                                                      */}
+        {/* ---------------------------------------------------------------- */}
+
         <div
           className="
             grid
             gap-12
             md:grid-cols-2
-            lg:grid-cols-[1.6fr_0.8fr_1fr]
-            lg:gap-16
+            lg:grid-cols-[1.6fr_1fr_1fr_1fr]
+            lg:gap-12
           "
         >
-          {/* Brand */}
+          {/* ================================================================ */}
+          {/* Brand                                                             */}
+          {/* ================================================================ */}
+
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -193,41 +309,13 @@ export default function Footer() {
               with a focus on clean engineering and real-world impact.
             </p>
 
-            {/* Social links */}
+            {/* Social icons */}
             <div
               className="mt-7 flex items-center gap-3"
-              aria-label="Social links"
+              aria-label="Social media links"
             >
               {socialLinks.map((social) => {
                 const Icon = social.icon;
-                const isPlaceholder = social.href === "#";
-
-                if (isPlaceholder) {
-                  return (
-                    <span
-                      key={social.name}
-                      aria-label={`${social.name} — coming soon`}
-                      title={`${social.name} — coming soon`}
-                      className="
-                        flex
-                        h-10
-                        w-10
-                        cursor-not-allowed
-                        items-center
-                        justify-center
-                        rounded-xl
-                        border
-                        border-zinc-800
-                        bg-zinc-900
-                        text-base
-                        text-zinc-500
-                        opacity-50
-                      "
-                    >
-                      <Icon aria-hidden="true" />
-                    </span>
-                  );
-                }
 
                 return (
                   <motion.a
@@ -257,7 +345,7 @@ export default function Footer() {
                       focus:ring-blue-500
                       focus:ring-offset-2
                       focus:ring-offset-zinc-950
-                      ${social.className}
+                      ${social.hover}
                     `}
                   >
                     <Icon aria-hidden="true" />
@@ -267,9 +355,12 @@ export default function Footer() {
             </div>
           </motion.div>
 
-          {/* Navigation */}
+          {/* ================================================================ */}
+          {/* Explore                                                           */}
+          {/* ================================================================ */}
+
           <motion.nav
-            aria-label="Footer navigation"
+            aria-label="Explore"
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
@@ -284,50 +375,24 @@ export default function Footer() {
                 text-zinc-200
               "
             >
-              Navigation
+              Explore
             </h2>
 
             <ul className="mt-5 space-y-3">
-              {quickLinks.map((link) => (
+              {navigation.explore.map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="
-                      group
-                      inline-flex
-                      items-center
-                      text-sm
-                      text-zinc-400
-                      transition-colors
-                      duration-200
-                      hover:text-white
-                      focus:outline-none
-                      focus-visible:text-white
-                    "
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="
-                        mr-2
-                        h-px
-                        w-0
-                        bg-blue-500
-                        transition-all
-                        duration-300
-                        group-hover:w-4
-                        group-focus-visible:w-4
-                      "
-                    />
-
-                    {link.name}
-                  </Link>
+                  <FooterLink {...link} />
                 </li>
               ))}
             </ul>
           </motion.nav>
 
-          {/* Focus Areas */}
-          <motion.div
+          {/* ================================================================ */}
+          {/* Work                                                              */}
+          {/* ================================================================ */}
+
+          <motion.nav
+            aria-label="Work"
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
@@ -342,11 +407,42 @@ export default function Footer() {
                 text-zinc-200
               "
             >
-              Focus Areas
+              Work
             </h2>
 
             <ul className="mt-5 space-y-3">
-              {expertise.map((item) => (
+              {navigation.work.map((link) => (
+                <li key={link.name}>
+                  <FooterLink {...link} />
+                </li>
+              ))}
+            </ul>
+          </motion.nav>
+
+          {/* ================================================================ */}
+          {/* Focus + Connect                                                   */}
+          {/* ================================================================ */}
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+          >
+            <h2
+              className="
+                text-xs
+                font-bold
+                uppercase
+                tracking-[0.18em]
+                text-zinc-200
+              "
+            >
+              Focus
+            </h2>
+
+            <ul className="mt-5 space-y-3">
+              {expertise.slice(0, 4).map((item) => (
                 <li
                   key={item}
                   className="
@@ -372,16 +468,45 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+
+            {/* Connect */}
+            <div className="mt-8">
+              <h2
+                className="
+                  text-xs
+                  font-bold
+                  uppercase
+                  tracking-[0.18em]
+                  text-zinc-200
+                "
+              >
+                Connect
+              </h2>
+
+              <ul className="mt-5 space-y-3">
+                {navigation.connect.map((link) => (
+                  <li key={link.name}>
+                    <FooterLink {...link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
           </motion.div>
         </div>
 
-        {/* Divider */}
+        {/* ---------------------------------------------------------------- */}
+        {/* Divider                                                           */}
+        {/* ---------------------------------------------------------------- */}
+
         <div
           aria-hidden="true"
           className="my-10 h-px bg-zinc-800 sm:my-12"
         />
 
-        {/* Bottom row */}
+        {/* ---------------------------------------------------------------- */}
+        {/* Bottom row                                                        */}
+        {/* ---------------------------------------------------------------- */}
+
         <div
           className="
             flex
@@ -395,12 +520,7 @@ export default function Footer() {
         >
           {/* Copyright */}
           <p className="text-zinc-500">
-            © {new Date().getFullYear()} Deepak Kumar.
-            <span className="hidden sm:inline"> </span>
-            <span className="sm:hidden">
-              <br />
-            </span>
-            All rights reserved.
+            © {new Date().getFullYear()} Deepak Kumar. All rights reserved.
           </p>
 
           {/* Built with */}
@@ -476,16 +596,15 @@ export default function Footer() {
           >
             <FaArrowUp
               aria-hidden="true"
-              className="
-                transition-transform
-                duration-300
-                group-hover:-translate-y-0.5
-              "
+              className="transition-transform duration-300"
             />
           </motion.button>
         </div>
 
-        {/* Signature */}
+        {/* ---------------------------------------------------------------- */}
+        {/* Signature                                                         */}
+        {/* ---------------------------------------------------------------- */}
+
         <div
           className="
             mt-8
@@ -497,11 +616,9 @@ export default function Footer() {
             text-zinc-600
           "
         >
-          <span>
-            Designed & engineered by{" "}
-            <span className="font-medium text-zinc-500">
-              Deepak Kumar
-            </span>
+          Designed & engineered by{" "}
+          <span className="font-medium text-zinc-500">
+            Deepak Kumar
           </span>
         </div>
       </div>

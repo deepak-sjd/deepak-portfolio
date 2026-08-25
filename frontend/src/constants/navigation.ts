@@ -12,22 +12,23 @@ export const NAV_ITEMS = [
     href: "#skills",
   },
   {
+    label: "Experience",
+    href: "#experience",
+  },
+  {
     label: "Projects",
     href: "#projects",
   },
-
-   { label: "Services", 
-    href: "#services" 
-  },
-
-  { label: "Notes",
-     href: "#notes" },
   {
-    label: "Experience",
-    href: "#experience",
+    label: "Services",
+    href: "#services",
+  },
+  {
+    label: "Notes",
+    href: "#notes",
   },
   {
     label: "Contact",
     href: "#contact",
   },
-];
+] as const;

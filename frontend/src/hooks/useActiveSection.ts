@@ -7,17 +7,23 @@ const SECTION_IDS = [
   "about",
   "skills",
   "projects",
+  "services",
+  "notes",
   "experience",
   "contact",
 ] as const;
 
 export default function useActiveSection() {
-  const [activeSection, setActiveSection] = useState<string>("home");
+  const [activeSection, setActiveSection] =
+    useState<string>("home");
 
   useEffect(() => {
     const sections = SECTION_IDS.map((id) =>
-      document.getElementById(id),
-    ).filter((section): section is HTMLElement => section !== null);
+      document.getElementById(id)
+    ).filter(
+      (section): section is HTMLElement =>
+        section !== null
+    );
 
     if (!sections.length) {
       return;
@@ -30,21 +36,25 @@ export default function useActiveSection() {
           .sort(
             (a, b) =>
               Math.abs(a.boundingClientRect.top) -
-              Math.abs(b.boundingClientRect.top),
+              Math.abs(b.boundingClientRect.top)
           );
 
         if (visibleSections.length > 0) {
-          setActiveSection(visibleSections[0].target.id);
+          setActiveSection(
+            visibleSections[0].target.id
+          );
         }
       },
       {
         root: null,
         rootMargin: "-20% 0px -60% 0px",
         threshold: 0,
-      },
+      }
     );
 
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
 
     return () => {
       observer.disconnect();
