@@ -1,0 +1,21 @@
+# -----------------------------------------------------------------
+# Merge these keys into your existing application.yml (don't replace
+# your whole file — just add these sections / merge with what's there).
+# -----------------------------------------------------------------
+
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true   # safe if your DB already has tables Hibernate created
+  jpa:
+    hibernate:
+      ddl-auto: validate        # stop letting Hibernate auto-change your schema in prod
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+app:
+  file:
+    upload-dir: ./uploads       # local folder where files are stored (create it, or it's auto-created)
+    public-base-url: /files     # matches WebConfig mapping -> served at http://your-api/files/notes/xyz.pdf

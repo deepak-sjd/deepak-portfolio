@@ -2,6 +2,7 @@ package com.deepak.portfolio.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record NoteRequest(
@@ -23,6 +24,10 @@ public record NoteRequest(
 
         @NotBlank(message = "Slug is required")
         @Size(max = 100, message = "Slug must not exceed 100 characters")
+        @Pattern(
+                regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                message = "Slug must be lowercase, alphanumeric, and hyphen-separated (e.g. 'my-note-title')"
+        )
         String slug,
 
         @NotNull(message = "Published status is required")

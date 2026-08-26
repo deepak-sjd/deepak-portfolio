@@ -11,4 +11,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByPublishedTrueOrderByDisplayOrderAsc();
 
     Optional<Note> findBySlugAndPublishedTrue(String slug);
+
+    boolean existsBySlug(String slug);
 }

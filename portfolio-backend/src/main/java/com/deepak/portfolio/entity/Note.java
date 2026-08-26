@@ -3,6 +3,9 @@ package com.deepak.portfolio.entity;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Entity
 @Table(name = "notes")
@@ -24,7 +27,7 @@ public class Note {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String slug;
 
     @Column(nullable = false)
@@ -38,6 +41,9 @@ public class Note {
 
     @Column(nullable = false)
     private Instant updatedAt;
+
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<NoteResource> resources = new ArrayList<>();
 
     protected Note() {
         // Required by JPA
@@ -106,6 +112,21 @@ public class Note {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    /** Resources sorted for stable, predictable display order in the UI. */
+    public List<NoteResource> getResources() {
+        return resources.stream()
+                .sorted(Comparator.comparing(NoteResource::getSortOrder))
+                .toList();
+    }
+
+    public void addResource(NoteResource resource) {
+        resources.add(resource);
+    }
+
+    public void removeResource(NoteResource resource) {
+        resources.remove(resource);
     }
 
     public void setTitle(String title) {
