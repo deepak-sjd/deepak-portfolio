@@ -238,7 +238,7 @@ export default async function NotePage({
         </div>
 
         {/* Resources */}
-        {note.resources.length > 0 && (
+        {(note.resources ?? []).length > 0 && (
           <NoteResources resources={note.resources} />
         )}
 

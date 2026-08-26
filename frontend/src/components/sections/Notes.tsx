@@ -460,7 +460,7 @@ export default function Notes() {
 
                   // De-duplicate resource types for the badge row (e.g. 2 PDFs -> one PDF badge).
                   const resourceTypes = Array.from(
-                    new Set(note.resources.map((r) => r.type)),
+                    new Set((note.resources ?? []).map((r) => r.type)),
                   );
 
                   return (
