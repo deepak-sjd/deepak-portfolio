@@ -4,6 +4,7 @@ import com.deepak.portfolio.dto.request.NoteRequest;
 import com.deepak.portfolio.dto.request.NoteResourceLinkRequest;
 import com.deepak.portfolio.dto.response.NoteResourceResponse;
 import com.deepak.portfolio.dto.response.NoteResponse;
+import com.deepak.portfolio.dto.response.NoteSummaryResponse;
 import com.deepak.portfolio.entity.Note;
 import com.deepak.portfolio.entity.NoteResource;
 import com.deepak.portfolio.entity.ResourceType;
@@ -45,33 +46,42 @@ public class NoteService {
     }
 
     // ============================================================
-    // NOTES
+    // TREE NAVIGATION
     // ============================================================
 
+    /** Top-level Field cards shown on the main Notes page. */
     @Transactional(readOnly = true)
-    public List<NoteResponse> getPublishedNotes() {
-        return noteRepository
-                .findByPublishedTrueOrderByDisplayOrderAsc()
+    public List<NoteSummaryResponse> getRootNotes() {
+        return noteRepository.findByParentIsNullAndPublishedTrueOrderByDisplayOrderAsc()
                 .stream()
-                .map(this::toResponse)
+                .map(this::toSummaryResponse)
                 .toList();
     }
 
+    /**
+     * A single node's full detail: its own content/resources, breadcrumb info,
+     * and its direct children (if any). The frontend decides whether to show
+     * a child grid (this node is a Field/Topic) or just the content (a leaf Subtopic).
+     */
     @Transactional(readOnly = true)
     public NoteResponse getPublishedNoteBySlug(String slug) {
         Note note = noteRepository
                 .findBySlugAndPublishedTrue(slug)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Published note not found with slug: " + slug)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Published note not found with slug: " + slug));
         return toResponse(note);
     }
+
+    // ============================================================
+    // NOTES (create/update/delete)
+    // ============================================================
 
     @Transactional
     public NoteResponse createNote(NoteRequest request) {
         if (noteRepository.existsBySlug(request.slug())) {
             throw new DuplicateSlugException(request.slug());
         }
+
+        Note parent = resolveParent(request.parentSlug());
 
         Note note = new Note(
                 request.title(),
@@ -80,7 +90,8 @@ public class NoteService {
                 request.content(),
                 request.slug(),
                 request.published(),
-                request.displayOrder()
+                request.displayOrder(),
+                parent
         );
 
         Note savedNote = noteRepository.save(note);
@@ -102,6 +113,7 @@ public class NoteService {
         note.setSlug(request.slug());
         note.setPublished(request.published());
         note.setDisplayOrder(request.displayOrder());
+        note.setParent(resolveParent(request.parentSlug()));
 
         return toResponse(note);
     }
@@ -110,7 +122,6 @@ public class NoteService {
     public void deleteNote(Long id) {
         Note note = findNoteOrThrow(id);
 
-        // Clean up any files on disk before the DB rows disappear via cascade.
         note.getResources().stream()
                 .filter(r -> UPLOADABLE_TYPES.contains(r.getType()))
                 .forEach(r -> fileStorageService.delete(UPLOAD_SUBDIRECTORY, r.getFileName()));
@@ -127,28 +138,18 @@ public class NoteService {
             Long noteId, MultipartFile file, ResourceType type, String label
     ) {
         if (!UPLOADABLE_TYPES.contains(type)) {
-            throw new FileStorageException(
-                    "Type must be one of " + UPLOADABLE_TYPES + " for file uploads"
-            );
+            throw new FileStorageException("Type must be one of " + UPLOADABLE_TYPES + " for file uploads");
         }
 
         Note note = findNoteOrThrow(noteId);
-
         FileStorageService.StoredFile stored = fileStorageService.store(file, UPLOAD_SUBDIRECTORY);
 
         NoteResource resource = new NoteResource(
-                note,
-                type,
-                label,
-                stored.publicUrl(),
-                stored.storedFileName(),
-                stored.sizeInBytes(),
-                nextSortOrder(note)
+                note, type, label, stored.publicUrl(), stored.storedFileName(), stored.sizeInBytes(), nextSortOrder(note)
         );
 
         note.addResource(resource);
         NoteResource saved = noteResourceRepository.save(resource);
-
         return toResourceResponse(saved);
     }
 
@@ -159,26 +160,17 @@ public class NoteService {
     @Transactional
     public NoteResourceResponse addLinkResource(Long noteId, NoteResourceLinkRequest request) {
         if (!LINK_TYPES.contains(request.type())) {
-            throw new FileStorageException(
-                    "Type must be one of " + LINK_TYPES + " for link resources"
-            );
+            throw new FileStorageException("Type must be one of " + LINK_TYPES + " for link resources");
         }
 
         Note note = findNoteOrThrow(noteId);
 
         NoteResource resource = new NoteResource(
-                note,
-                request.type(),
-                request.label(),
-                request.url(),
-                null,
-                null,
-                nextSortOrder(note)
+                note, request.type(), request.label(), request.url(), null, null, nextSortOrder(note)
         );
 
         note.addResource(resource);
         NoteResource saved = noteResourceRepository.save(resource);
-
         return toResourceResponse(saved);
     }
 
@@ -189,9 +181,7 @@ public class NoteService {
         NoteResource resource = note.getResources().stream()
                 .filter(r -> r.getId().equals(resourceId))
                 .findFirst()
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Resource not found with id: " + resourceId)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + resourceId));
 
         if (UPLOADABLE_TYPES.contains(resource.getType())) {
             fileStorageService.delete(UPLOAD_SUBDIRECTORY, resource.getFileName());
@@ -210,6 +200,14 @@ public class NoteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id));
     }
 
+    private Note resolveParent(String parentSlug) {
+        if (parentSlug == null || parentSlug.isBlank()) {
+            return null;
+        }
+        return noteRepository.findBySlug(parentSlug)
+                .orElseThrow(() -> new ResourceNotFoundException("Parent note not found with slug: " + parentSlug));
+    }
+
     private int nextSortOrder(Note note) {
         return note.getResources().size();
     }
@@ -218,6 +216,14 @@ public class NoteService {
         List<NoteResourceResponse> resources = note.getResources().stream()
                 .map(this::toResourceResponse)
                 .toList();
+
+        List<NoteSummaryResponse> children = noteRepository
+                .findByParent_SlugAndPublishedTrueOrderByDisplayOrderAsc(note.getSlug())
+                .stream()
+                .map(this::toSummaryResponse)
+                .toList();
+
+        Note parent = note.getParent();
 
         return new NoteResponse(
                 note.getId(),
@@ -230,7 +236,23 @@ public class NoteService {
                 note.getDisplayOrder(),
                 note.getCreatedAt(),
                 note.getUpdatedAt(),
-                resources
+                resources,
+                parent != null ? parent.getSlug() : null,
+                parent != null ? parent.getTitle() : null,
+                children
+        );
+    }
+
+    private NoteSummaryResponse toSummaryResponse(Note note) {
+        boolean hasChildren = noteRepository.existsByParent_Slug(note.getSlug());
+        return new NoteSummaryResponse(
+                note.getId(),
+                note.getTitle(),
+                note.getSlug(),
+                note.getSummary(),
+                note.getDisplayOrder(),
+                hasChildren,
+                note.getResources().size()
         );
     }
 

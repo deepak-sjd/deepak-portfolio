@@ -4,6 +4,7 @@ import com.deepak.portfolio.dto.request.NoteRequest;
 import com.deepak.portfolio.dto.request.NoteResourceLinkRequest;
 import com.deepak.portfolio.dto.response.NoteResourceResponse;
 import com.deepak.portfolio.dto.response.NoteResponse;
+import com.deepak.portfolio.dto.response.NoteSummaryResponse;
 import com.deepak.portfolio.entity.ResourceType;
 import com.deepak.portfolio.service.NoteService;
 import jakarta.validation.Valid;
@@ -24,14 +25,20 @@ public class NoteController {
     }
 
     // ============================================================
-    // PUBLIC NOTES
+    // PUBLIC — TREE NAVIGATION
     // ============================================================
 
+    /** Top-level Field cards (Generative AI, Backend, etc.) for the main Notes page. */
     @GetMapping
-    public List<NoteResponse> getPublishedNotes() {
-        return noteService.getPublishedNotes();
+    public List<NoteSummaryResponse> getRootNotes() {
+        return noteService.getRootNotes();
     }
 
+    /**
+     * A single node's detail — includes its own content/resources plus its
+     * direct children. If children is non-empty, the frontend shows a grid
+     * to drill down further; if empty, it's a leaf and shows content+resources.
+     */
     @GetMapping("/{slug}")
     public NoteResponse getPublishedNoteBySlug(@PathVariable String slug) {
         return noteService.getPublishedNoteBySlug(slug);

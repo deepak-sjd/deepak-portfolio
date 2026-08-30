@@ -14,6 +14,13 @@ public record NoteResponse(
         Integer displayOrder,
         Instant createdAt,
         Instant updatedAt,
-        List<NoteResourceResponse> resources
+        List<NoteResourceResponse> resources,
+
+        /** Null if this is a top-level Field. */
+        String parentSlug,
+        String parentTitle,
+
+        /** Direct children of this node. */
+        List<NoteSummaryResponse> children
 ) {
 }

@@ -19,7 +19,7 @@ public record NoteRequest(
         @Size(max = 500, message = "Summary must not exceed 500 characters")
         String summary,
 
-        @NotBlank(message = "Content is required")
+        /** Optional: "folder" nodes that only group children can leave this blank. */
         String content,
 
         @NotBlank(message = "Slug is required")
@@ -34,6 +34,9 @@ public record NoteRequest(
         Boolean published,
 
         @NotNull(message = "Display order is required")
-        Integer displayOrder
+        Integer displayOrder,
+
+        /** Optional: slug of the parent node to nest this note under. Omit/null for a top-level Field. */
+        String parentSlug
 ) {
 }

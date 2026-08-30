@@ -18,13 +18,18 @@ public class Note {
     @Column(nullable = false, length = 200)
     private String title;
 
+    /**
+     * Legacy top-level grouping label (e.g. "Generative AI"). Kept for backward
+     * compatibility and quick display; the real hierarchy now lives in `parent`.
+     */
     @Column(nullable = false, length = 100)
     private String category;
 
     @Column(nullable = false, length = 500)
     private String summary;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    /** Nullable: pure "folder" nodes (Fields, Topics that only group children) may have no body content. */
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = false, length = 100, unique = true)
@@ -42,6 +47,16 @@ public class Note {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    /**
+     * Self-referencing parent. Null = top-level "Field" (e.g. Generative AI, Backend).
+     * A node with a parent but that also has children is a "Topic" (e.g. RAG, LLM).
+     * A node with a parent and no children is a leaf "Subtopic" (e.g. Chunking, Tokens & Tokenization).
+     * The tree can nest to any depth — the UI decides how to render each level.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Note parent;
+
     @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<NoteResource> resources = new ArrayList<>();
 
@@ -56,7 +71,8 @@ public class Note {
             String content,
             String slug,
             boolean published,
-            Integer displayOrder
+            Integer displayOrder,
+            Note parent
     ) {
         this.title = title;
         this.category = category;
@@ -65,6 +81,7 @@ public class Note {
         this.slug = slug;
         this.published = published;
         this.displayOrder = displayOrder;
+        this.parent = parent;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -114,7 +131,10 @@ public class Note {
         return updatedAt;
     }
 
-    /** Resources sorted for stable, predictable display order in the UI. */
+    public Note getParent() {
+        return parent;
+    }
+
     public List<NoteResource> getResources() {
         return resources.stream()
                 .sorted(Comparator.comparing(NoteResource::getSortOrder))
@@ -155,5 +175,9 @@ public class Note {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public void setParent(Note parent) {
+        this.parent = parent;
     }
 }
