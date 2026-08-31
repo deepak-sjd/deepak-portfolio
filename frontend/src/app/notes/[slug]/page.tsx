@@ -56,6 +56,51 @@ function estimateReadingMinutes(content: string | null): number {
   return Math.max(1, Math.round(words / 200));
 }
 
+interface TocItem {
+  level: 2 | 3;
+  text: string;
+  slug: string;
+}
+
+function slugifyHeading(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+/**
+ * Pulls out all ## and ### headings from the raw Markdown content, in
+ * document order, generating a unique anchor slug for each — used to build
+ * the sidebar table of contents. Deliberately simple (line-based regex)
+ * rather than a full Markdown parse, since headings always start a line.
+ */
+function extractHeadings(content: string | null): TocItem[] {
+  if (!content) return [];
+
+  const items: TocItem[] = [];
+  const seenSlugs = new Map<string, number>();
+  const lines = content.split("\n");
+
+  for (const line of lines) {
+    const match = line.match(/^(#{2,3})\s+(.+?)\s*$/);
+    if (!match) continue;
+
+    const level = match[1].length as 2 | 3;
+    const text = match[2].replace(/[*_`]/g, "").trim();
+    let slug = slugifyHeading(text);
+
+    const count = seenSlugs.get(slug) ?? 0;
+    seenSlugs.set(slug, count + 1);
+    if (count > 0) slug = `${slug}-${count}`;
+
+    items.push({ level, text, slug });
+  }
+
+  return items;
+}
+
 export default async function NotePage({ params }: NotePageProps) {
   const { slug } = await params;
 
@@ -75,6 +120,18 @@ export default async function NotePage({ params }: NotePageProps) {
   const backHref = note.parentSlug ? `/notes/${note.parentSlug}` : "/#notes";
   const backLabel = note.parentTitle ? `Back to ${note.parentTitle}` : "Back to Notes";
   const readingMinutes = estimateReadingMinutes(note.content);
+  const toc = isStudyPage ? extractHeadings(note.content) : [];
+  const hasToc = toc.length >= 3; // not worth a sidebar for a couple of headings
+
+  // Matches each rendered <h2>/<h3> to its pre-computed TOC slug, in document
+  // order — react-markdown renders headings in the same order they appear
+  // in the source, so a simple counter keeps them in sync with `toc`.
+  let headingCursor = 0;
+  const nextHeadingId = (_text: string): string => {
+    const item = toc[headingCursor];
+    headingCursor += 1;
+    return item?.slug ?? "";
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white dark:bg-zinc-950">
@@ -84,7 +141,7 @@ export default async function NotePage({ params }: NotePageProps) {
         className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-blue-500/[0.07] blur-[120px] dark:bg-blue-500/[0.12]"
       />
 
-      <article className="relative mx-auto max-w-4xl px-6 pb-24 pt-32 lg:px-8">
+      <article className={`relative mx-auto px-6 pb-24 pt-32 lg:px-8 ${hasToc ? "max-w-6xl" : "max-w-4xl"}`}>
 
         {/* Back link */}
         <Link
@@ -105,7 +162,7 @@ export default async function NotePage({ params }: NotePageProps) {
         </Link>
 
         {/* Header */}
-        <header className="mt-10">
+        <header className="mt-10 max-w-3xl">
           <div
             className="
               flex h-12 w-12 items-center justify-center rounded-xl
@@ -149,15 +206,68 @@ export default async function NotePage({ params }: NotePageProps) {
 
         {/* Resources quick-access strip — leaf/study pages only, shown up top */}
         {isStudyPage && note.resources.length > 0 && (
-          <ResourceQuickLinks resources={note.resources} />
+          <div className="max-w-3xl">
+            <ResourceQuickLinks resources={note.resources} />
+          </div>
+        )}
+
+        {/* Mobile "On this page" — collapsible, only shown when there's a TOC and on small screens */}
+        {hasToc && (
+          <details className="mt-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 lg:hidden dark:border-zinc-800 dark:bg-zinc-900">
+            <summary className="cursor-pointer text-sm font-bold text-zinc-900 dark:text-white">
+              On this page
+            </summary>
+            <nav className="mt-3 flex flex-col gap-2">
+              {toc.map((item) => (
+                <a
+                  key={item.slug}
+                  href={`#${item.slug}`}
+                  className={`text-sm text-zinc-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 ${item.level === 3 ? "pl-4" : ""}`}
+                >
+                  {item.text}
+                </a>
+              ))}
+            </nav>
+          </details>
         )}
 
         {/* Divider */}
         <div className="my-10 h-px bg-zinc-200 dark:bg-zinc-800" />
 
+        {/* Content row: optional sticky TOC sidebar + the study content */}
+        <div className={hasToc ? "lg:flex lg:items-start lg:gap-12" : ""}>
+
+          {hasToc && (
+            <nav
+              aria-label="Table of contents"
+              className="hidden shrink-0 lg:sticky lg:top-32 lg:block lg:w-56"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-600">
+                On this page
+              </p>
+              <ul className="mt-4 space-y-1 border-l border-zinc-200 dark:border-zinc-800">
+                {toc.map((item) => (
+                  <li key={item.slug}>
+                    <a
+                      href={`#${item.slug}`}
+                      className={`
+                        block border-l-2 border-transparent py-1 text-sm text-zinc-500
+                        transition-colors hover:border-blue-500 hover:text-blue-600
+                        dark:text-zinc-400 dark:hover:text-blue-400
+                        ${item.level === 3 ? "pl-8" : "pl-4"}
+                      `}
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+
         {/* Study content — narrower column for comfortable reading */}
         {note.content && (
-          <div className="mx-auto max-w-[70ch]">
+          <div className="mx-auto max-w-[70ch] flex-1 lg:mx-0">
             <div className="text-base leading-8 text-zinc-700 dark:text-zinc-300 sm:text-lg">
               <ReactMarkdown
                 components={{
@@ -166,16 +276,24 @@ export default async function NotePage({ params }: NotePageProps) {
                       {children}
                     </h2>
                   ),
-                  h2: ({ children }) => (
-                    <h2 className="mb-4 mt-10 text-2xl font-black tracking-tight text-zinc-950 first:mt-0 dark:text-white sm:text-3xl">
-                      {children}
-                    </h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 className="mb-3 mt-8 text-lg font-bold tracking-tight text-zinc-950 dark:text-white sm:text-xl">
-                      {children}
-                    </h3>
-                  ),
+                  h2: ({ children }) => {
+                    const text = String(children);
+                    const id = nextHeadingId(text);
+                    return (
+                      <h2 id={id} className="mb-4 mt-10 scroll-mt-32 text-2xl font-black tracking-tight text-zinc-950 first:mt-0 dark:text-white sm:text-3xl">
+                        {children}
+                      </h2>
+                    );
+                  },
+                  h3: ({ children }) => {
+                    const text = String(children);
+                    const id = nextHeadingId(text);
+                    return (
+                      <h3 id={id} className="mb-3 mt-8 scroll-mt-32 text-lg font-bold tracking-tight text-zinc-950 dark:text-white sm:text-xl">
+                        {children}
+                      </h3>
+                    );
+                  },
                   p: ({ children }) => (
                     <p className="mb-6 last:mb-0">{children}</p>
                   ),
@@ -237,6 +355,9 @@ export default async function NotePage({ params }: NotePageProps) {
             </div>
           </div>
         )}
+
+        </div>
+        {/* end content row */}
 
         {/* Children grid — Field/Topic browse view */}
         {isBrowseNode && <ChildrenGrid children={note.children} />}

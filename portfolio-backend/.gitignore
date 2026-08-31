@@ -32,12 +32,34 @@ build/
 ### VS Code ###
 .vscode/
 
-### Environment / Secrets
-
+### Environment / Secrets ###
 .env
 .env.*
 !.env.example
 
-### Logs
-
+### Logs ###
 *.log
+
+### Frontend / Node.js ###
+node_modules/
+**/node_modules/
+
+.next/
+**/.next/
+
+out/
+dist/
+
+*.zip
+
+### Frontend environment ###
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+### Backend uploads ###
+portfolio-backend/uploads/
+
+### OS files ###
+.DS_Store
+Thumbs.db
