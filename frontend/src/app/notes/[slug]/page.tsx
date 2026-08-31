@@ -141,7 +141,7 @@ export default async function NotePage({ params }: NotePageProps) {
         className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-blue-500/[0.07] blur-[120px] dark:bg-blue-500/[0.12]"
       />
 
-      <article className={`relative mx-auto px-6 pb-24 pt-32 lg:px-8 ${hasToc ? "max-w-6xl" : "max-w-4xl"}`}>
+      <article className={`relative mx-auto px-6 pb-24 pt-20 sm:pt-24 lg:px-8 ${hasToc ? "max-w-6xl" : "max-w-4xl"}`}>
 
         {/* Back link */}
         <Link
@@ -162,7 +162,7 @@ export default async function NotePage({ params }: NotePageProps) {
         </Link>
 
         {/* Header */}
-        <header className="mt-10 max-w-3xl">
+        <header className="mt-6 max-w-3xl">
           <div
             className="
               flex h-12 w-12 items-center justify-center rounded-xl
@@ -232,7 +232,7 @@ export default async function NotePage({ params }: NotePageProps) {
         )}
 
         {/* Divider */}
-        <div className="my-10 h-px bg-zinc-200 dark:bg-zinc-800" />
+        <div className="my-8 h-px bg-zinc-200 dark:bg-zinc-800" />
 
         {/* Content row: optional sticky TOC sidebar + the study content */}
         <div className={hasToc ? "lg:flex lg:items-start lg:gap-12" : ""}>
@@ -240,7 +240,7 @@ export default async function NotePage({ params }: NotePageProps) {
           {hasToc && (
             <nav
               aria-label="Table of contents"
-              className="hidden shrink-0 lg:sticky lg:top-32 lg:block lg:w-56"
+              className="hidden shrink-0 lg:sticky lg:top-24 lg:block lg:w-56"
             >
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-600">
                 On this page
@@ -272,7 +272,7 @@ export default async function NotePage({ params }: NotePageProps) {
               <ReactMarkdown
                 components={{
                   h1: ({ children }) => (
-                    <h2 className="mb-4 mt-10 text-2xl font-black tracking-tight text-zinc-950 first:mt-0 dark:text-white sm:text-3xl">
+                    <h2 className="mb-4 mt-12 border-l-[3px] border-blue-500 pl-4 text-xl font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-2xl">
                       {children}
                     </h2>
                   ),
@@ -280,7 +280,7 @@ export default async function NotePage({ params }: NotePageProps) {
                     const text = String(children);
                     const id = nextHeadingId(text);
                     return (
-                      <h2 id={id} className="mb-4 mt-10 scroll-mt-32 text-2xl font-black tracking-tight text-zinc-950 first:mt-0 dark:text-white sm:text-3xl">
+                      <h2 id={id} className="mb-4 mt-12 scroll-mt-24 border-l-[3px] border-blue-500 pl-4 text-xl font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-2xl">
                         {children}
                       </h2>
                     );
@@ -289,7 +289,7 @@ export default async function NotePage({ params }: NotePageProps) {
                     const text = String(children);
                     const id = nextHeadingId(text);
                     return (
-                      <h3 id={id} className="mb-3 mt-8 scroll-mt-32 text-lg font-bold tracking-tight text-zinc-950 dark:text-white sm:text-xl">
+                      <h3 id={id} className="mb-3 mt-8 scroll-mt-24 pl-4 text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-200 sm:text-lg">
                         {children}
                       </h3>
                     );
