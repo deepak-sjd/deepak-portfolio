@@ -5,7 +5,7 @@ import NotesSidebar from "@/components/layout/NotesSidebar";
 
 export default function NotesLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto flex max-w-[1400px]">
+    <div className="mx-auto flex max-w-[1680px]">
       {/*
         Sticky + its own scroll: the sidebar pins in place as the article
         scrolls, and if the expanded tree is taller than the viewport, only
@@ -14,7 +14,7 @@ export default function NotesLayout({ children }: { children: ReactNode }) {
       */}
       <aside
         className="
-          sticky top-0 hidden h-screen w-72 shrink-0 overflow-y-auto
+          sticky top-0 hidden h-screen w-80 shrink-0 overflow-y-auto
           border-r border-zinc-200 bg-white px-6 py-28
           lg:block
           dark:border-zinc-800 dark:bg-zinc-950

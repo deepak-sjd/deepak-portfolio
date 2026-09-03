@@ -296,10 +296,14 @@ export default function Services() {
             {services.map((service, index) => {
               const Icon = getServiceIcon(service.icon ?? "");
 
-              const technologies = service.technologies
+              const allTechnologies = service.technologies
                 .split(",")
                 .map((technology) => technology.trim())
                 .filter(Boolean);
+
+              const MAX_VISIBLE_TECH = 6;
+              const technologies = allTechnologies.slice(0, MAX_VISIBLE_TECH);
+              const hiddenTechCount = allTechnologies.length - technologies.length;
 
               return (
                 <motion.article
@@ -336,10 +340,10 @@ export default function Services() {
                     hover:-translate-y-1
                     hover:border-blue-200
                     hover:shadow-[0_25px_70px_-35px_rgba(37,99,235,0.22)]
-                    dark:border-zinc-800
-                    dark:bg-zinc-900/90
-                    dark:shadow-none
-                    dark:hover:border-zinc-700
+                    dark:border-zinc-700/80
+                    dark:bg-zinc-900
+                    dark:shadow-[0_20px_60px_-35px_rgba(0,0,0,0.6)]
+                    dark:hover:border-blue-800/60
                     md:p-7
                   "
                 >
@@ -367,18 +371,13 @@ export default function Services() {
                       flex h-12 w-12
                       items-center justify-center
                       rounded-xl
-                      border border-blue-100
-                      bg-blue-50
-                      text-blue-600
+                      bg-gradient-to-br from-blue-500 to-indigo-600
+                      text-white
+                      shadow-[0_8px_20px_-8px_rgba(37,99,235,0.6)]
+                      ring-1 ring-white/20
                       transition-all duration-300
                       group-hover:scale-105
-                      group-hover:bg-blue-600
-                      group-hover:text-white
-                      dark:border-blue-900/50
-                      dark:bg-blue-950/30
-                      dark:text-blue-400
-                      dark:group-hover:bg-blue-500
-                      dark:group-hover:text-white
+                      group-hover:shadow-[0_10px_28px_-8px_rgba(37,99,235,0.75)]
                     "
                   >
                     <Icon
@@ -450,6 +449,7 @@ export default function Services() {
                         <span
                           key={technology}
                           className="
+                            inline-flex items-center gap-1.5
                             rounded-lg
                             border border-zinc-200
                             bg-zinc-50
@@ -466,9 +466,36 @@ export default function Services() {
                             dark:group-hover:text-blue-400
                           "
                         >
+                          <span
+                            aria-hidden="true"
+                            className="
+                              h-1 w-1 shrink-0 rounded-full
+                              bg-zinc-300
+                              transition-colors duration-200
+                              group-hover:bg-blue-500
+                              dark:bg-zinc-600
+                            "
+                          />
                           {technology}
                         </span>
                       ))}
+
+                      {hiddenTechCount > 0 && (
+                        <span
+                          className="
+                            inline-flex items-center
+                            rounded-lg
+                            border border-dashed border-zinc-300
+                            px-2.5 py-1.5
+                            text-[11px] font-semibold
+                            text-zinc-400
+                            dark:border-zinc-700
+                            dark:text-zinc-500
+                          "
+                        >
+                          +{hiddenTechCount} more
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -491,6 +518,14 @@ export default function Services() {
                         dark:group-hover:text-blue-400
                       "
                     >
+                      <span
+                        aria-hidden="true"
+                        className="relative flex h-2 w-2 shrink-0"
+                      >
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                      </span>
+
                       <span>Available for projects</span>
 
                       <FaArrowRight

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
+  FaDatabase,
   FaDocker,
   FaGitAlt,
   FaJava,
@@ -11,15 +12,24 @@ import {
 } from "react-icons/fa";
 import {
   SiFastapi,
+  SiFlutter,
   SiLangchain,
   SiMysql,
   SiNextdotjs,
+  SiOpencv,
   SiPostgresql,
   SiPytorch,
+  SiScikitlearn,
   SiSpringboot,
   SiTensorflow,
   SiTypescript,
 } from "react-icons/si";
+import {
+  BotMessageSquare,
+  BrainCircuit,
+  DatabaseZap,
+  ScanEye,
+} from "lucide-react";
 
 import {
   getSkills,
@@ -32,7 +42,8 @@ type SkillCategory =
   | "Backend"
   | "Frontend"
   | "Database"
-  | "DevOps";
+  | "DevOps"
+  | "Mobile";
 
 type Skill = {
   id: number;
@@ -71,6 +82,27 @@ const skillMetadata: Record<
     featured: true,
   },
 
+  "Machine Learning": {
+    icon: <SiScikitlearn aria-hidden="true" />,
+    description:
+      "Predictive modeling, feature engineering and classical algorithms",
+    featured: true,
+  },
+
+  "Deep Learning": {
+    icon: <BrainCircuit aria-hidden="true" />,
+    description:
+      "Neural network design, training and optimization at scale",
+    featured: true,
+  },
+
+  "Computer Vision": {
+    icon: <SiOpencv aria-hidden="true" />,
+    description:
+      "Image classification, detection and segmentation pipelines",
+    featured: true,
+  },
+
   PyTorch: {
     icon: <SiPytorch aria-hidden="true" />,
     description:
@@ -88,6 +120,27 @@ const skillMetadata: Record<
     icon: <SiLangchain aria-hidden="true" />,
     description:
       "LLM applications and retrieval pipelines",
+    featured: true,
+  },
+
+  LLMs: {
+    icon: <BotMessageSquare aria-hidden="true" />,
+    description:
+      "Prompting, fine-tuning and integrating large language models",
+    featured: true,
+  },
+
+  RAG: {
+    icon: <DatabaseZap aria-hidden="true" />,
+    description:
+      "Grounding model responses in retrieved, domain-specific knowledge",
+    featured: true,
+  },
+
+  VLMs: {
+    icon: <ScanEye aria-hidden="true" />,
+    description:
+      "Multimodal models that reason jointly over images and text",
     featured: true,
   },
 
@@ -131,6 +184,13 @@ const skillMetadata: Record<
       "Type-safe modern web development",
   },
 
+  SQL: {
+    icon: <FaDatabase aria-hidden="true" />,
+    description:
+      "Schema design, queries and relational data modeling",
+    featured: true,
+  },
+
   PostgreSQL: {
     icon: <SiPostgresql aria-hidden="true" />,
     description:
@@ -155,6 +215,13 @@ const skillMetadata: Record<
     icon: <FaGitAlt aria-hidden="true" />,
     description:
       "Version control and collaborative development",
+  },
+
+  Flutter: {
+    icon: <SiFlutter aria-hidden="true" />,
+    description:
+      "Cross-platform mobile apps from a single codebase",
+    featured: true,
   },
 };
 
@@ -231,6 +298,12 @@ const categories: {
     eyebrow: "06 / PLATFORM",
     description:
       "Containerization, version control and development infrastructure.",
+  },
+  {
+    name: "Mobile",
+    eyebrow: "07 / DEVICES",
+    description:
+      "Cross-platform mobile apps with Flutter and Firebase.",
   },
 ];
 

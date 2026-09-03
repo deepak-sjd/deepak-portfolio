@@ -141,7 +141,7 @@ export default async function NotePage({ params }: NotePageProps) {
         className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-blue-500/[0.07] blur-[120px] dark:bg-blue-500/[0.12]"
       />
 
-      <article className={`relative mx-auto px-6 pb-24 pt-20 sm:pt-24 lg:px-8 ${hasToc ? "max-w-6xl" : "max-w-4xl"}`}>
+      <article className={`relative mx-auto px-6 pb-24 pt-20 sm:pt-24 lg:px-8 ${isBrowseNode ? "max-w-7xl" : hasToc ? "max-w-6xl" : "max-w-4xl"}`}>
 
         {/* Back link */}
         <Link
@@ -265,9 +265,17 @@ export default async function NotePage({ params }: NotePageProps) {
             </nav>
           )}
 
-        {/* Study content — narrower column for comfortable reading */}
+        {/*
+          Two different jobs, two different widths: a real study article is
+          long-form reading and stays capped at 70ch for readability. A
+          browse-node's content (like this "Fundamentals" intro) is just a
+          couple of sentences before the Topics grid below it — capping that
+          to 70ch made it look like a stray narrow column instead of an
+          intentional intro, so it gets the wider max-w-3xl the header
+          summary already uses, staying visually consistent with it.
+        */}
         {note.content && (
-          <div className="mx-auto max-w-[70ch] flex-1 lg:mx-0">
+          <div className={isBrowseNode ? "max-w-3xl" : "mx-auto max-w-[70ch] flex-1 lg:mx-0"}>
             <div className="text-base leading-8 text-zinc-700 dark:text-zinc-300 sm:text-lg">
               <ReactMarkdown
                 components={{
@@ -405,7 +413,7 @@ function ChildrenGrid({ children }: { children: NoteSummaryApiResponse[] }) {
         Topics
       </h2>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {children.map((child) => (
           <Link
             key={child.id}
@@ -500,7 +508,7 @@ function NoteResources({ resources }: { resources: NoteResourceApiResponse[] }) 
         Resources
       </h2>
 
-      <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {resources.map((resource) => {
           const Icon = RESOURCE_ICONS[resource.type];
           const isDownload = DOWNLOADABLE_TYPES.includes(resource.type);
