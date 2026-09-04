@@ -289,8 +289,8 @@ export default function Services() {
               mt-14
               grid
               gap-6
-              sm:grid-cols-2
-              lg:grid-cols-4
+              lg:grid-cols-2
+              lg:gap-8
             "
           >
             {services.map((service, index) => {
@@ -331,20 +331,20 @@ export default function Services() {
                     flex-col
                     overflow-hidden
                     rounded-[1.75rem]
-                    border border-zinc-200/80
+                    border border-zinc-200
                     bg-white/90
-                    p-6
+                    p-7
                     shadow-[0_16px_50px_-30px_rgba(24,24,27,0.3)]
                     backdrop-blur-xl
                     transition-all duration-500
                     hover:-translate-y-1
-                    hover:border-blue-200
+                    hover:border-blue-300
                     hover:shadow-[0_25px_70px_-35px_rgba(37,99,235,0.22)]
-                    dark:border-zinc-700/80
+                    dark:border-zinc-700
                     dark:bg-zinc-900
                     dark:shadow-[0_20px_60px_-35px_rgba(0,0,0,0.6)]
-                    dark:hover:border-blue-800/60
-                    md:p-7
+                    dark:hover:border-blue-700
+                    md:p-9
                   "
                 >
                   {/* Top accent */}
@@ -431,7 +431,7 @@ export default function Services() {
 
                   {/* Technologies */}
 
-                  <div className="mt-6">
+                  <div className="mt-6 border-t border-zinc-100 pt-6 dark:border-zinc-800/80">
                     <p
                       className="
                         mb-3

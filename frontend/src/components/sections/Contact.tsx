@@ -23,8 +23,8 @@ const contactDetails = [
   {
     icon: FaEnvelope,
     label: "Email",
-    value: "deepakg@gmail.com",
-    href: "mailto:deepakg@gmail.com",
+    value: "deepakkg2508@gmail.com",
+    href: "mailto:deepakkg2508@gmail.com",
     description: "Best for professional inquiries",
   },
   {
@@ -52,12 +52,12 @@ const socialLinks = [
   {
     name: "LinkedIn",
     icon: FaLinkedin,
-    href: "#",
+    href: "https://www.linkedin.com/in/deepak-sjd/",
   },
   {
     name: "Instagram",
     icon: FaInstagram,
-    href: "#",
+    href: "https://www.instagram.com/gupta_deepak_74/",
   },
 ];
 
@@ -942,7 +942,7 @@ export default function Contact() {
           </div>
 
           <a
-            href="mailto:deepakg@gmail.com"
+            href="mailto:deepakkg2508@gmail.com"
             className="
               group
               inline-flex
@@ -962,7 +962,7 @@ export default function Contact() {
               dark:focus-visible:ring-offset-zinc-950
             "
           >
-            deepakg@gmail.com
+            deepakkg2508@gmail.com
 
             <FaArrowRight
               aria-hidden="true"
