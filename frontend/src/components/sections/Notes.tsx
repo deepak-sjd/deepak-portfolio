@@ -39,6 +39,10 @@ function iconForField(title: string): React.ElementType {
 
 const MAX_FEATURED_FIELDS = 12;
 
+// Wrapping Next's Link in motion() lets the whole card be a real, single
+// <a> element while still driving hover/tap physics through framer-motion.
+const MotionLink = motion.create(Link);
+
 export default function Notes() {
   const [fields, setFields] = useState<NoteSummaryApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -168,65 +172,118 @@ export default function Notes() {
                 const Icon = iconForField(field.title);
 
                 return (
-                  <motion.article
+                  <motion.div
                     key={field.id}
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.5, delay: index * 0.06, ease: "easeOut" }}
-                    className="
-                      group flex flex-col overflow-hidden rounded-3xl border
-                      border-zinc-200/80 bg-white p-6
-                      shadow-[0_15px_50px_-30px_rgba(24,24,27,0.35)]
-                      transition-all duration-300
-                      hover:-translate-y-1 hover:border-blue-200
-                      hover:shadow-[0_25px_60px_-30px_rgba(37,99,235,0.3)]
-                      dark:border-zinc-800 dark:bg-zinc-900/70 dark:hover:border-zinc-700
-                    "
                   >
-                    <div className="flex items-center justify-between">
-                      <div
+                    <MotionLink
+                      href={`/notes/${field.slug}`}
+                      whileHover="hover"
+                      whileTap={{ scale: 0.985 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                      className="
+                        group relative flex h-full flex-col overflow-hidden
+                        rounded-3xl border border-zinc-200/80 bg-white p-6
+                        shadow-[0_15px_50px_-30px_rgba(24,24,27,0.35)]
+                        outline-none transition-colors duration-300
+                        hover:border-blue-200 focus-visible:ring-2
+                        focus-visible:ring-blue-500 focus-visible:ring-offset-2
+                        dark:border-zinc-800 dark:bg-zinc-900/70
+                        dark:hover:border-zinc-700
+                        dark:focus-visible:ring-offset-zinc-950
+                      "
+                    >
+                      {/* Soft gradient glow that fades in behind the content on hover */}
+                      <motion.span
+                        aria-hidden="true"
+                        variants={{
+                          hover: { opacity: 1 },
+                        }}
+                        initial={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
                         className="
-                          flex h-11 w-11 items-center justify-center rounded-xl
-                          bg-blue-50 text-blue-600 ring-1 ring-blue-100
-                          dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
+                          pointer-events-none absolute inset-0
+                          bg-gradient-to-br from-blue-50 via-transparent to-cyan-50
+                          dark:from-blue-500/[0.07] dark:via-transparent dark:to-cyan-500/[0.07]
                         "
+                      />
+
+                      {/* Card lifts and gains a colored shadow as one motion unit */}
+                      <motion.span
+                        aria-hidden="true"
+                        variants={{
+                          hover: {
+                            boxShadow: "0 25px 60px -30px rgba(37,99,235,0.35)",
+                          },
+                        }}
+                        transition={{ duration: 0.3 }}
+                        className="pointer-events-none absolute inset-0 rounded-3xl"
+                      />
+
+                      <motion.span
+                        variants={{ hover: { y: -6 } }}
+                        transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                        className="relative flex h-full flex-col"
                       >
-                        <Icon aria-hidden="true" className="text-base" />
-                      </div>
+                        <div className="flex items-center justify-between">
+                          <motion.div
+                            variants={{
+                              hover: { scale: 1.1, rotate: -6 },
+                            }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            className="
+                              flex h-11 w-11 items-center justify-center rounded-xl
+                              bg-blue-50 text-blue-600 ring-1 ring-blue-100
+                              transition-colors duration-300
+                              group-hover:bg-blue-600 group-hover:text-white
+                              group-hover:ring-blue-600
+                              dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
+                            "
+                          >
+                            <Icon aria-hidden="true" className="text-base" />
+                          </motion.div>
 
-                      <span className="text-xs font-medium text-zinc-400 dark:text-zinc-600">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                    </div>
+                          <span className="text-xs font-medium text-zinc-400 dark:text-zinc-600">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                        </div>
 
-                    <h3 className="mt-6 text-xl font-bold tracking-tight text-zinc-950 dark:text-white">
-                      {field.title}
-                    </h3>
+                        <h3
+                          className="
+                            mt-6 text-xl font-bold tracking-tight text-zinc-950
+                            transition-colors duration-300 group-hover:text-blue-600
+                            dark:text-white dark:group-hover:text-blue-400
+                          "
+                        >
+                          {field.title}
+                        </h3>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                      {field.summary}
-                    </p>
+                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                          {field.summary}
+                        </p>
 
-                    <div className="mt-auto pt-7">
-                      <Link
-                        href={`/notes/${field.slug}`}
-                        className="
-                          group/link inline-flex items-center gap-2 text-sm font-bold
-                          text-blue-600 transition-colors hover:text-blue-700
-                          focus:outline-none focus-visible:rounded focus-visible:ring-2
-                          focus-visible:ring-blue-500
-                          dark:text-blue-400 dark:hover:text-blue-300
-                        "
-                      >
-                        Explore topics
-                        <FaArrowRight
-                          aria-hidden="true"
-                          className="text-xs transition-transform duration-300 group-hover/link:translate-x-1"
-                        />
-                      </Link>
-                    </div>
-                  </motion.article>
+                        <div className="mt-auto pt-7">
+                          <span
+                            className="
+                              inline-flex items-center gap-2 text-sm font-bold
+                              text-blue-600 transition-colors duration-300
+                              group-hover:text-blue-700
+                              dark:text-blue-400 dark:group-hover:text-blue-300
+                            "
+                          >
+                            Explore topics
+                            <FaArrowRight
+                              aria-hidden="true"
+                              className="text-xs transition-transform duration-300 group-hover:translate-x-1.5"
+                            />
+                          </span>
+                        </div>
+                      </motion.span>
+                    </MotionLink>
+                  </motion.div>
                 );
               })}
             </div>
