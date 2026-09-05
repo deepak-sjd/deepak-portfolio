@@ -27,6 +27,14 @@ public class ServiceController {
         );
     }
 
+    /** Admin-only: returns every service (active and inactive) for management purposes. */
+    @GetMapping("/admin")
+    public ResponseEntity<List<ServiceResponse>> getAllServicesForAdmin() {
+        return ResponseEntity.ok(
+                serviceService.getAllServicesForAdmin()
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponse> getServiceById(
             @PathVariable Long id

@@ -6,6 +6,7 @@ export interface ProjectApiResponse {
   githubUrl: string;
   liveUrl: string;
   imageUrl: string;
+  videoUrl: string | null;
   featured: boolean;
   displayOrder: number;
 }

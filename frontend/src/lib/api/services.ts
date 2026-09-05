@@ -1,3 +1,5 @@
+import type { ProjectApiResponse } from "./projects";
+
 export interface ServiceApiResponse {
   id: number;
   title: string;
@@ -10,6 +12,7 @@ export interface ServiceApiResponse {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+  relatedProjects: ProjectApiResponse[];
 }
 
 const API_BASE_URL =

@@ -8,6 +8,9 @@ import {
   FaCamera,
   FaServer,
   FaProjectDiagram,
+  FaGithub,
+  FaExternalLinkAlt,
+  FaPlay,
 } from "react-icons/fa";
 
 import {
@@ -46,6 +49,99 @@ function getServiceIcon(icon: string): ServiceIcon {
     default:
       return FaBrain;
   }
+}
+
+/* ==========================================================================
+   Proof-of-Work Chip — links a Service to a real Project
+   ========================================================================== */
+
+interface ProofOfWorkChipProps {
+  project: {
+    id: number;
+    title: string;
+    githubUrl: string | null;
+    liveUrl: string | null;
+    videoUrl: string | null;
+  };
+}
+
+function ProofOfWorkChip({ project }: ProofOfWorkChipProps) {
+  const primaryUrl = project.githubUrl || project.liveUrl || null;
+  const isClickable = !!primaryUrl;
+
+  const openPrimaryLink = () => {
+    if (primaryUrl) {
+      window.open(primaryUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  return (
+    <div
+      role={isClickable ? "link" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onClick={isClickable ? openPrimaryLink : undefined}
+      onKeyDown={(event) => {
+        if (isClickable && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          openPrimaryLink();
+        }
+      }}
+      aria-label={isClickable ? `Open ${project.title} on GitHub` : project.title}
+      className={`
+        flex items-center justify-between gap-3
+        rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3
+        transition-all duration-200
+        dark:border-zinc-800 dark:bg-zinc-900/60
+        ${isClickable ? `
+          cursor-pointer
+          hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+          dark:hover:border-blue-800 dark:hover:bg-blue-950/20 dark:focus-visible:ring-offset-zinc-950
+        ` : "opacity-60"}
+      `}
+    >
+      <span className="min-w-0 truncate text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+        {project.title}
+      </span>
+
+      {/* Availability indicators — lit up when present, dimmed when not, so
+          it's clear at a glance what proof actually exists for this project. */}
+      <span className="flex shrink-0 items-center gap-1.5">
+        <span
+          title={project.githubUrl ? "View source on GitHub" : "No public repository"}
+          className={`flex h-6 w-6 items-center justify-center rounded-md ${
+            project.githubUrl
+              ? "bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900"
+              : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+          }`}
+        >
+          <FaGithub aria-hidden="true" className="text-[11px]" />
+        </span>
+
+        <span
+          title={project.liveUrl ? "Live demo available" : "No live demo"}
+          className={`flex h-6 w-6 items-center justify-center rounded-md ${
+            project.liveUrl
+              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+              : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+          }`}
+        >
+          <FaExternalLinkAlt aria-hidden="true" className="text-[9px]" />
+        </span>
+
+        <span
+          title={project.videoUrl ? "Demo video available" : "No demo video"}
+          className={`flex h-6 w-6 items-center justify-center rounded-md ${
+            project.videoUrl
+              ? "bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400"
+              : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+          }`}
+        >
+          <FaPlay aria-hidden="true" className="text-[8px]" />
+        </span>
+      </span>
+    </div>
+  );
 }
 
 /* ==========================================================================
@@ -469,6 +565,30 @@ export default function Services() {
                     </p>
                   </div>
 
+                  {/* Proof of work — real projects behind this service, if any */}
+
+                  {service.relatedProjects.length > 0 && (
+                    <div className="mt-6 border-t border-zinc-100 pt-6 dark:border-zinc-800/80">
+                      <p
+                        className="
+                          mb-3
+                          text-[10px] font-bold
+                          uppercase
+                          tracking-[0.18em]
+                          text-zinc-400
+                        "
+                      >
+                        Proof of Work
+                      </p>
+
+                      <div className="space-y-2">
+                        {service.relatedProjects.map((project) => (
+                          <ProofOfWorkChip key={project.id} project={project} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Bottom indicator */}
 
                   <div
@@ -600,7 +720,7 @@ export default function Services() {
           </div>
 
           <a
-            href="#contact"
+            href="/#contact"
             className="
               group inline-flex shrink-0
               items-center gap-2

@@ -39,6 +39,7 @@ public class ProjectService {
                 request.featured(),
                 request.displayOrder()
         );
+        project.setVideoUrl(request.videoUrl());
 
         Project savedProject = projectRepository.save(project);
 
@@ -122,6 +123,7 @@ public class ProjectService {
         project.setGithubUrl(request.githubUrl());
         project.setLiveUrl(request.liveUrl());
         project.setImageUrl(request.imageUrl());
+        project.setVideoUrl(request.videoUrl());
         project.setFeatured(request.featured());
         project.setDisplayOrder(request.displayOrder());
 
@@ -151,7 +153,7 @@ public class ProjectService {
     // ENTITY → RESPONSE DTO
     // ============================================================
 
-    private ProjectResponse toResponse(Project project) {
+    ProjectResponse toResponse(Project project) {
 
         return new ProjectResponse(
                 project.getId(),
@@ -161,6 +163,7 @@ public class ProjectService {
                 project.getGithubUrl(),
                 project.getLiveUrl(),
                 project.getImageUrl(),
+                project.getVideoUrl(),
                 project.isFeatured(),
                 project.getDisplayOrder()
         );
