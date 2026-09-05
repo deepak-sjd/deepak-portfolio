@@ -12,31 +12,7 @@ import ThemeToggle from "@/components/common/ThemeToggle";
 
 import { NAV_ITEMS } from "@/constants/navigation";
 import useActiveSection from "@/hooks/useActiveSection";
-import { scrollToHash } from "@/utils/scrollToHash";
-
-/**
- * Next's <Link> only reliably auto-scrolls to a "#hash" target on a real
- * pathname change. Clicking "/#notes" while already sitting on "/" is a
- * same-pathname navigation, and Next sometimes treats it as a no-op —
- * which is exactly the "click Notes, nothing happens" bug. So: if we're
- * already on the target page, skip the router entirely and scroll by hand.
- * If we're on a *different* page, let Link do a real navigation — landing
- * there is handled by <HashScrollHandler /> in the root layout.
- */
-function useHashLinkClick(pathname: string) {
-  return (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (!href.includes("#")) return;
-
-    const [path, hash] = href.split("#");
-    const targetPath = path || "/";
-
-    if (pathname === targetPath) {
-      event.preventDefault();
-      scrollToHash(hash);
-      window.history.replaceState(null, "", href);
-    }
-  };
-}
+import useHashLinkClick from "@/hooks/useHashLinkClick";
 
 /**
  * Some nav links are homepage anchors ("/#about" — only ever "active" while

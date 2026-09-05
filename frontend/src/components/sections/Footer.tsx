@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   FaArrowUp,
@@ -10,31 +11,36 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
+import useHashLinkClick from "@/hooks/useHashLinkClick";
+
 /* -------------------------------------------------------------------------- */
 /* Navigation                                                                 */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Skills / Experience / Projects / Services live at their own routes now
+ * ("/skills", not a "#skills" section on the homepage) — mirrors
+ * constants/navigation.ts. "About", "Notes" and "Contact" are still real
+ * homepage sections, so they stay as "/#hash" links and go through the
+ * same scroll-on-click handling the navbar uses.
+ */
 const navigation = {
   explore: [
-    { name: "Home", href: "#home" },
-    { name: "About", href: "#about" },
-    { name: "Skills", href: "#skills" },
-    { name: "Services", href: "#services" },
-    { name: "Experience", href: "#experience" },
+    { name: "Home", href: "/" },
+    { name: "About", href: "/#about" },
+    { name: "Skills", href: "/skills" },
+    { name: "Services", href: "/services" },
+    { name: "Experience", href: "/experience" },
   ],
 
   work: [
-    { name: "Projects", href: "#projects" },
-    { name: "Notes", href: "#notes" },
-    { name: "Contact", href: "#contact" },
+    { name: "Projects", href: "/projects" },
+    { name: "Notes", href: "/#notes" },
+    { name: "Contact", href: "/#contact" },
   ],
 
   connect: [
-    {
-      name: "GitHub",
-      href: "https://github.com/deepak-sjd",
-      external: true,
-    },
+    { name: "GitHub", href: "https://github.com/deepak-sjd", external: true },
     {
       name: "LinkedIn",
       href: "https://linkedin.com/in/deepak-sjd",
@@ -57,8 +63,7 @@ const socialLinks = [
     name: "GitHub",
     href: "https://github.com/deepak-sjd",
     icon: FaGithub,
-    hover:
-      "hover:border-zinc-600 hover:bg-zinc-800 hover:text-white",
+    hover: "hover:border-zinc-600 hover:bg-zinc-800 hover:text-white",
   },
   {
     name: "LinkedIn",
@@ -101,6 +106,9 @@ function FooterLink({
   href: string;
   external?: boolean;
 }) {
+  const pathname = usePathname();
+  const handleHashLinkClick = useHashLinkClick(pathname);
+
   const className = `
     group
     inline-flex
@@ -148,7 +156,11 @@ function FooterLink({
   }
 
   return (
-    <Link href={href} className={className}>
+    <Link
+      href={href}
+      onClick={(event) => handleHashLinkClick(event, href)}
+      className={className}
+    >
       {content}
     </Link>
   );
@@ -235,10 +247,12 @@ export default function Footer() {
         <div
           className="
             grid
+            grid-cols-1
             gap-12
-            md:grid-cols-2
+            sm:grid-cols-2
             lg:grid-cols-[1.6fr_1fr_1fr_1fr]
-            lg:gap-12
+            lg:gap-10
+            xl:gap-12
           "
         >
           {/* ================================================================ */}
@@ -250,9 +264,10 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.45 }}
+            className="sm:col-span-2 lg:col-span-1"
           >
             <Link
-              href="#home"
+              href="/"
               aria-label="Deepak Kumar — return to homepage"
               className="group inline-flex items-center gap-3"
             >
@@ -262,6 +277,7 @@ export default function Footer() {
                   flex
                   h-11
                   w-11
+                  shrink-0
                   items-center
                   justify-center
                   rounded-xl
@@ -498,10 +514,7 @@ export default function Footer() {
         {/* Divider                                                           */}
         {/* ---------------------------------------------------------------- */}
 
-        <div
-          aria-hidden="true"
-          className="my-10 h-px bg-zinc-800 sm:my-12"
-        />
+        <div aria-hidden="true" className="my-10 h-px bg-zinc-800 sm:my-12" />
 
         {/* ---------------------------------------------------------------- */}
         {/* Bottom row                                                        */}
@@ -536,28 +549,19 @@ export default function Footer() {
           >
             <span>Built with</span>
 
-            <FaHeart
-              aria-hidden="true"
-              className="text-red-500"
-            />
+            <FaHeart aria-hidden="true" className="text-red-500" />
 
             <span>using</span>
 
-            <span className="font-medium text-zinc-300">
-              Next.js
-            </span>
+            <span className="font-medium text-zinc-300">Next.js</span>
 
             <span aria-hidden="true">•</span>
 
-            <span className="font-medium text-zinc-300">
-              TypeScript
-            </span>
+            <span className="font-medium text-zinc-300">TypeScript</span>
 
             <span aria-hidden="true">•</span>
 
-            <span className="font-medium text-zinc-300">
-              Tailwind CSS
-            </span>
+            <span className="font-medium text-zinc-300">Tailwind CSS</span>
           </div>
 
           {/* Back to top */}
@@ -616,10 +620,8 @@ export default function Footer() {
             text-zinc-600
           "
         >
-          Designed & engineered by{" "}
-          <span className="font-medium text-zinc-500">
-            Deepak Kumar
-          </span>
+          Designed &amp; engineered by{" "}
+          <span className="font-medium text-zinc-500">Deepak Kumar</span>
         </div>
       </div>
     </footer>
