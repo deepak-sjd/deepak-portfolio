@@ -2,6 +2,8 @@ package com.deepak.portfolio.dto.request;
 
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 public record ServiceRequest(
 
         @NotBlank(message = "Title is required")
@@ -29,6 +31,9 @@ public record ServiceRequest(
         @Min(value = 0, message = "Display order cannot be negative")
         Integer displayOrder,
 
-        boolean active
+        boolean active,
+
+        /** IDs of Projects that showcase this service. Optional — null/absent means "no linked projects". */
+        List<Long> relatedProjectIds
 ) {
 }

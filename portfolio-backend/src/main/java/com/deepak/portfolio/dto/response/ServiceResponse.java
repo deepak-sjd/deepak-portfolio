@@ -1,6 +1,7 @@
 package com.deepak.portfolio.dto.response;
 
 import java.time.Instant;
+import java.util.List;
 
 public record ServiceResponse(
         Long id,
@@ -13,6 +14,7 @@ public record ServiceResponse(
         Integer displayOrder,
         boolean active,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        List<ProjectResponse> relatedProjects
 ) {
 }

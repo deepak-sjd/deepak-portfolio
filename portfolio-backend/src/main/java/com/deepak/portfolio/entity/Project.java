@@ -28,6 +28,10 @@ public class Project {
     @Column(length = 500)
     private String imageUrl;
 
+    /** Optional demo/walkthrough video link (e.g. YouTube) shown alongside GitHub/live links. */
+    @Column(length = 500)
+    private String videoUrl;
+
     @Column(nullable = false)
     private boolean featured;
 
@@ -102,6 +106,14 @@ protected void onUpdate() {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 
     public boolean isFeatured() {

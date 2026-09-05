@@ -8,6 +8,7 @@ public record ProjectResponse(
         String githubUrl,
         String liveUrl,
         String imageUrl,
+        String videoUrl,
         boolean featured,
         Integer displayOrder
 ) {

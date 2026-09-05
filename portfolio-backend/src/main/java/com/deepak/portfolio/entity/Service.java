@@ -2,6 +2,8 @@ package com.deepak.portfolio.entity;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "services")
@@ -40,6 +42,22 @@ public class Service {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    /**
+     * Projects that showcase this service in practice — lets a Service card
+     * link straight through to real proof-of-work (GitHub/live demo/video)
+     * instead of just describing the skill in prose. Unidirectional: Project
+     * doesn't need to know which services point at it, so there's no risk
+     * of circular JSON serialization.
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "service_projects",
+            joinColumns = @JoinColumn(name = "service_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    @OrderColumn(name = "display_order")
+    private List<Project> relatedProjects = new ArrayList<>();
 
     protected Service() {
     }
@@ -118,6 +136,14 @@ public class Service {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public List<Project> getRelatedProjects() {
+        return relatedProjects;
+    }
+
+    public void setRelatedProjects(List<Project> relatedProjects) {
+        this.relatedProjects = relatedProjects;
     }
 
     public void setTitle(String title) {
