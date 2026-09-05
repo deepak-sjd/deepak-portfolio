@@ -12,6 +12,31 @@ import ThemeToggle from "@/components/common/ThemeToggle";
 
 import { NAV_ITEMS } from "@/constants/navigation";
 import useActiveSection from "@/hooks/useActiveSection";
+import { scrollToHash } from "@/utils/scrollToHash";
+
+/**
+ * Next's <Link> only reliably auto-scrolls to a "#hash" target on a real
+ * pathname change. Clicking "/#notes" while already sitting on "/" is a
+ * same-pathname navigation, and Next sometimes treats it as a no-op —
+ * which is exactly the "click Notes, nothing happens" bug. So: if we're
+ * already on the target page, skip the router entirely and scroll by hand.
+ * If we're on a *different* page, let Link do a real navigation — landing
+ * there is handled by <HashScrollHandler /> in the root layout.
+ */
+function useHashLinkClick(pathname: string) {
+  return (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.includes("#")) return;
+
+    const [path, hash] = href.split("#");
+    const targetPath = path || "/";
+
+    if (pathname === targetPath) {
+      event.preventDefault();
+      scrollToHash(hash);
+      window.history.replaceState(null, "", href);
+    }
+  };
+}
 
 /**
  * Some nav links are homepage anchors ("/#about" — only ever "active" while
@@ -39,6 +64,7 @@ export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
 
   const activeSection = useActiveSection();
+  const handleHashLinkClick = useHashLinkClick(pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -138,6 +164,7 @@ export default function Navbar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={(e) => handleHashLinkClick(e, item.href)}
                     aria-current={isActive ? "page" : undefined}
                     className={`relative rounded-md py-2 text-sm font-semibold transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950 ${
                       isActive
@@ -232,7 +259,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-4 md:flex">
           <ThemeToggle />
 
-          <Link href="/#contact">
+          <Link href="/#contact" onClick={(e) => handleHashLinkClick(e, "/#contact")}>
             <Button>Hire Me</Button>
           </Link>
         </div>
@@ -286,7 +313,10 @@ export default function Navbar() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      onClick={handleMobileLinkClick}
+                      onClick={(e) => {
+                        handleHashLinkClick(e, item.href);
+                        handleMobileLinkClick();
+                      }}
                       aria-current={isActive ? "page" : undefined}
                       tabIndex={mobileMenuOpen ? 0 : -1}
                       className={`block rounded-xl px-4 py-3 text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950 ${
@@ -366,7 +396,10 @@ export default function Navbar() {
           <div className="mt-5 border-t border-zinc-200 pt-5 dark:border-zinc-800">
             <Link
               href="/#contact"
-              onClick={handleMobileLinkClick}
+              onClick={(e) => {
+                handleHashLinkClick(e, "/#contact");
+                handleMobileLinkClick();
+              }}
               className="block"
             >
               <Button className="w-full">Hire Me</Button>
