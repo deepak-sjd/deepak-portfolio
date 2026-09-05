@@ -301,7 +301,7 @@ export default function Services() {
                 .map((technology) => technology.trim())
                 .filter(Boolean);
 
-              const MAX_VISIBLE_TECH = 6;
+              const MAX_VISIBLE_TECH = 10;
               const technologies = allTechnologies.slice(0, MAX_VISIBLE_TECH);
               const hiddenTechCount = allTechnologies.length - technologies.length;
 
@@ -364,26 +364,32 @@ export default function Services() {
                     "
                   />
 
-                  {/* Icon */}
+                  {/* Icon + index number */}
 
-                  <div
-                    className="
-                      flex h-12 w-12
-                      items-center justify-center
-                      rounded-xl
-                      bg-gradient-to-br from-blue-500 to-indigo-600
-                      text-white
-                      shadow-[0_8px_20px_-8px_rgba(37,99,235,0.6)]
-                      ring-1 ring-white/20
-                      transition-all duration-300
-                      group-hover:scale-105
-                      group-hover:shadow-[0_10px_28px_-8px_rgba(37,99,235,0.75)]
-                    "
-                  >
-                    <Icon
-                      aria-hidden="true"
-                      className="text-lg"
-                    />
+                  <div className="flex items-center justify-between">
+                    <div
+                      className="
+                        flex h-12 w-12
+                        items-center justify-center
+                        rounded-xl
+                        bg-gradient-to-br from-blue-500 to-indigo-600
+                        text-white
+                        shadow-[0_8px_20px_-8px_rgba(37,99,235,0.6)]
+                        ring-1 ring-white/20
+                        transition-all duration-300
+                        group-hover:scale-105
+                        group-hover:shadow-[0_10px_28px_-8px_rgba(37,99,235,0.75)]
+                      "
+                    >
+                      <Icon
+                        aria-hidden="true"
+                        className="text-lg"
+                      />
+                    </div>
+
+                    <span className="text-xs font-medium text-zinc-400 dark:text-zinc-600">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
                   </div>
 
                   {/* Category */}
@@ -444,59 +450,23 @@ export default function Services() {
                       Technologies
                     </p>
 
-                    <div className="flex flex-wrap gap-2">
-                      {technologies.map((technology) => (
-                        <span
-                          key={technology}
-                          className="
-                            inline-flex items-center gap-1.5
-                            rounded-lg
-                            border border-zinc-200
-                            bg-zinc-50
-                            px-2.5 py-1.5
-                            text-[11px] font-semibold
-                            text-zinc-600
-                            transition-colors duration-200
-                            group-hover:border-blue-100
-                            group-hover:text-blue-600
-                            dark:border-zinc-700
-                            dark:bg-zinc-950
-                            dark:text-zinc-400
-                            dark:group-hover:border-blue-900
-                            dark:group-hover:text-blue-400
-                          "
-                        >
-                          <span
-                            aria-hidden="true"
-                            className="
-                              h-1 w-1 shrink-0 rounded-full
-                              bg-zinc-300
-                              transition-colors duration-200
-                              group-hover:bg-blue-500
-                              dark:bg-zinc-600
-                            "
-                          />
-                          {technology}
+                    <p className="text-sm font-medium leading-7 text-zinc-500 dark:text-zinc-400">
+                      {technologies.map((technology, i) => (
+                        <span key={technology}>
+                          <span className="text-zinc-800 dark:text-zinc-200">
+                            {technology}
+                          </span>
+                          {i < technologies.length - 1 && (
+                            <span className="mx-2 text-zinc-300 dark:text-zinc-700">·</span>
+                          )}
                         </span>
                       ))}
-
                       {hiddenTechCount > 0 && (
-                        <span
-                          className="
-                            inline-flex items-center
-                            rounded-lg
-                            border border-dashed border-zinc-300
-                            px-2.5 py-1.5
-                            text-[11px] font-semibold
-                            text-zinc-400
-                            dark:border-zinc-700
-                            dark:text-zinc-500
-                          "
-                        >
-                          +{hiddenTechCount} more
+                        <span className="text-zinc-400 dark:text-zinc-600">
+                          {" "}+ {hiddenTechCount} more
                         </span>
                       )}
-                    </div>
+                    </p>
                   </div>
 
                   {/* Bottom indicator */}
