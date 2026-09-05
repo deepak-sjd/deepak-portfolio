@@ -670,7 +670,7 @@ export default function Experience() {
           </div>
 
           <a
-            href="#projects"
+            href="/projects"
             className="
               group inline-flex shrink-0
               items-center gap-2

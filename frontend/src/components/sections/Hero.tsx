@@ -253,7 +253,7 @@ export default function Hero() {
             {/* ===================================================== */}
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href="#projects">
+              <a href="/projects">
                 <Button
                   className="
                     group
@@ -286,7 +286,7 @@ export default function Hero() {
               </a>
 
               <a
-                href="#contact"
+                href="/#contact"
                 className="
                   inline-flex
                   items-center
