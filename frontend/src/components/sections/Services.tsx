@@ -66,12 +66,17 @@ interface ProofOfWorkChipProps {
 }
 
 function ProofOfWorkChip({ project }: ProofOfWorkChipProps) {
-  const primaryUrl = project.githubUrl || project.liveUrl || null;
+  // Row background/title click falls back to whichever link exists first —
+  // but each icon below has its own handler and stops the click from
+  // reaching this one, so clicking Video actually opens the video, not
+  // silently falling through to GitHub like it did before.
+  const primaryUrl = project.githubUrl || project.liveUrl || project.videoUrl || null;
   const isClickable = !!primaryUrl;
 
-  const openPrimaryLink = () => {
-    if (primaryUrl) {
-      window.open(primaryUrl, "_blank", "noopener,noreferrer");
+  const openLink = (url: string | null, event: React.SyntheticEvent) => {
+    event.stopPropagation();
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -79,14 +84,14 @@ function ProofOfWorkChip({ project }: ProofOfWorkChipProps) {
     <div
       role={isClickable ? "link" : undefined}
       tabIndex={isClickable ? 0 : undefined}
-      onClick={isClickable ? openPrimaryLink : undefined}
+      onClick={isClickable ? (event) => openLink(primaryUrl, event) : undefined}
       onKeyDown={(event) => {
         if (isClickable && (event.key === "Enter" || event.key === " ")) {
           event.preventDefault();
-          openPrimaryLink();
+          openLink(primaryUrl, event);
         }
       }}
-      aria-label={isClickable ? `Open ${project.title} on GitHub` : project.title}
+      aria-label={isClickable ? `Open ${project.title}` : project.title}
       className={`
         flex items-center justify-between gap-3
         rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3
@@ -104,41 +109,50 @@ function ProofOfWorkChip({ project }: ProofOfWorkChipProps) {
         {project.title}
       </span>
 
-      {/* Availability indicators — lit up when present, dimmed when not, so
-          it's clear at a glance what proof actually exists for this project. */}
+      {/* Each icon is its own clickable button now — availability AND a
+          working link to that specific thing, not just a status dot. */}
       <span className="flex shrink-0 items-center gap-1.5">
-        <span
+        <button
+          type="button"
+          disabled={!project.githubUrl}
+          onClick={(event) => openLink(project.githubUrl, event)}
           title={project.githubUrl ? "View source on GitHub" : "No public repository"}
-          className={`flex h-6 w-6 items-center justify-center rounded-md ${
+          className={`flex h-6 w-6 items-center justify-center rounded-md transition-transform ${
             project.githubUrl
-              ? "bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900"
-              : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+              ? "cursor-pointer bg-zinc-800 text-white hover:scale-110 dark:bg-zinc-100 dark:text-zinc-900"
+              : "cursor-default bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
           }`}
         >
           <FaGithub aria-hidden="true" className="text-[11px]" />
-        </span>
+        </button>
 
-        <span
+        <button
+          type="button"
+          disabled={!project.liveUrl}
+          onClick={(event) => openLink(project.liveUrl, event)}
           title={project.liveUrl ? "Live demo available" : "No live demo"}
-          className={`flex h-6 w-6 items-center justify-center rounded-md ${
+          className={`flex h-6 w-6 items-center justify-center rounded-md transition-transform ${
             project.liveUrl
-              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
-              : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+              ? "cursor-pointer bg-emerald-100 text-emerald-700 hover:scale-110 dark:bg-emerald-950/50 dark:text-emerald-400"
+              : "cursor-default bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
           }`}
         >
           <FaExternalLinkAlt aria-hidden="true" className="text-[9px]" />
-        </span>
+        </button>
 
-        <span
+        <button
+          type="button"
+          disabled={!project.videoUrl}
+          onClick={(event) => openLink(project.videoUrl, event)}
           title={project.videoUrl ? "Demo video available" : "No demo video"}
-          className={`flex h-6 w-6 items-center justify-center rounded-md ${
+          className={`flex h-6 w-6 items-center justify-center rounded-md transition-transform ${
             project.videoUrl
-              ? "bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400"
-              : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+              ? "cursor-pointer bg-red-100 text-red-600 hover:scale-110 dark:bg-red-950/50 dark:text-red-400"
+              : "cursor-default bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
           }`}
         >
           <FaPlay aria-hidden="true" className="text-[8px]" />
-        </span>
+        </button>
       </span>
     </div>
   );
