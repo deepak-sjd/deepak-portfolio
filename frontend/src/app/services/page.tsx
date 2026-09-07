@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import ScrollProgress from "@/components/common/ScrollProgress";
 import PageTransition from "@/components/common/PageTransition";
-import Services from "@/components/sections/Services";
+import ServicesShowcase from "@/components/sections/ServicesShowcase";
 import Footer from "@/components/sections/Footer";
 
 export const metadata = {
@@ -16,7 +16,7 @@ export default function ServicesPage() {
       <Navbar />
       <PageTransition>
         <main>
-          <Services />
+          <ServicesShowcase />
         </main>
         <Footer />
       </PageTransition>
