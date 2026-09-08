@@ -12,6 +12,7 @@ import {
   FaChevronRight,
   FaExternalLinkAlt,
   FaGithub,
+  FaImage,
   FaPlay,
   FaProjectDiagram,
   FaServer,
@@ -56,65 +57,35 @@ function parseTechnologies(csv: string): string[] {
 }
 
 /* ==========================================================================
-   Device mockup — a real "product photo" feel: ambient glow behind it,
-   a subtle 3D tilt, gloss highlight on the bezel, and a soft ground shadow —
-   instead of a flat bordered rectangle.
+   Project preview — a clean, simple image card instead of a fake device
+   frame. No bezel/chrome to fight for contrast against a dark background,
+   and it degrades gracefully if the image fails to load or is missing.
    ========================================================================== */
 
-function DeviceMockup({ project }: { project: ProjectApiResponse | undefined }) {
+function ProjectPreview({ project }: { project: ProjectApiResponse | undefined }) {
   return (
-    <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-      {/* Ambient glow behind the device — this is most of what makes a mockup
-          read as "product photography" instead of "a box with a border" */}
+    <div className="relative">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 scale-90 rounded-full bg-blue-500/25 blur-[80px]"
+        className="pointer-events-none absolute inset-0 scale-90 rounded-3xl bg-blue-500/20 blur-3xl dark:bg-blue-500/25"
       />
-
-      <div
-        className="relative"
-        style={{ perspective: "1600px" }}
-      >
-        <div
-          className="relative transition-transform duration-500"
-          style={{ transform: "rotateY(-6deg) rotateX(2deg)" }}
-        >
-          {/* Screen + bezel */}
-          <div className="relative rounded-t-2xl border-[10px] border-b-0 border-slate-700 bg-gradient-to-b from-slate-700 to-slate-800 p-1 shadow-2xl">
-            {/* Camera dot */}
-            <div className="absolute left-1/2 top-1 h-1 w-1 -translate-x-1/2 rounded-full bg-slate-500" />
-
-            {/* Gloss highlight sweeping across the bezel top edge */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-
-            <div className="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-slate-900 to-black">
-              {project?.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={project.imageUrl}
-                  alt={project.title}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <p className="px-6 text-center text-sm font-medium text-slate-500">
-                  {project ? "Preview coming soon" : "No linked project yet"}
-                </p>
-              )}
-            </div>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-xl dark:border-white/10 dark:bg-slate-900">
+        {project?.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={project.imageUrl}
+            alt={project.title}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-zinc-400 dark:text-slate-600">
+            <FaImage aria-hidden="true" className="text-2xl" />
+            <p className="text-sm font-medium">
+              {project ? "Preview coming soon" : "No linked project yet"}
+            </p>
           </div>
-
-          {/* Base / keyboard deck — narrower than the screen, like a real laptop */}
-          <div className="mx-auto h-3.5 w-full rounded-b-xl bg-gradient-to-b from-slate-600 to-slate-800 shadow-lg" />
-          <div className="mx-auto h-2 w-1/4 rounded-b-lg bg-gradient-to-b from-slate-700 to-slate-900" />
-        </div>
+        )}
       </div>
-
-      {/* Ground shadow — grounds the device in the space instead of it
-          looking like it's floating with nothing beneath it */}
-      <div
-        aria-hidden="true"
-        className="mx-auto mt-4 h-4 w-4/5 rounded-full bg-black/40 blur-xl"
-      />
     </div>
   );
 }
@@ -132,12 +103,12 @@ function ProofOfWorkLink({
   href: string | null;
   icon: React.ElementType;
   label: string;
-  variant: "light" | "green" | "red";
+  variant: "dark" | "green" | "red";
 }) {
   const variantClasses = {
-    light: "bg-white text-slate-900 hover:bg-slate-200",
-    green: "bg-emerald-500 text-white hover:bg-emerald-400",
-    red: "bg-red-500 text-white hover:bg-red-400",
+    dark: "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200",
+    green: "bg-emerald-600 text-white hover:bg-emerald-700",
+    red: "bg-red-600 text-white hover:bg-red-700",
   }[variant];
 
   if (!href) return null;
@@ -164,15 +135,16 @@ function ExtraProjectRow({ project }: { project: ProjectApiResponse }) {
       target="_blank"
       rel="noopener noreferrer"
       className={`
-        flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3
+        flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3
         transition-all duration-200
-        ${primaryUrl ? "cursor-pointer hover:border-blue-400/40 hover:bg-white/10" : "cursor-default opacity-50"}
+        dark:border-white/10 dark:bg-white/5
+        ${primaryUrl ? "cursor-pointer hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md dark:hover:border-blue-400/40 dark:hover:bg-white/10" : "cursor-default opacity-50"}
       `}
     >
-      <span className="truncate text-sm font-semibold text-slate-200">
+      <span className="truncate text-sm font-semibold text-zinc-800 dark:text-slate-200">
         {project.title}
       </span>
-      <span className="flex shrink-0 items-center gap-1.5 text-slate-500">
+      <span className="flex shrink-0 items-center gap-1.5 text-zinc-400 dark:text-slate-500">
         {project.githubUrl && <FaGithub aria-hidden="true" className="text-xs" />}
         {project.liveUrl && <FaExternalLinkAlt aria-hidden="true" className="text-[10px]" />}
         {project.videoUrl && <FaPlay aria-hidden="true" className="text-[10px]" />}
@@ -194,26 +166,29 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
   const [featured, ...rest] = service.relatedProjects;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+    // items-start (not items-center) — items-center was stretching the text
+    // column to vertically center against the tall image column, which is
+    // what caused the large empty gap above "Featured Service".
+    <div className="grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-16">
       {/* Left — pitch */}
       <div>
-        <span className="inline-block rounded-full bg-blue-500/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-blue-300 ring-1 ring-inset ring-blue-400/20">
+        <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-blue-600 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-1 dark:ring-inset dark:ring-blue-400/20">
           Featured Service
         </span>
 
-        <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30">
+        <div className="mt-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20">
           <Icon aria-hidden="true" className="text-2xl" />
         </div>
 
-        <h2 className="mt-6 text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl">
+        <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl">
           {service.title.split(" ").map((word, i) => (
-            <span key={i} className={i === 0 ? "" : "text-blue-400"}>
+            <span key={i} className={i === 0 ? "" : "text-blue-600 dark:text-blue-400"}>
               {word}{" "}
             </span>
           ))}
         </h2>
 
-        <p className="mt-4 max-w-lg text-base leading-7 text-slate-400 sm:text-lg">
+        <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-slate-400 sm:text-lg">
           {service.description}
         </p>
 
@@ -222,16 +197,16 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
             {visibleTech.map((tech) => (
               <span
                 key={tech}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300"
+                className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
               >
-                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-500/20">
-                  <FaCheck aria-hidden="true" className="text-[7px] text-blue-300" />
+                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-500/20">
+                  <FaCheck aria-hidden="true" className="text-[7px] text-blue-600 dark:text-blue-300" />
                 </span>
                 {tech}
               </span>
             ))}
             {extraTechCount > 0 && (
-              <span className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-slate-500">
+              <span className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-zinc-400 dark:text-slate-500">
                 +{extraTechCount} more
               </span>
             )}
@@ -240,7 +215,7 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
 
         <a
           href="#proof-of-work"
-          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-500 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-400"
+          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
         >
           View Proof of Work
           <FaArrowRight aria-hidden="true" className="text-xs" />
@@ -249,33 +224,33 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
 
       {/* Right — the proof */}
       <div>
-        <DeviceMockup project={featured} />
+        <ProjectPreview project={featured} />
 
         <div
           id="proof-of-work"
-          className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+          className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-sm"
         >
           {featured ? (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
                 Proof of Work
               </p>
-              <h3 className="mt-2 text-lg font-bold text-white">
+              <h3 className="mt-2 text-lg font-bold text-zinc-950 dark:text-white">
                 {featured.title}
               </h3>
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-400">
+              <p className="mt-2 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-slate-400">
                 {featured.description}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                <ProofOfWorkLink href={featured.githubUrl} icon={FaGithub} label="View GitHub" variant="light" />
+                <ProofOfWorkLink href={featured.githubUrl} icon={FaGithub} label="View GitHub" variant="dark" />
                 <ProofOfWorkLink href={featured.liveUrl} icon={FaExternalLinkAlt} label="Live Demo" variant="green" />
                 <ProofOfWorkLink href={featured.videoUrl} icon={FaPlay} label="Watch Video" variant="red" />
               </div>
 
               {rest.length > 0 && (
-                <div className="mt-5 space-y-2 border-t border-white/10 pt-5">
-                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div className="mt-5 space-y-2 border-t border-zinc-100 pt-5 dark:border-white/10">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
                     Also built for this
                   </p>
                   {rest.map((project) => (
@@ -286,10 +261,10 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
             </>
           ) : (
             <div className="py-6 text-center">
-              <p className="text-sm font-semibold text-slate-400">
+              <p className="text-sm font-semibold text-zinc-500 dark:text-slate-400">
                 Proof of work coming soon for this service.
               </p>
-              <p className="mt-1 text-xs text-slate-600">
+              <p className="mt-1 text-xs text-zinc-400 dark:text-slate-600">
                 Real projects will show up here as they&apos;re linked.
               </p>
             </div>
@@ -301,11 +276,10 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
 }
 
 /* ==========================================================================
-   Services Showcase — full-bleed dark section, no seam against the page.
-   The dark background belongs to the <section> itself, edge to edge, not to
-   a floating rounded card sitting inside a light/dark page — that's what
-   fixes the "box in a page" look. Content stays centered via an inner
-   max-w-7xl wrapper, but the background runs the full viewport width.
+   Services Showcase — now fully theme-adaptive (light AND dark look
+   intentional and polished), not hardcoded dark. That's what fixes the
+   navbar-contrast bug: whatever theme the site is in, this section matches
+   it, so the navbar's theme-aware text color always has correct contrast.
    ========================================================================== */
 
 const SWIPE_THRESHOLD = 60;
@@ -368,25 +342,22 @@ export default function ServicesShowcase() {
   };
 
   return (
-    <section className="relative isolate overflow-hidden bg-gradient-to-br from-slate-950 via-[#0a1128] to-slate-950 py-20 sm:py-24">
-      {/* Ambient glow accents — span the whole section, not just the card */}
-      <div aria-hidden="true" className="pointer-events-none absolute -top-32 right-0 h-[32rem] w-[32rem] rounded-full bg-blue-600/20 blur-[120px]" />
-      <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-96 w-96 rounded-full bg-indigo-600/15 blur-[120px]" />
+    <section className="relative isolate overflow-hidden border-t border-zinc-200/70 bg-white py-20 dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-950 dark:via-[#0a1128] dark:to-slate-950 sm:py-24">
+      {/* Ambient glow accents — subtle in light mode, richer in dark mode */}
+      <div aria-hidden="true" className="pointer-events-none absolute -top-32 right-0 h-[32rem] w-[32rem] rounded-full bg-blue-200/40 blur-[120px] dark:bg-blue-600/20" />
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-96 w-96 rounded-full bg-indigo-100/40 blur-[120px] dark:bg-indigo-600/15" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header — lives on the same dark surface as everything else now,
-            no separate light-mode treatment, so there's no seam anywhere
-            in this section regardless of the site's own theme toggle. */}
-        <div className="mb-12 max-w-3xl">
+        <div className="mb-10 max-w-3xl">
           <div className="flex items-center gap-3">
-            <span aria-hidden="true" className="h-px w-9 bg-blue-400" />
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-400">
+            <span aria-hidden="true" className="h-px w-9 bg-blue-600 dark:bg-blue-400" />
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
               Services
             </span>
           </div>
-          <h1 className="mt-6 text-4xl font-black leading-[1.06] tracking-[-0.035em] text-white sm:text-5xl">
+          <h1 className="mt-6 text-4xl font-black leading-[1.06] tracking-[-0.035em] text-zinc-950 dark:text-white sm:text-5xl">
             Engineering solutions for
-            <span className="block bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
               real-world problems.
             </span>
           </h1>
@@ -394,18 +365,18 @@ export default function ServicesShowcase() {
 
         {loading && (
           <div className="flex h-[420px] items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent dark:border-blue-400" />
           </div>
         )}
 
         {!loading && error && (
-          <div role="alert" className="rounded-2xl border border-red-400/30 bg-red-500/10 p-6 text-sm text-red-300">
+          <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-300">
             Unable to load services right now.
           </div>
         )}
 
         {!loading && !error && services.length === 0 && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center text-sm text-slate-400">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-10 text-center text-sm text-zinc-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
             No services published yet.
           </div>
         )}
@@ -418,9 +389,9 @@ export default function ServicesShowcase() {
                   type="button"
                   onClick={goPrev}
                   aria-label="Previous service"
-                  className="absolute left-0 top-1/2 z-10 hidden -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 p-3 backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white/20 lg:flex"
+                  className="absolute left-0 top-1/2 z-10 hidden -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white p-3 shadow-lg transition-transform hover:scale-110 dark:border-white/10 dark:bg-white/10 dark:backdrop-blur-sm dark:hover:bg-white/20 lg:flex"
                 >
-                  <FaChevronLeft aria-hidden="true" className="text-sm text-white" />
+                  <FaChevronLeft aria-hidden="true" className="text-sm text-zinc-600 dark:text-white" />
                 </button>
               )}
 
@@ -446,15 +417,15 @@ export default function ServicesShowcase() {
                   type="button"
                   onClick={goNext}
                   aria-label="Next service"
-                  className="absolute right-0 top-1/2 z-10 hidden translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 p-3 backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white/20 lg:flex"
+                  className="absolute right-0 top-1/2 z-10 hidden translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white p-3 shadow-lg transition-transform hover:scale-110 dark:border-white/10 dark:bg-white/10 dark:backdrop-blur-sm dark:hover:bg-white/20 lg:flex"
                 >
-                  <FaChevronRight aria-hidden="true" className="text-sm text-white" />
+                  <FaChevronRight aria-hidden="true" className="text-sm text-zinc-600 dark:text-white" />
                 </button>
               )}
             </div>
 
             {services.length > 1 && (
-              <div className="mt-10 flex items-center justify-center gap-2">
+              <div className="mt-8 flex items-center justify-center gap-2">
                 {services.map((s, i) => (
                   <button
                     key={s.id}
@@ -463,7 +434,9 @@ export default function ServicesShowcase() {
                     aria-label={`Go to ${s.title}`}
                     aria-current={i === index}
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      i === index ? "w-8 bg-blue-400" : "w-2 bg-white/20 hover:bg-white/30"
+                      i === index
+                        ? "w-8 bg-blue-600 dark:bg-blue-400"
+                        : "w-2 bg-zinc-300 hover:bg-zinc-400 dark:bg-white/20 dark:hover:bg-white/30"
                     }`}
                   />
                 ))}
@@ -476,7 +449,7 @@ export default function ServicesShowcase() {
                   type="button"
                   onClick={() => scrollStrip(-280)}
                   aria-label="Scroll services left"
-                  className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 backdrop-blur-sm transition-colors hover:border-blue-400/30 hover:text-white sm:flex"
+                  className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-500 transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:border-blue-400/30 dark:hover:text-white sm:flex"
                 >
                   <FaArrowLeft aria-hidden="true" className="text-xs" />
                 </button>
@@ -503,22 +476,24 @@ export default function ServicesShowcase() {
                         className={`
                           flex w-64 shrink-0 items-start gap-3 rounded-2xl border p-4 text-left transition-all duration-200
                           ${isActive
-                            ? "border-blue-400/40 bg-blue-500/10"
-                            : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"}
+                            ? "border-blue-300 bg-blue-50 dark:border-blue-400/40 dark:bg-blue-500/10"
+                            : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20 dark:hover:bg-white/10"}
                         `}
                       >
                         <div
                           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                            isActive ? "bg-blue-500 text-white" : "bg-white/10 text-slate-400"
+                            isActive
+                              ? "bg-blue-600 text-white"
+                              : "bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-slate-400"
                           }`}
                         >
                           <Icon aria-hidden="true" className="text-sm" />
                         </div>
                         <div className="min-w-0">
-                          <p className={`truncate text-sm font-bold ${isActive ? "text-blue-300" : "text-white"}`}>
+                          <p className={`truncate text-sm font-bold ${isActive ? "text-blue-700 dark:text-blue-300" : "text-zinc-900 dark:text-white"}`}>
                             {s.title}
                           </p>
-                          <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
+                          <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500 dark:text-slate-500">
                             {s.description}
                           </p>
                         </div>
@@ -531,7 +506,7 @@ export default function ServicesShowcase() {
                   type="button"
                   onClick={() => scrollStrip(280)}
                   aria-label="Scroll services right"
-                  className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 backdrop-blur-sm transition-colors hover:border-blue-400/30 hover:text-white sm:flex"
+                  className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-500 transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:border-blue-400/30 dark:hover:text-white sm:flex"
                 >
                   <FaArrowRight aria-hidden="true" className="text-xs" />
                 </button>
