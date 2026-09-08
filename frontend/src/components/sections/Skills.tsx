@@ -347,7 +347,7 @@ export default function Skills() {
     <section
       id="skills"
       aria-labelledby="skills-heading"
-      className="relative overflow-hidden py-24 sm:py-28 lg:py-32"
+      className="relative overflow-hidden py-14 sm:py-16 lg:py-20"
     >
       {/* Ambient background */}
       <div
@@ -377,7 +377,7 @@ export default function Skills() {
 
           <h2
             id="skills-heading"
-            className="mt-5 max-w-4xl text-4xl font-black leading-[1.08] tracking-tight text-zinc-950 dark:text-white sm:text-5xl lg:text-[3.5rem]"
+            className="mt-4 max-w-4xl text-3xl font-black leading-[1.1] tracking-tight text-zinc-950 dark:text-white sm:text-4xl lg:text-5xl"
           >
             Technologies I use to{" "}
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
@@ -385,7 +385,7 @@ export default function Skills() {
             </span>
           </h2>
 
-          <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 dark:text-zinc-400 md:text-lg">
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-600 dark:text-zinc-400 md:text-base">
             A practical engineering stack spanning AI applications, backend
             services, modern web development, data systems and infrastructure.
           </p>
@@ -412,13 +412,13 @@ export default function Skills() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-14"
+            className="mt-8"
           >
             {/* Tab bar */}
             <div
               role="tablist"
               aria-label="Skill categories"
-              className="flex flex-wrap gap-2 border-b border-zinc-200 pb-4 dark:border-zinc-800"
+              className="flex flex-wrap gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-800"
             >
               {categoriesWithCounts.map((category) => {
                 const isActive = category.name === activeCategory;
@@ -479,41 +479,44 @@ export default function Skills() {
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className="pt-8"
+                className="pt-6"
               >
                 <p className="max-w-2xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
                   {activeCategoryMeta?.description}
                 </p>
 
-                {/* Core skills — larger cards with context */}
+                {/* Core skills — compact horizontal cards, scroll in one row */}
                 {coreSkills.length > 0 && (
                   <motion.div
                     variants={gridVariants}
                     initial="initial"
                     animate="animate"
-                    className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    className="scrollbar-thin mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3"
                   >
                     {coreSkills.map((skill) => (
                       <motion.div
                         key={skill.id}
                         variants={itemVariants}
                         transition={{ duration: 0.35, ease: "easeOut" }}
-                        whileHover={{ y: -4 }}
-                        className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-b from-white to-zinc-50/60 p-5 shadow-[0_8px_30px_-24px_rgba(24,24,27,0.35)] transition-colors duration-300 hover:border-blue-300 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900/60 dark:hover:border-blue-900"
+                        whileHover={{ y: -3 }}
+                        title={skill.description}
+                        className="group relative flex w-[240px] shrink-0 snap-start items-center gap-3 overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-b from-white to-zinc-50/60 p-4 shadow-[0_8px_30px_-24px_rgba(24,24,27,0.35)] transition-colors duration-300 hover:border-blue-300 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900/60 dark:hover:border-blue-900 sm:w-[280px]"
                       >
                         <div
                           aria-hidden="true"
                           className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 transition-transform duration-300 group-hover:scale-x-100"
                         />
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-950 text-lg text-white transition-transform duration-300 group-hover:scale-105 dark:bg-white dark:text-zinc-950">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-lg text-white transition-transform duration-300 group-hover:scale-105 dark:bg-white dark:text-zinc-950">
                           {skill.icon}
                         </div>
-                        <h4 className="mt-4 text-sm font-bold text-zinc-950 dark:text-white">
-                          {skill.name}
-                        </h4>
-                        <p className="mt-1.5 text-xs leading-5 text-zinc-500 dark:text-zinc-500">
-                          {skill.description}
-                        </p>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="truncate text-sm font-bold text-zinc-950 dark:text-white">
+                            {skill.name}
+                          </h4>
+                          <p className="mt-1 truncate text-xs leading-5 text-zinc-500 dark:text-zinc-500">
+                            {skill.description}
+                          </p>
+                        </div>
                       </motion.div>
                     ))}
                   </motion.div>
@@ -525,7 +528,7 @@ export default function Skills() {
                     variants={gridVariants}
                     initial="initial"
                     animate="animate"
-                    className="mt-6 flex flex-wrap gap-2"
+                    className="mt-4 flex flex-wrap gap-2"
                   >
                     {otherSkills.map((skill) => (
                       <motion.div
@@ -554,7 +557,7 @@ export default function Skills() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5 }}
-          className="mt-16 border-t border-zinc-200 pt-8 dark:border-zinc-800"
+          className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800"
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <p className="max-w-2xl text-sm leading-7 text-zinc-500 dark:text-zinc-400">
@@ -568,6 +571,23 @@ export default function Skills() {
           </div>
         </motion.div>
       </div>
+
+      <style jsx>{`
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background-color: rgba(148, 163, 184, 0.5);
+          border-radius: 9999px;
+        }
+      `}</style>
     </section>
   );
 }
