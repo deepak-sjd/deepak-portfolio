@@ -15,6 +15,10 @@ public record SkillRequest(
         String category,
 
         @NotNull(message = "Display order is required")
-        Integer displayOrder
+        Integer displayOrder,
+
+        /** Optional — shown on the public Skills section. Falls back to a generic line if blank. */
+        @Size(max = 300, message = "Description must not exceed 300 characters")
+        String description
 ) {
 }

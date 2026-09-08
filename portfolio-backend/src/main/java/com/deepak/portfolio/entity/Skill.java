@@ -20,6 +20,13 @@ public class Skill {
     private Integer displayOrder;
 
     /**
+     * Short, admin-editable blurb shown on the public Skills section.
+     * Optional — the frontend falls back to a generic line if this is blank.
+     */
+    @Column(length = 300)
+    private String description;
+
+    /**
      * Required by JPA.
      */
     protected Skill() {
@@ -28,11 +35,13 @@ public class Skill {
     public Skill(
             String name,
             String category,
-            Integer displayOrder
+            Integer displayOrder,
+            String description
     ) {
         this.name = name;
         this.category = category;
         this.displayOrder = displayOrder;
+        this.description = description;
     }
 
     public Long getId() {
@@ -51,6 +60,10 @@ public class Skill {
         return displayOrder;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -61,5 +74,9 @@ public class Skill {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -3,6 +3,7 @@ export interface SkillApiResponse {
   name: string;
   category: string;
   displayOrder: number;
+  description?: string | null;
 }
 
 const API_BASE_URL =

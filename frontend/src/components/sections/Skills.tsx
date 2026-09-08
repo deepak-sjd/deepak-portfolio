@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  FaAws,
   FaDatabase,
   FaDocker,
   FaGitAlt,
@@ -13,14 +14,21 @@ import {
 import {
   SiFastapi,
   SiFlutter,
+  SiGraphql,
+  SiJavascript,
+  SiKubernetes,
   SiLangchain,
+  SiMongodb,
   SiMysql,
   SiNextdotjs,
+  SiNodedotjs,
   SiOpencv,
   SiPostgresql,
   SiPytorch,
+  SiRedis,
   SiScikitlearn,
   SiSpringboot,
+  SiTailwindcss,
   SiTensorflow,
   SiTypescript,
 } from "react-icons/si";
@@ -72,111 +80,156 @@ type Skill = {
 |--------------------------------------------------------------------------
 */
 
-const skillMetadata: Record<
+const skillMetadataList: Record<
   string,
   { description: string; featured?: boolean; icon: React.ReactNode }
 > = {
-  Python: {
+  python: {
     icon: <FaPython aria-hidden="true" />,
-    description: "AI pipelines, data processing and model development",
+    description: "AI pipelines, data processing and model development.",
     featured: true,
   },
-  "Machine Learning": {
+  "machine learning": {
     icon: <SiScikitlearn aria-hidden="true" />,
-    description: "Predictive modeling, feature engineering and classical algorithms",
+    description: "Predictive modeling, feature engineering and classical algorithms.",
     featured: true,
   },
-  "Deep Learning": {
+  "deep learning": {
     icon: <BrainCircuit aria-hidden="true" />,
-    description: "Neural network design, training and optimization at scale",
+    description: "Neural network design, training and optimization at scale.",
     featured: true,
   },
-  "Computer Vision": {
-    icon: <SiOpencv aria-hidden="true" />,
-    description: "Image classification, detection and segmentation pipelines",
-    featured: true,
-  },
-  PyTorch: {
-    icon: <SiPytorch aria-hidden="true" />,
-    description: "Deep learning and computer vision",
-  },
-  TensorFlow: {
-    icon: <SiTensorflow aria-hidden="true" />,
-    description: "Machine learning and neural networks",
-  },
-  LangChain: {
-    icon: <SiLangchain aria-hidden="true" />,
-    description: "LLM applications and retrieval pipelines",
-    featured: true,
-  },
-  LLMs: {
-    icon: <BotMessageSquare aria-hidden="true" />,
-    description: "Prompting, fine-tuning and integrating large language models",
-    featured: true,
-  },
-  RAG: {
-    icon: <DatabaseZap aria-hidden="true" />,
-    description: "Grounding model responses in retrieved, domain-specific knowledge",
-    featured: true,
-  },
-  VLMs: {
+  "computer vision": {
     icon: <ScanEye aria-hidden="true" />,
-    description: "Multimodal models that reason jointly over images and text",
+    description: "Image classification, detection and segmentation pipelines.",
+    featured: true,
   },
-  Java: {
+  pytorch: {
+    icon: <SiPytorch aria-hidden="true" />,
+    description: "Training and fine-tuning neural networks for deep learning.",
+    featured: true,
+  },
+  tensorflow: {
+    icon: <SiTensorflow aria-hidden="true" />,
+    description: "Building and deploying production machine learning models.",
+  },
+  "scikit-learn": {
+    icon: <SiScikitlearn aria-hidden="true" />,
+    description: "Classical ML models, preprocessing pipelines and evaluation.",
+  },
+  opencv: {
+    icon: <SiOpencv aria-hidden="true" />,
+    description: "Real-time image processing for computer vision pipelines.",
+  },
+  langchain: {
+    icon: <SiLangchain aria-hidden="true" />,
+    description: "LLM applications and retrieval pipelines.",
+    featured: true,
+  },
+  llms: {
+    icon: <BotMessageSquare aria-hidden="true" />,
+    description: "Prompting, fine-tuning and integrating large language models.",
+    featured: true,
+  },
+  rag: {
+    icon: <DatabaseZap aria-hidden="true" />,
+    description: "Grounding model responses in retrieved, domain-specific knowledge.",
+    featured: true,
+  },
+  vlms: {
+    icon: <ScanEye aria-hidden="true" />,
+    description: "Multimodal models that reason jointly over images and text.",
+    featured: true,
+  },
+  java: {
     icon: <FaJava aria-hidden="true" />,
-    description: "Object-oriented and enterprise application development",
+    description: "Object-oriented and enterprise application development.",
     featured: true,
   },
-  "Spring Boot": {
+  "spring boot": {
     icon: <SiSpringboot aria-hidden="true" />,
-    description: "REST APIs, services and backend systems",
+    description: "REST APIs, services and backend systems.",
     featured: true,
   },
-  FastAPI: {
+  fastapi: {
     icon: <SiFastapi aria-hidden="true" />,
-    description: "High-performance Python APIs and AI services",
+    description: "High-performance Python APIs and AI services.",
+    featured: true,
   },
-  React: {
+  "node.js": {
+    icon: <SiNodedotjs aria-hidden="true" />,
+    description: "Server-side JavaScript for APIs and backend services.",
+  },
+  react: {
     icon: <FaReact aria-hidden="true" />,
-    description: "Component-based application interfaces",
+    description: "Component-based, state-driven application interfaces.",
     featured: true,
   },
-  "Next.js": {
+  "next.js": {
     icon: <SiNextdotjs aria-hidden="true" />,
-    description: "Production-ready React applications",
+    description: "Production-ready, server-rendered React applications.",
     featured: true,
   },
-  TypeScript: {
+  typescript: {
     icon: <SiTypescript aria-hidden="true" />,
-    description: "Type-safe modern web development",
+    description: "Type-safe, maintainable modern web development.",
+    featured: true,
   },
-  SQL: {
+  javascript: {
+    icon: <SiJavascript aria-hidden="true" />,
+    description: "Core scripting for interactive, dynamic web applications.",
+  },
+  "tailwind css": {
+    icon: <SiTailwindcss aria-hidden="true" />,
+    description: "Utility-first styling for consistent, responsive interfaces.",
+  },
+  graphql: {
+    icon: <SiGraphql aria-hidden="true" />,
+    description: "Typed, flexible APIs for precise client data fetching.",
+  },
+  sql: {
     icon: <FaDatabase aria-hidden="true" />,
-    description: "Schema design, queries and relational data modeling",
+    description: "Schema design, queries and relational data modeling.",
     featured: true,
   },
-  PostgreSQL: {
+  postgresql: {
     icon: <SiPostgresql aria-hidden="true" />,
-    description: "Relational data modeling and persistence",
+    description: "Relational data modeling and reliable persistence.",
     featured: true,
   },
-  MySQL: {
+  mysql: {
     icon: <SiMysql aria-hidden="true" />,
-    description: "Relational databases and SQL",
+    description: "Relational databases for transactional application data.",
   },
-  Docker: {
+  mongodb: {
+    icon: <SiMongodb aria-hidden="true" />,
+    description: "Document-based storage for flexible, evolving schemas.",
+  },
+  redis: {
+    icon: <SiRedis aria-hidden="true" />,
+    description: "In-memory caching and fast key-value data access.",
+  },
+  docker: {
     icon: <FaDocker aria-hidden="true" />,
-    description: "Containerization and reproducible environments",
+    description: "Containerization and reproducible deployment environments.",
     featured: true,
   },
-  Git: {
-    icon: <FaGitAlt aria-hidden="true" />,
-    description: "Version control and collaborative development",
+  kubernetes: {
+    icon: <SiKubernetes aria-hidden="true" />,
+    description: "Orchestrating and scaling containerized services.",
   },
-  Flutter: {
+  aws: {
+    icon: <FaAws aria-hidden="true" />,
+    description: "Cloud infrastructure for hosting and scaling applications.",
+  },
+  git: {
+    icon: <FaGitAlt aria-hidden="true" />,
+    description: "Version control and collaborative development workflows.",
+    featured: true,
+  },
+  flutter: {
     icon: <SiFlutter aria-hidden="true" />,
-    description: "Cross-platform mobile apps from a single codebase",
+    description: "Cross-platform mobile apps from a single codebase.",
     featured: true,
   },
 };
@@ -185,8 +238,13 @@ const skillMetadata: Record<
    API → UI mapping
    ========================================================================== */
 
+function normalizeKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
 function mapApiSkill(skill: SkillApiResponse): Skill {
-  const metadata = skillMetadata[skill.name];
+  const metadata = skillMetadataList[normalizeKey(skill.name)];
+  const adminDescription = skill.description?.trim();
 
   return {
     id: skill.id,
@@ -199,9 +257,13 @@ function mapApiSkill(skill: SkillApiResponse): Skill {
           {skill.name.charAt(0)}
         </span>
       ),
+    // Admin-written description (from admin.html) always wins if present —
+    // the hardcoded list below is only a fallback for skills that haven't
+    // been given one yet.
     description:
+      (adminDescription && adminDescription.length > 0 ? adminDescription : undefined) ??
       metadata?.description ??
-      "Technology used in software engineering and application development.",
+      "Applied in production systems as part of the engineering stack.",
     featured: metadata?.featured ?? false,
   };
 }
@@ -340,8 +402,6 @@ export default function Skills() {
     [skills, activeCategory]
   );
 
-  const coreSkills = activeSkills.filter((s) => s.featured);
-  const otherSkills = activeSkills.filter((s) => !s.featured);
 
   return (
     <section
@@ -485,63 +545,51 @@ export default function Skills() {
                   {activeCategoryMeta?.description}
                 </p>
 
-                {/* Core skills — compact horizontal cards, scroll in one row */}
-                {coreSkills.length > 0 && (
+                {/* All skills in this category — one scrollable row, consistent cards */}
+                {activeSkills.length > 0 && (
                   <motion.div
                     variants={gridVariants}
                     initial="initial"
                     animate="animate"
-                    className="scrollbar-thin mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3"
+                    className="scrollbar-thin mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-0.5 pb-3 pt-2"
+                    style={{
+                      WebkitMaskImage:
+                        "linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)",
+                      maskImage:
+                        "linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)",
+                    }}
                   >
-                    {coreSkills.map((skill) => (
+                    {activeSkills.map((skill) => (
                       <motion.div
                         key={skill.id}
                         variants={itemVariants}
                         transition={{ duration: 0.35, ease: "easeOut" }}
-                        whileHover={{ y: -3 }}
-                        title={skill.description}
-                        className="group relative flex w-[240px] shrink-0 snap-start items-center gap-3 overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-b from-white to-zinc-50/60 p-4 shadow-[0_8px_30px_-24px_rgba(24,24,27,0.35)] transition-colors duration-300 hover:border-blue-300 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900/60 dark:hover:border-blue-900 sm:w-[280px]"
+                        whileHover={{ y: -4 }}
+                        className="group relative flex w-[220px] shrink-0 snap-start flex-col gap-3 overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-b from-white to-zinc-50/60 p-4 shadow-[0_8px_30px_-24px_rgba(24,24,27,0.35)] transition-[colors,box-shadow] duration-300 hover:border-blue-300 hover:shadow-[0_20px_45px_-24px_rgba(37,99,235,0.35)] dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900/60 dark:hover:border-blue-900 dark:hover:shadow-[0_20px_45px_-24px_rgba(37,99,235,0.3)] sm:w-[250px]"
                       >
                         <div
                           aria-hidden="true"
                           className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 transition-transform duration-300 group-hover:scale-x-100"
                         />
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-lg text-white transition-transform duration-300 group-hover:scale-105 dark:bg-white dark:text-zinc-950">
-                          {skill.icon}
-                        </div>
-                        <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-base text-white transition-transform duration-300 group-hover:scale-105 dark:bg-white dark:text-zinc-950">
+                            {skill.icon}
+                          </div>
                           <h4 className="truncate text-sm font-bold text-zinc-950 dark:text-white">
                             {skill.name}
                           </h4>
-                          <p className="mt-1 truncate text-xs leading-5 text-zinc-500 dark:text-zinc-500">
-                            {skill.description}
-                          </p>
                         </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-
-                {/* Supporting skills — compact chips, no repeated card chrome */}
-                {otherSkills.length > 0 && (
-                  <motion.div
-                    variants={gridVariants}
-                    initial="initial"
-                    animate="animate"
-                    className="mt-4 flex flex-wrap gap-2"
-                  >
-                    {otherSkills.map((skill) => (
-                      <motion.div
-                        key={skill.id}
-                        variants={itemVariants}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        title={skill.description}
-                        className="group flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-600 transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-300 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-white"
-                      >
-                        <span className="text-sm text-zinc-400 transition-colors group-hover:text-blue-500 dark:text-zinc-600">
-                          {skill.icon}
-                        </span>
-                        {skill.name}
+                        <p
+                          className="text-xs leading-5 text-zinc-500 dark:text-zinc-500"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {skill.description}
+                        </p>
                       </motion.div>
                     ))}
                   </motion.div>

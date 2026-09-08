@@ -45,7 +45,8 @@ public class SkillService {
         Skill skill = new Skill(
                 request.name(),
                 request.category(),
-                request.displayOrder()
+                request.displayOrder(),
+                request.description()
         );
 
         return toResponse(skillRepository.save(skill));
@@ -62,6 +63,7 @@ public class SkillService {
         skill.setName(request.name());
         skill.setCategory(request.category());
         skill.setDisplayOrder(request.displayOrder());
+        skill.setDescription(request.description());
 
         return toResponse(skillRepository.save(skill));
     }
@@ -82,7 +84,8 @@ public class SkillService {
                 skill.getId(),
                 skill.getName(),
                 skill.getCategory(),
-                skill.getDisplayOrder()
+                skill.getDisplayOrder(),
+                skill.getDescription()
         );
     }
 }
