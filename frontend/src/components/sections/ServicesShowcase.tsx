@@ -56,30 +56,65 @@ function parseTechnologies(csv: string): string[] {
 }
 
 /* ==========================================================================
-   Device mockup — pure CSS laptop frame around a project screenshot
+   Device mockup — a real "product photo" feel: ambient glow behind it,
+   a subtle 3D tilt, gloss highlight on the bezel, and a soft ground shadow —
+   instead of a flat bordered rectangle.
    ========================================================================== */
 
 function DeviceMockup({ project }: { project: ProjectApiResponse | undefined }) {
   return (
-    <div className="mx-auto w-full max-w-md lg:max-w-none">
-      <div className="rounded-t-2xl border-[10px] border-b-0 border-slate-700 bg-slate-800 p-1 shadow-2xl">
-        <div className="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-slate-800 to-slate-950">
-          {project?.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={project.imageUrl}
-              alt={project.title}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <p className="px-6 text-center text-sm font-medium text-slate-500">
-              {project ? "Preview coming soon" : "No linked project yet"}
-            </p>
-          )}
+    <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+      {/* Ambient glow behind the device — this is most of what makes a mockup
+          read as "product photography" instead of "a box with a border" */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 scale-90 rounded-full bg-blue-500/25 blur-[80px]"
+      />
+
+      <div
+        className="relative"
+        style={{ perspective: "1600px" }}
+      >
+        <div
+          className="relative transition-transform duration-500"
+          style={{ transform: "rotateY(-6deg) rotateX(2deg)" }}
+        >
+          {/* Screen + bezel */}
+          <div className="relative rounded-t-2xl border-[10px] border-b-0 border-slate-700 bg-gradient-to-b from-slate-700 to-slate-800 p-1 shadow-2xl">
+            {/* Camera dot */}
+            <div className="absolute left-1/2 top-1 h-1 w-1 -translate-x-1/2 rounded-full bg-slate-500" />
+
+            {/* Gloss highlight sweeping across the bezel top edge */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+
+            <div className="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-slate-900 to-black">
+              {project?.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={project.imageUrl}
+                  alt={project.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <p className="px-6 text-center text-sm font-medium text-slate-500">
+                  {project ? "Preview coming soon" : "No linked project yet"}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Base / keyboard deck — narrower than the screen, like a real laptop */}
+          <div className="mx-auto h-3.5 w-full rounded-b-xl bg-gradient-to-b from-slate-600 to-slate-800 shadow-lg" />
+          <div className="mx-auto h-2 w-1/4 rounded-b-lg bg-gradient-to-b from-slate-700 to-slate-900" />
         </div>
       </div>
-      <div className="mx-auto h-3 w-full rounded-b-xl bg-gradient-to-b from-slate-600 to-slate-700" />
-      <div className="mx-auto h-1.5 w-1/5 rounded-b-md bg-slate-700" />
+
+      {/* Ground shadow — grounds the device in the space instead of it
+          looking like it's floating with nothing beneath it */}
+      <div
+        aria-hidden="true"
+        className="mx-auto mt-4 h-4 w-4/5 rounded-full bg-black/40 blur-xl"
+      />
     </div>
   );
 }
@@ -218,7 +253,7 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
 
         <div
           id="proof-of-work"
-          className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+          className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
         >
           {featured ? (
             <>
@@ -266,7 +301,11 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
 }
 
 /* ==========================================================================
-   Services Showcase — the full horizontal-panel-scroll experience
+   Services Showcase — full-bleed dark section, no seam against the page.
+   The dark background belongs to the <section> itself, edge to edge, not to
+   a floating rounded card sitting inside a light/dark page — that's what
+   fixes the "box in a page" look. Content stays centered via an inner
+   max-w-7xl wrapper, but the background runs the full viewport width.
    ========================================================================== */
 
 const SWIPE_THRESHOLD = 60;
@@ -276,7 +315,7 @@ export default function ServicesShowcase() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(0); // -1 = came from the right, 1 = came from the left
+  const [direction, setDirection] = useState(0);
   const stripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -308,7 +347,6 @@ export default function ServicesShowcase() {
   const goNext = () => goTo(index + 1);
   const goPrev = () => goTo(index - 1);
 
-  // Keyboard navigation
   useEffect(() => {
     if (services.length < 2) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -330,185 +368,175 @@ export default function ServicesShowcase() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 dark:bg-zinc-950 sm:py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header — stays in the site's normal light/dark palette */}
-        <div className="mb-10 max-w-3xl">
+    <section className="relative isolate overflow-hidden bg-gradient-to-br from-slate-950 via-[#0a1128] to-slate-950 py-20 sm:py-24">
+      {/* Ambient glow accents — span the whole section, not just the card */}
+      <div aria-hidden="true" className="pointer-events-none absolute -top-32 right-0 h-[32rem] w-[32rem] rounded-full bg-blue-600/20 blur-[120px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-96 w-96 rounded-full bg-indigo-600/15 blur-[120px]" />
+
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Header — lives on the same dark surface as everything else now,
+            no separate light-mode treatment, so there's no seam anywhere
+            in this section regardless of the site's own theme toggle. */}
+        <div className="mb-12 max-w-3xl">
           <div className="flex items-center gap-3">
-            <span aria-hidden="true" className="h-px w-9 bg-blue-600 dark:bg-blue-400" />
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
+            <span aria-hidden="true" className="h-px w-9 bg-blue-400" />
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-400">
               Services
             </span>
           </div>
-          <h1 className="mt-6 text-4xl font-black leading-[1.06] tracking-[-0.035em] text-zinc-950 dark:text-white sm:text-5xl">
+          <h1 className="mt-6 text-4xl font-black leading-[1.06] tracking-[-0.035em] text-white sm:text-5xl">
             Engineering solutions for
-            <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
+            <span className="block bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
               real-world problems.
             </span>
           </h1>
         </div>
 
         {loading && (
-          <div className="flex h-[420px] items-center justify-center rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
+          <div className="flex h-[420px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
           </div>
         )}
 
         {!loading && error && (
-          <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
+          <div role="alert" className="rounded-2xl border border-red-400/30 bg-red-500/10 p-6 text-sm text-red-300">
             Unable to load services right now.
           </div>
         )}
 
         {!loading && !error && services.length === 0 && (
-          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-10 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center text-sm text-slate-400">
             No services published yet.
           </div>
         )}
 
         {!loading && !error && services.length > 0 && (
           <>
-            {/*
-              Everything below is a single, fixed-dark "showcase" surface —
-              deliberately breaking from the site's light/dark toggle, the
-              same way a spotlight section on a premium site often does.
-              Sub-elements sit on it as translucent glass, not separate
-              bordered boxes, so it reads as one panel instead of a stack of
-              nested cards.
-            */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-[#0a1128] to-slate-950 p-6 shadow-2xl sm:p-10">
-              {/* Ambient glow accents */}
-              <div aria-hidden="true" className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full bg-blue-600/20 blur-[100px]" />
-              <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-indigo-600/10 blur-[100px]" />
-
-              <div className="relative">
-                {services.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={goPrev}
-                    aria-label="Previous service"
-                    className="absolute left-0 top-1/2 z-10 hidden -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 p-3 backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white/20 lg:flex"
-                  >
-                    <FaChevronLeft aria-hidden="true" className="text-sm text-white" />
-                  </button>
-                )}
-
-                <AnimatePresence mode="wait" custom={direction}>
-                  <motion.div
-                    key={services[index].id}
-                    custom={direction}
-                    initial={{ opacity: 0, x: direction >= 0 ? 40 : -40 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: direction >= 0 ? -40 : 40 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    drag={services.length > 1 ? "x" : false}
-                    dragConstraints={{ left: 0, right: 0 }}
-                    dragElastic={0.15}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <ServicePanel service={services[index]} />
-                  </motion.div>
-                </AnimatePresence>
-
-                {services.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    aria-label="Next service"
-                    className="absolute right-0 top-1/2 z-10 hidden translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 p-3 backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white/20 lg:flex"
-                  >
-                    <FaChevronRight aria-hidden="true" className="text-sm text-white" />
-                  </button>
-                )}
-              </div>
-
-              {/* Pagination dots */}
+            <div className="relative">
               {services.length > 1 && (
-                <div className="relative mt-8 flex items-center justify-center gap-2">
-                  {services.map((s, i) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => goTo(i)}
-                      aria-label={`Go to ${s.title}`}
-                      aria-current={i === index}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        i === index ? "w-8 bg-blue-400" : "w-2 bg-white/20 hover:bg-white/30"
-                      }`}
-                    />
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  aria-label="Previous service"
+                  className="absolute left-0 top-1/2 z-10 hidden -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 p-3 backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white/20 lg:flex"
+                >
+                  <FaChevronLeft aria-hidden="true" className="text-sm text-white" />
+                </button>
               )}
 
-              {/* Bottom mini-card strip */}
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={services[index].id}
+                  custom={direction}
+                  initial={{ opacity: 0, x: direction >= 0 ? 40 : -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: direction >= 0 ? -40 : 40 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  drag={services.length > 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.15}
+                  onDragEnd={handleDragEnd}
+                >
+                  <ServicePanel service={services[index]} />
+                </motion.div>
+              </AnimatePresence>
+
               {services.length > 1 && (
-                <div className="relative mt-8 flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => scrollStrip(-280)}
-                    aria-label="Scroll services left"
-                    className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 backdrop-blur-sm transition-colors hover:border-blue-400/30 hover:text-white sm:flex"
-                  >
-                    <FaArrowLeft aria-hidden="true" className="text-xs" />
-                  </button>
-
-                  <div
-                    ref={stripRef}
-                    className="hide-scrollbar flex flex-1 gap-3 overflow-x-auto scroll-smooth"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                  >
-                    <style jsx>{`
-                      .hide-scrollbar::-webkit-scrollbar {
-                        display: none;
-                      }
-                    `}</style>
-
-                    {services.map((s, i) => {
-                      const Icon = getServiceIcon(s.icon ?? "brain");
-                      const isActive = i === index;
-                      return (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => goTo(i)}
-                          className={`
-                            flex w-64 shrink-0 items-start gap-3 rounded-2xl border p-4 text-left transition-all duration-200
-                            ${isActive
-                              ? "border-blue-400/40 bg-blue-500/10"
-                              : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"}
-                          `}
-                        >
-                          <div
-                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                              isActive ? "bg-blue-500 text-white" : "bg-white/10 text-slate-400"
-                            }`}
-                          >
-                            <Icon aria-hidden="true" className="text-sm" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className={`truncate text-sm font-bold ${isActive ? "text-blue-300" : "text-white"}`}>
-                              {s.title}
-                            </p>
-                            <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
-                              {s.description}
-                            </p>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => scrollStrip(280)}
-                    aria-label="Scroll services right"
-                    className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 backdrop-blur-sm transition-colors hover:border-blue-400/30 hover:text-white sm:flex"
-                  >
-                    <FaArrowRight aria-hidden="true" className="text-xs" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  aria-label="Next service"
+                  className="absolute right-0 top-1/2 z-10 hidden translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 p-3 backdrop-blur-sm transition-transform hover:scale-110 hover:bg-white/20 lg:flex"
+                >
+                  <FaChevronRight aria-hidden="true" className="text-sm text-white" />
+                </button>
               )}
             </div>
+
+            {services.length > 1 && (
+              <div className="mt-10 flex items-center justify-center gap-2">
+                {services.map((s, i) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => goTo(i)}
+                    aria-label={`Go to ${s.title}`}
+                    aria-current={i === index}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      i === index ? "w-8 bg-blue-400" : "w-2 bg-white/20 hover:bg-white/30"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {services.length > 1 && (
+              <div className="relative mt-8 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => scrollStrip(-280)}
+                  aria-label="Scroll services left"
+                  className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 backdrop-blur-sm transition-colors hover:border-blue-400/30 hover:text-white sm:flex"
+                >
+                  <FaArrowLeft aria-hidden="true" className="text-xs" />
+                </button>
+
+                <div
+                  ref={stripRef}
+                  className="hide-scrollbar flex flex-1 gap-3 overflow-x-auto scroll-smooth"
+                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                >
+                  <style jsx>{`
+                    .hide-scrollbar::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}</style>
+
+                  {services.map((s, i) => {
+                    const Icon = getServiceIcon(s.icon ?? "brain");
+                    const isActive = i === index;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => goTo(i)}
+                        className={`
+                          flex w-64 shrink-0 items-start gap-3 rounded-2xl border p-4 text-left transition-all duration-200
+                          ${isActive
+                            ? "border-blue-400/40 bg-blue-500/10"
+                            : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"}
+                        `}
+                      >
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                            isActive ? "bg-blue-500 text-white" : "bg-white/10 text-slate-400"
+                          }`}
+                        >
+                          <Icon aria-hidden="true" className="text-sm" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className={`truncate text-sm font-bold ${isActive ? "text-blue-300" : "text-white"}`}>
+                            {s.title}
+                          </p>
+                          <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
+                            {s.description}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollStrip(280)}
+                  aria-label="Scroll services right"
+                  className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 backdrop-blur-sm transition-colors hover:border-blue-400/30 hover:text-white sm:flex"
+                >
+                  <FaArrowRight aria-hidden="true" className="text-xs" />
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
