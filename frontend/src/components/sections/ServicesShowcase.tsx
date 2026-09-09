@@ -166,19 +166,20 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
           Featured Service
         </span>
 
-        <div className="mt-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20">
-          <Icon aria-hidden="true" className="text-2xl" />
+        <div className="mt-5 flex items-center gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20">
+            <Icon aria-hidden="true" className="text-xl" />
+          </div>
+          <h2 className="text-2xl font-black leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-3xl">
+            {service.title.split(" ").map((word, i) => (
+              <span key={i} className={i === 0 ? "" : "text-blue-600 dark:text-blue-400"}>
+                {word}{" "}
+              </span>
+            ))}
+          </h2>
         </div>
 
-        <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl">
-          {service.title.split(" ").map((word, i) => (
-            <span key={i} className={i === 0 ? "" : "text-blue-600 dark:text-blue-400"}>
-              {word}{" "}
-            </span>
-          ))}
-        </h2>
-
-        <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-slate-400 sm:text-lg">
+        <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600 dark:text-slate-400 sm:text-base">
           {service.description}
         </p>
 
@@ -207,7 +208,7 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
           href="#proof-of-work"
           className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
         >
-          View Proof of Work
+          See it in Action
           <FaArrowRight aria-hidden="true" className="text-xs" />
         </a>
       </div>
@@ -232,7 +233,7 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
                   </p>
                 </div>
 
-                <h3 className="mt-5 text-2xl font-black leading-tight text-zinc-950 dark:text-white">
+                <h3 className="mt-5 text-xl font-black leading-tight text-zinc-950 dark:text-white">
                   {featured.title}
                 </h3>
                 <p className="mt-3 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-slate-400 sm:text-base">
@@ -390,7 +391,7 @@ export default function ServicesShowcase() {
                   type="button"
                   onClick={goPrev}
                   aria-label="Previous service"
-                  className="absolute left-0 top-1/2 z-10 hidden -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white p-3 shadow-lg transition-transform hover:scale-110 dark:border-white/10 dark:bg-white/10 dark:backdrop-blur-sm dark:hover:bg-white/20 lg:flex"
+                  className="absolute left-0 top-1/2 z-10 hidden -translate-x-16 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white p-3 shadow-lg transition-transform hover:scale-110 dark:border-white/10 dark:bg-white/10 dark:backdrop-blur-sm dark:hover:bg-white/20 xl:flex"
                 >
                   <FaChevronLeft aria-hidden="true" className="text-sm text-zinc-600 dark:text-white" />
                 </button>
@@ -418,7 +419,7 @@ export default function ServicesShowcase() {
                   type="button"
                   onClick={goNext}
                   aria-label="Next service"
-                  className="absolute right-0 top-1/2 z-10 hidden translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white p-3 shadow-lg transition-transform hover:scale-110 dark:border-white/10 dark:bg-white/10 dark:backdrop-blur-sm dark:hover:bg-white/20 lg:flex"
+                  className="absolute right-0 top-1/2 z-10 hidden translate-x-16 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white p-3 shadow-lg transition-transform hover:scale-110 dark:border-white/10 dark:bg-white/10 dark:backdrop-blur-sm dark:hover:bg-white/20 xl:flex"
                 >
                   <FaChevronRight aria-hidden="true" className="text-sm text-zinc-600 dark:text-white" />
                 </button>
