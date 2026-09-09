@@ -22,15 +22,20 @@ import { getTasks, type TaskApiResponse } from "@/lib/api/tasks";
 |--------------------------------------------------------------------------
 | Weather
 |--------------------------------------------------------------------------
-| Open-Meteo requires no API key, so this calls it directly from the
-| client. Coordinates are fixed to a single location — update LAT/LON/
-| LOCATION_LABEL below if you're based somewhere else.
+| Weather auto-detects the visitor's location via the browser Geolocation
+| API, then:
+|   1. Fetches live conditions from Open-Meteo (no API key required).
+|   2. Reverse-geocodes the coordinates to a city name via BigDataCloud's
+|      free client-side endpoint (no API key required).
+|
+| If location access is denied, unsupported, or times out, it silently
+| falls back to a fixed default location below.
 |--------------------------------------------------------------------------
 */
 
-const LAT = 13.0827;
-const LON = 80.2707;
-const LOCATION_LABEL = "Chennai, IN";
+const DEFAULT_LAT = 13.0827;
+const DEFAULT_LON = 80.2707;
+const DEFAULT_LOCATION_LABEL = "Chennai, IN";
 
 const WEATHER_CODE_META: Record<
   number,
@@ -60,7 +65,28 @@ const WEATHER_CODE_META: Record<
 type WeatherState =
   | { status: "loading" }
   | { status: "error" }
-  | { status: "ready"; tempC: number; label: string; icon: React.ComponentType<{ className?: string }> };
+  | {
+      status: "ready";
+      tempC: number;
+      condition: string;
+      icon: React.ComponentType<{ className?: string }>;
+      location: string;
+    };
+
+async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const city = data?.city || data?.locality;
+    const country = data?.countryCode;
+    return [city, country].filter(Boolean).join(", ") || null;
+  } catch {
+    return null;
+  }
+}
 
 function useWeather(): WeatherState {
   const [state, setState] = useState<WeatherState>({ status: "loading" });
@@ -68,13 +94,17 @@ function useWeather(): WeatherState {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadWeather() {
+    async function fetchWeatherFor(lat: number, lon: number, knownLabel?: string) {
       try {
-        const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true`
-        );
-        if (!res.ok) throw new Error("Weather request failed");
-        const data = await res.json();
+        const [weatherRes, locationLabel] = await Promise.all([
+          fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+          ),
+          knownLabel ? Promise.resolve(knownLabel) : reverseGeocode(lat, lon),
+        ]);
+
+        if (!weatherRes.ok) throw new Error("Weather request failed");
+        const data = await weatherRes.json();
         const code = data?.current_weather?.weathercode as number | undefined;
         const temp = data?.current_weather?.temperature as number | undefined;
 
@@ -86,13 +116,38 @@ function useWeather(): WeatherState {
         }
 
         const meta = WEATHER_CODE_META[code] ?? { label: "Clear", icon: Sun };
-        setState({ status: "ready", tempC: Math.round(temp), label: meta.label, icon: meta.icon });
+        setState({
+          status: "ready",
+          tempC: Math.round(temp),
+          condition: meta.label,
+          icon: meta.icon,
+          location: locationLabel || "Your location",
+        });
       } catch {
         if (!cancelled) setState({ status: "error" });
       }
     }
 
-    loadWeather();
+    if (typeof window === "undefined" || !("geolocation" in navigator)) {
+      fetchWeatherFor(DEFAULT_LAT, DEFAULT_LON, DEFAULT_LOCATION_LABEL);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!cancelled) {
+          fetchWeatherFor(pos.coords.latitude, pos.coords.longitude);
+        }
+      },
+      () => {
+        // Permission denied, timed out, or unavailable — fall back quietly.
+        if (!cancelled) {
+          fetchWeatherFor(DEFAULT_LAT, DEFAULT_LON, DEFAULT_LOCATION_LABEL);
+        }
+      },
+      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
+    );
+
     return () => {
       cancelled = true;
     };
@@ -102,18 +157,33 @@ function useWeather(): WeatherState {
 }
 
 /* ==========================================================================
+   Live clock — updates every minute so "Today"/"Tomorrow" and the header
+   date/time are always correct, no matter when someone visits.
+   ========================================================================== */
+
+function useLiveClock() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return now;
+}
+
+/* ==========================================================================
    Date helpers
    ========================================================================== */
 
-function startOfToday(): Date {
-  const d = new Date();
+function startOfDay(date: Date): Date {
+  const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
 }
 
-function dateLabel(isoDate: string): string {
+function dateLabel(isoDate: string, today: Date): string {
   const date = new Date(`${isoDate}T00:00:00`);
-  const today = startOfToday();
   const diffDays = Math.round((date.getTime() - today.getTime()) / 86_400_000);
 
   if (diffDays === 0) return "Today";
@@ -149,6 +219,8 @@ export default function Schedule() {
   const [tasks, setTasks] = useState<TaskApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const weather = useWeather();
+  const now = useLiveClock();
+  const today = useMemo(() => startOfDay(now), [now]);
 
   useEffect(() => {
     async function load() {
@@ -166,7 +238,6 @@ export default function Schedule() {
   }, []);
 
   const upcomingEvents = useMemo(() => {
-    const today = startOfToday();
     return events
       .filter((e) => new Date(`${e.eventDate}T00:00:00`) >= today)
       .sort((a, b) => {
@@ -175,7 +246,7 @@ export default function Schedule() {
         return (a.startTime ?? "").localeCompare(b.startTime ?? "");
       })
       .slice(0, 6);
-  }, [events]);
+  }, [events, today]);
 
   const sortedTasks = useMemo(
     () => [...tasks].sort((a, b) => a.displayOrder - b.displayOrder),
@@ -183,6 +254,16 @@ export default function Schedule() {
   );
 
   const WeatherIcon = weather.status === "ready" ? weather.icon : Sun;
+
+  const liveDateLabel = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+  const liveTimeLabel = now.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
   return (
     <section
@@ -193,10 +274,13 @@ export default function Schedule() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-3xl">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-blue-600 dark:bg-blue-400" />
             <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
               Live Status
+            </span>
+            <span className="ml-auto font-mono text-[11px] text-zinc-400 dark:text-zinc-600">
+              {liveDateLabel} · {liveTimeLabel}
             </span>
           </div>
           <h2
@@ -247,7 +331,7 @@ export default function Schedule() {
                     <div key={event.id} className="flex gap-4 py-3 first:pt-0 last:pb-0">
                       <div className="w-20 shrink-0 pt-0.5">
                         <p className="text-xs font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-                          {dateLabel(event.eventDate)}
+                          {dateLabel(event.eventDate, today)}
                         </p>
                         {start && (
                           <p className="mt-0.5 text-[11px] text-zinc-400 dark:text-zinc-600">
@@ -282,7 +366,7 @@ export default function Schedule() {
             >
               <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-500">
                 <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                {LOCATION_LABEL}
+                {weather.status === "ready" ? weather.location : "Locating…"}
               </div>
 
               <div className="mt-3 flex items-center justify-between">
@@ -294,7 +378,7 @@ export default function Schedule() {
                         <span className="text-lg font-bold text-zinc-400 dark:text-zinc-600">C</span>
                       </p>
                       <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                        {weather.label}
+                        {weather.condition}
                       </p>
                     </div>
                     <WeatherIcon className="h-10 w-10 text-blue-500 dark:text-blue-400" />
