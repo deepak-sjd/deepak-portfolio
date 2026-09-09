@@ -11,8 +11,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaExternalLinkAlt,
+  FaFolderOpen,
   FaGithub,
-  FaImage,
   FaPlay,
   FaProjectDiagram,
   FaServer,
@@ -57,36 +57,26 @@ function parseTechnologies(csv: string): string[] {
 }
 
 /* ==========================================================================
-   Project preview — a clean, simple image card instead of a fake device
-   frame. No bezel/chrome to fight for contrast against a dark background,
-   and it degrades gracefully if the image fails to load or is missing.
+   Decorative engineering-grid backdrop — a self-contained CSS pattern with
+   connecting dots, used behind Proof of Work instead of an external project
+   image. It never fails to load, never looks broken, and gives the card
+   visual richness on its own regardless of whether any project has a real
+   screenshot yet.
    ========================================================================== */
 
-function ProjectPreview({ project }: { project: ProjectApiResponse | undefined }) {
+function EngineeringGridBackdrop() {
   return (
-    <div className="relative">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 scale-90 rounded-3xl bg-blue-500/20 blur-3xl dark:bg-blue-500/25"
-      />
-      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-xl dark:border-white/10 dark:bg-slate-900">
-        {project?.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={project.imageUrl}
-            alt={project.title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-zinc-400 dark:text-slate-600">
-            <FaImage aria-hidden="true" className="text-2xl" />
-            <p className="text-sm font-medium">
-              {project ? "Preview coming soon" : "No linked project yet"}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-60 dark:opacity-40"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle, rgba(59,130,246,0.35) 1px, transparent 1px)",
+        backgroundSize: "22px 22px",
+        maskImage: "radial-gradient(ellipse at top right, black 0%, transparent 70%)",
+        WebkitMaskImage: "radial-gradient(ellipse at top right, black 0%, transparent 70%)",
+      }}
+    />
   );
 }
 
@@ -222,53 +212,64 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
         </a>
       </div>
 
-      {/* Right — the proof */}
+      {/* Right — the proof, now the primary element of this column */}
       <div>
-        <ProjectPreview project={featured} />
-
         <div
           id="proof-of-work"
-          className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-sm"
+          className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5 dark:backdrop-blur-sm sm:p-8"
         >
-          {featured ? (
-            <>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
-                Proof of Work
-              </p>
-              <h3 className="mt-2 text-lg font-bold text-zinc-950 dark:text-white">
-                {featured.title}
-              </h3>
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-slate-400">
-                {featured.description}
-              </p>
+          <EngineeringGridBackdrop />
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                <ProofOfWorkLink href={featured.githubUrl} icon={FaGithub} label="View GitHub" variant="dark" />
-                <ProofOfWorkLink href={featured.liveUrl} icon={FaExternalLinkAlt} label="Live Demo" variant="green" />
-                <ProofOfWorkLink href={featured.videoUrl} icon={FaPlay} label="Watch Video" variant="red" />
-              </div>
-
-              {rest.length > 0 && (
-                <div className="mt-5 space-y-2 border-t border-zinc-100 pt-5 dark:border-white/10">
-                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
-                    Also built for this
+          <div className="relative">
+            {featured ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/20">
+                    <FaFolderOpen aria-hidden="true" className="text-lg" />
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
+                    Proof of Work
                   </p>
-                  {rest.map((project) => (
-                    <ExtraProjectRow key={project.id} project={project} />
-                  ))}
                 </div>
-              )}
-            </>
-          ) : (
-            <div className="py-6 text-center">
-              <p className="text-sm font-semibold text-zinc-500 dark:text-slate-400">
-                Proof of work coming soon for this service.
-              </p>
-              <p className="mt-1 text-xs text-zinc-400 dark:text-slate-600">
-                Real projects will show up here as they&apos;re linked.
-              </p>
-            </div>
-          )}
+
+                <h3 className="mt-5 text-2xl font-black leading-tight text-zinc-950 dark:text-white">
+                  {featured.title}
+                </h3>
+                <p className="mt-3 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-slate-400 sm:text-base">
+                  {featured.description}
+                </p>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <ProofOfWorkLink href={featured.githubUrl} icon={FaGithub} label="View GitHub" variant="dark" />
+                  <ProofOfWorkLink href={featured.liveUrl} icon={FaExternalLinkAlt} label="Live Demo" variant="green" />
+                  <ProofOfWorkLink href={featured.videoUrl} icon={FaPlay} label="Watch Video" variant="red" />
+                </div>
+
+                {rest.length > 0 && (
+                  <div className="mt-6 space-y-2 border-t border-zinc-100 pt-6 dark:border-white/10">
+                    <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
+                      Also built for this
+                    </p>
+                    {rest.map((project) => (
+                      <ExtraProjectRow key={project.id} project={project} />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex flex-col items-center py-10 text-center">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100 text-zinc-400 dark:bg-white/10 dark:text-slate-500">
+                  <FaFolderOpen aria-hidden="true" className="text-lg" />
+                </div>
+                <p className="mt-4 text-sm font-semibold text-zinc-500 dark:text-slate-400">
+                  Proof of work coming soon for this service.
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-slate-600">
+                  Real projects will show up here as they&apos;re linked.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
