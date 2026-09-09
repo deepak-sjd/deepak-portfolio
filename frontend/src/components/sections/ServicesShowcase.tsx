@@ -96,7 +96,7 @@ function ProofOfWorkLink({
   variant: "dark" | "green" | "red";
 }) {
   const variantClasses = {
-    dark: "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200",
+    dark: "bg-zinc-900 text-white hover:bg-zinc-700",
     green: "bg-emerald-600 text-white hover:bg-emerald-700",
     red: "bg-red-600 text-white hover:bg-red-700",
   }[variant];
@@ -155,6 +155,17 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
 
   const [featured, ...rest] = service.relatedProjects;
 
+  // "See it in Action" should actually land somewhere meaningful, not just
+  // scroll a few hundred pixels to a card already on screen. Prefer sending
+  // the visitor to the real, live, working thing; fall back sensibly.
+  const ctaHref = featured?.liveUrl || featured?.githubUrl || "#proof-of-work";
+  const ctaIsExternal = ctaHref !== "#proof-of-work";
+  const ctaLabel = featured?.liveUrl
+    ? "See it Live"
+    : featured?.githubUrl
+      ? "View the Code"
+      : "See the Details";
+
   return (
     // items-start (not items-center) — items-center was stretching the text
     // column to vertically center against the tall image column, which is
@@ -205,10 +216,12 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
         )}
 
         <a
-          href="#proof-of-work"
+          href={ctaHref}
+          target={ctaIsExternal ? "_blank" : undefined}
+          rel={ctaIsExternal ? "noopener noreferrer" : undefined}
           className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
         >
-          See it in Action
+          {ctaLabel}
           <FaArrowRight aria-hidden="true" className="text-xs" />
         </a>
       </div>
