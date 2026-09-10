@@ -221,7 +221,7 @@ export default function Experience() {
               text-zinc-950
               dark:text-white
               sm:text-5xl
-              lg:text-6xl
+              lg:text-[3.5rem]
             "
           >
             Building experience through{" "}
