@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 
 import Hero from "./Hero";
-import Schedule from "./Schedule";
 import About from "./About";
 import Notes from "./Notes";
 import Contact from "./Contact";
@@ -83,7 +82,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <Schedule />
       <About />
       <Notes />
       <Contact />

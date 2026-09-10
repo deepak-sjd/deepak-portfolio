@@ -108,10 +108,11 @@ function ProofOfWorkLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      style={{ color: "#ffffff" }}
       className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${variantClasses}`}
     >
-      <Icon aria-hidden="true" className="text-xs" />
-      {label}
+      <Icon aria-hidden="true" style={{ color: "#ffffff" }} className="text-xs" />
+      <span style={{ color: "#ffffff" }}>{label}</span>
     </a>
   );
 }

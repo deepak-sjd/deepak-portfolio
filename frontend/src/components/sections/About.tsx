@@ -1,40 +1,34 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  FaArrowRight,
-  FaBrain,
-  FaCloud,
-  FaCode,
-  FaLayerGroup,
-} from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 
 import Button from "@/components/ui/Button";
 
-const focusAreas = [
+const principles = [
   {
-    icon: FaBrain,
-    title: "AI Engineering",
+    number: "01",
+    title: "Systems over demos",
     description:
-      "Generative AI, RAG applications, computer vision, and AI-powered workflows.",
+      "I build things that hold up in production, not just in a pitch or a notebook.",
   },
   {
-    icon: FaLayerGroup,
-    title: "Backend Systems",
+    number: "02",
+    title: "Simplicity is a feature",
     description:
-      "Well-structured APIs, application services, data flows, and dependable backend architecture.",
+      "The best architecture is the one a team can still understand a year later.",
   },
   {
-    icon: FaCode,
-    title: "Product Engineering",
+    number: "03",
+    title: "AI is a tool, not the product",
     description:
-      "Modern web applications that turn complex technical systems into usable products.",
+      "Intelligence should serve the experience, not replace good engineering underneath it.",
   },
   {
-    icon: FaCloud,
-    title: "Delivery & Infrastructure",
+    number: "04",
+    title: "Ship, then iterate",
     description:
-      "Containerized applications, CI/CD workflows, and engineering practices for reliable delivery.",
+      "Working software in front of real users beats a perfect plan that stays on paper.",
   },
 ];
 
@@ -266,7 +260,7 @@ export default function About() {
                     dark:text-zinc-600
                   "
                 >
-                  How I work
+                  How I think about engineering
                 </span>
 
                 <span
@@ -280,117 +274,73 @@ export default function About() {
                 />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                {focusAreas.map((area, index) => {
-                  const Icon = area.icon;
-
-                  return (
-                    <motion.div
-                      key={area.title}
-                      initial={{
-                        opacity: 0,
-                        y: shouldReduceMotion ? 0 : 16,
-                      }}
-                      whileInView={{
-                        opacity: 1,
-                        y: 0,
-                      }}
-                      viewport={{
-                        once: true,
-                        amount: 0.15,
-                      }}
-                      transition={{
-                        duration: 0.45,
-                        delay: shouldReduceMotion ? 0 : index * 0.06,
-                        ease: "easeOut",
-                      }}
-                      whileHover={
-                        shouldReduceMotion
-                          ? undefined
-                          : {
-                              y: -3,
-                            }
-                      }
+              <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                {principles.map((principle, index) => (
+                  <motion.div
+                    key={principle.title}
+                    initial={{
+                      opacity: 0,
+                      y: shouldReduceMotion ? 0 : 14,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    viewport={{
+                      once: true,
+                      amount: 0.15,
+                    }}
+                    transition={{
+                      duration: 0.45,
+                      delay: shouldReduceMotion ? 0 : index * 0.06,
+                      ease: "easeOut",
+                    }}
+                    className="group flex items-start gap-5 py-5 first:pt-0 last:pb-0"
+                  >
+                    <span
                       className="
-                        group
-                        rounded-2xl
-                        border
-                        border-zinc-200/80
-                        bg-zinc-50/60
-                        p-5
-                        transition-all
+                        shrink-0
+                        font-mono
+                        text-sm
+                        font-bold
+                        text-zinc-300
+                        transition-colors
                         duration-300
-                        hover:border-zinc-300
-                        hover:bg-white
-                        hover:shadow-[0_18px_40px_-25px_rgba(24,24,27,0.35)]
-                        dark:border-zinc-800
-                        dark:bg-zinc-900/60
-                        dark:hover:border-zinc-700
-                        dark:hover:bg-zinc-900
-                        dark:hover:shadow-none
+                        group-hover:text-blue-500
+                        dark:text-zinc-700
+                        dark:group-hover:text-blue-400
                       "
                     >
-                      <div className="flex items-start gap-4">
-                        <div
-                          className="
-                            flex
-                            h-10
-                            w-10
-                            shrink-0
-                            items-center
-                            justify-center
-                            rounded-xl
-                            border
-                            border-zinc-200
-                            bg-white
-                            text-blue-600
-                            transition-all
-                            duration-300
-                            group-hover:border-blue-200
-                            group-hover:bg-blue-600
-                            group-hover:text-white
-                            dark:border-zinc-800
-                            dark:bg-zinc-950
-                            dark:text-blue-400
-                            dark:group-hover:border-blue-800
-                            dark:group-hover:bg-blue-500
-                            dark:group-hover:text-white
-                          "
-                        >
-                          <Icon
-                            aria-hidden="true"
-                            className="text-base"
-                          />
-                        </div>
+                      {principle.number}
+                    </span>
 
-                        <div>
-                          <h3
-                            className="
-                              text-sm
-                              font-bold
-                              text-zinc-950
-                              dark:text-white
-                            "
-                          >
-                            {area.title}
-                          </h3>
+                    <div>
+                      <h3
+                        className="
+                          text-sm
+                          font-bold
+                          text-zinc-950
+                          dark:text-white
+                        "
+                      >
+                        {principle.title}
+                      </h3>
 
-                          <p
-                            className="
-                              mt-1.5
-                              text-sm
-                              leading-6
-                              text-zinc-500
-                              dark:text-zinc-400
-                            "
-                          >
-                            {area.description}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                      <p
+                        className="
+                          mt-1.5
+                          max-w-xl
+                          text-sm
+                          leading-6
+                          text-zinc-500
+                          dark:text-zinc-400
+                        "
+                      >
+                        {principle.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
