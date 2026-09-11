@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 export interface ContactMessageRequest {
   name: string;
   email: string;
@@ -12,10 +14,6 @@ export interface ContactMessageResponse {
   message: string;
   createdAt: string;
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "http://localhost:8080";
 
 export async function submitContactMessage(
   request: ContactMessageRequest,

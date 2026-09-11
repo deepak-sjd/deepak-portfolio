@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 export interface ResumeApiResponse {
   id: number;
   title: string;
@@ -7,10 +9,6 @@ export interface ResumeApiResponse {
   createdAt: string;
   updatedAt: string;
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "http://localhost:8080";
 
 export async function getActiveResume(): Promise<ResumeApiResponse> {
   const response = await fetch(

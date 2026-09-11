@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 export interface TaskApiResponse {
   id: number;
   title: string;
@@ -5,9 +7,6 @@ export interface TaskApiResponse {
   dueDate?: string | null; // "YYYY-MM-DD"
   displayOrder: number;
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 export async function getTasks(): Promise<TaskApiResponse[]> {
   const response = await fetch(`${API_BASE_URL}/api/v1/tasks`, {

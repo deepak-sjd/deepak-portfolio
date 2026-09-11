@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 export interface EventApiResponse {
   id: number;
   title: string;
@@ -7,9 +9,6 @@ export interface EventApiResponse {
   location?: string | null;
   description?: string | null;
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 export async function getEvents(): Promise<EventApiResponse[]> {
   const response = await fetch(`${API_BASE_URL}/api/v1/events`, {
