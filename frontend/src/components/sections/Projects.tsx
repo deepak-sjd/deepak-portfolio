@@ -28,6 +28,7 @@ type Project = {
   technologies: string[];
   github?: string;
   demo?: string;
+  imageUrl?: string;
   featured?: boolean;
   status: "Production Focus" | "Engineering Project" | "Concept";
 };
@@ -111,6 +112,9 @@ function mapApiProject(project: ProjectApiResponse): Project {
 
     demo:
       project.liveUrl || undefined,
+
+    imageUrl:
+      project.imageUrl || undefined,
 
     featured:
       project.featured,
@@ -220,6 +224,29 @@ function ProjectVisual({
   project: Project;
   featured?: boolean;
 }) {
+  if (project.imageUrl) {
+    return (
+      <div
+        className={`
+          relative overflow-hidden rounded-2xl
+          border border-zinc-200/80 bg-zinc-100
+          dark:border-zinc-800 dark:bg-zinc-950
+          ${featured ? "h-48" : "h-36"}
+        `}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={project.imageUrl}
+          alt={project.title}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+      </div>
+    );
+  }
+
+  // Fallback for projects that don't have a real screenshot yet — an
+  // intentional abstract placeholder rather than a broken/empty box.
   return (
     <div
       aria-hidden="true"
@@ -406,23 +433,9 @@ function ProjectCard({
           </span>
         </div>
 
-        <p
-          className="
-            mt-5
-            text-[10px]
-            font-bold
-            uppercase
-            tracking-[0.17em]
-            text-zinc-400
-            dark:text-zinc-500
-          "
-        >
-          {project.eyebrow}
-        </p>
-
         <h3
           className="
-            mt-2
+            mt-5
             text-xl font-bold
             leading-tight
             tracking-tight
@@ -436,6 +449,7 @@ function ProjectCard({
         <p
           className="
             mt-4
+            line-clamp-3
             text-sm
             leading-7
             text-zinc-600
@@ -460,7 +474,7 @@ function ProjectCard({
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {project.technologies.map((technology) => (
+            {project.technologies.slice(0, 5).map((technology) => (
               <span
                 key={technology}
                 className="
@@ -484,32 +498,12 @@ function ProjectCard({
                 {technology}
               </span>
             ))}
+            {project.technologies.length > 5 && (
+              <span className="inline-flex items-center px-2.5 py-1.5 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
+                +{project.technologies.length - 5} more
+              </span>
+            )}
           </div>
-        </div>
-
-        <div
-          className="
-            mt-6
-            flex items-center gap-2
-            text-[11px]
-            font-medium
-            text-zinc-400
-          "
-        >
-          <span
-            className={`
-              h-1.5 w-1.5 rounded-full
-              ${
-                project.status === "Production Focus"
-                  ? "bg-emerald-500"
-                  : project.status === "Engineering Project"
-                    ? "bg-blue-500"
-                    : "bg-zinc-400"
-              }
-            `}
-          />
-
-          {project.status}
         </div>
 
         <div className="mt-auto flex flex-wrap gap-3 pt-7">
@@ -606,22 +600,9 @@ function FeaturedProject({
             </span>
           </div>
 
-          <p
-            className="
-              mt-6
-              text-[10px]
-              font-bold
-              uppercase
-              tracking-[0.18em]
-              text-zinc-400
-            "
-          >
-            {project.eyebrow}
-          </p>
-
           <h3
             className="
-              mt-2
+              mt-6
               text-2xl
               font-black
               leading-tight
@@ -637,6 +618,7 @@ function FeaturedProject({
           <p
             className="
               mt-5
+              line-clamp-4
               max-w-2xl
               text-sm
               leading-7
@@ -663,7 +645,7 @@ function FeaturedProject({
             </p>
 
             <div className="flex flex-wrap gap-2">
-              {project.technologies.map((technology) => (
+              {project.technologies.slice(0, 6).map((technology) => (
                 <span
                   key={technology}
                   className="
@@ -682,6 +664,11 @@ function FeaturedProject({
                   {technology}
                 </span>
               ))}
+              {project.technologies.length > 6 && (
+                <span className="inline-flex items-center px-2.5 py-1.5 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
+                  +{project.technologies.length - 6} more
+                </span>
+              )}
             </div>
           </div>
 
@@ -735,13 +722,22 @@ export default function Projects() {
     loadProjects();
   }, []);
 
-  const featuredProjects = projects.filter(
-    (project) => project.featured
-  );
+  // A "featured" spotlight is meant to highlight your 1-2 best projects, not
+  // become the whole page if more than that get marked featured. Cap it so
+  // adding a 10th featured project doesn't turn into 10 stacked giant rows —
+  // anything past the cap falls back into the normal compact grid below.
+  const MAX_SPOTLIGHT_PROJECTS = 2;
 
-  const standardProjects = projects.filter(
-    (project) => !project.featured
-  );
+  const featuredProjects: Project[] = [];
+  const standardProjects: Project[] = [];
+
+  for (const project of projects) {
+    if (project.featured && featuredProjects.length < MAX_SPOTLIGHT_PROJECTS) {
+      featuredProjects.push(project);
+    } else {
+      standardProjects.push(project);
+    }
+  }
 
   return (
     <section
@@ -830,7 +826,7 @@ export default function Projects() {
               text-zinc-950
               dark:text-white
               sm:text-5xl
-              lg:text-6xl
+              lg:text-[3.5rem]
             "
           >
             Engineering ideas into{" "}
@@ -1069,36 +1065,34 @@ export default function Projects() {
             href="https://github.com/deepak-sjd"
             target="_blank"
             rel="noopener noreferrer"
+            style={{ color: "#ffffff" }}
             className="
               group
               inline-flex shrink-0
               items-center gap-2
               rounded-xl
-              bg-zinc-950
+              bg-zinc-900
               px-5 py-3
               text-sm font-semibold
-              text-white
               shadow-sm
               transition-all duration-300
               hover:-translate-y-0.5
-              hover:bg-zinc-800
+              hover:bg-zinc-700
               hover:shadow-md
               focus-visible:outline-none
               focus-visible:ring-2
               focus-visible:ring-blue-500
               focus-visible:ring-offset-2
-              dark:bg-white
-              dark:text-zinc-950
-              dark:hover:bg-zinc-200
               dark:focus-visible:ring-offset-zinc-950
             "
           >
-            <FaGithub aria-hidden="true" />
+            <FaGithub aria-hidden="true" style={{ color: "#ffffff" }} />
 
-            View GitHub
+            <span style={{ color: "#ffffff" }}>View GitHub</span>
 
             <FaArrowRight
               aria-hidden="true"
+              style={{ color: "#ffffff" }}
               className="
                 text-xs
                 transition-transform duration-300
