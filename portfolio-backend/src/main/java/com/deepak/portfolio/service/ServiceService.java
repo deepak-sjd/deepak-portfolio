@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @org.springframework.stereotype.Service
 public class ServiceService {
@@ -150,6 +151,7 @@ public class ServiceService {
 
         List<ProjectResponse> relatedProjects = service.getRelatedProjects()
                 .stream()
+                .filter(Objects::nonNull)
                 .map(projectService::toResponse)
                 .toList();
 

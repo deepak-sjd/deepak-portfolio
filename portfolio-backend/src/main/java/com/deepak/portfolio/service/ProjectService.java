@@ -6,6 +6,7 @@ import com.deepak.portfolio.dto.response.ProjectResponse;
 import com.deepak.portfolio.entity.Project;
 import com.deepak.portfolio.exception.ResourceNotFoundException;
 import com.deepak.portfolio.repository.ProjectRepository;
+import com.deepak.portfolio.repository.ServiceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ import java.util.List;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ServiceRepository serviceRepository;
 
-    public ProjectService(ProjectRepository projectRepository) {
+    public ProjectService(ProjectRepository projectRepository, ServiceRepository serviceRepository) {
         this.projectRepository = projectRepository;
+        this.serviceRepository = serviceRepository;
     }
 
     // ============================================================
@@ -145,6 +148,12 @@ public class ProjectService {
                                 "Project not found with id: " + id
                         )
                 );
+
+        // Clean up any Service -> Project links first, so we never leave a
+        // dangling service_projects row behind (see
+        // ServiceRepository.removeProjectFromAllServices for why that
+        // matters).
+        serviceRepository.removeProjectFromAllServices(id);
 
         projectRepository.delete(project);
     }

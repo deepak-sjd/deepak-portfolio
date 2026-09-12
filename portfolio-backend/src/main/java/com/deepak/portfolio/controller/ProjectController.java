@@ -55,7 +55,7 @@ public PageResponse<ProjectResponse> getAllProjects(
         @PageableDefault(
                 size = 10,
                 page = 0,
-                sort = "title",
+                sort = "displayOrder",
                 direction = Sort.Direction.ASC
         )
         Pageable pageable
