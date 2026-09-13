@@ -75,6 +75,26 @@ public class ContactMessageService {
     }
 
     // ============================================================
+    // MARK READ / UNREAD
+    // ============================================================
+
+    @Transactional
+    public ContactMessageResponse setRead(Long id, boolean read) {
+
+        ContactMessage contactMessage =
+                contactMessageRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Contact message not found with id: " + id
+                                )
+                        );
+
+        contactMessage.setRead(read);
+
+        return toResponse(contactMessage);
+    }
+
+    // ============================================================
     // DELETE
     // ============================================================
 
@@ -103,8 +123,10 @@ public class ContactMessageService {
         return new ContactMessageResponse(
                 contactMessage.getId(),
                 contactMessage.getName(),
+                contactMessage.getEmail(),
                 contactMessage.getSubject(),
                 contactMessage.getMessage(),
+                contactMessage.isRead(),
                 contactMessage.getCreatedAt()
         );
     }

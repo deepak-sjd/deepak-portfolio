@@ -32,6 +32,9 @@ public class ContactMessage {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(name = "is_read", nullable = false)
+    private boolean read;
+
     protected ContactMessage() {
         // Required by JPA
     }
@@ -47,6 +50,7 @@ public class ContactMessage {
         this.subject = subject;
         this.message = message;
         this.createdAt = Instant.now();
+        this.read = false;
     }
 
     public Long getId() {
@@ -71,6 +75,14 @@ public class ContactMessage {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 
     public void setName(String name) {
