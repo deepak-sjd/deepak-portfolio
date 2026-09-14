@@ -1,5 +1,4 @@
 import type { ProjectApiResponse } from "./projects";
-import { API_BASE_URL } from "./config";
 
 export interface ServiceApiResponse {
   id: number;
@@ -16,6 +15,10 @@ export interface ServiceApiResponse {
   relatedProjects: ProjectApiResponse[];
 }
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "http://localhost:8080";
+
 export async function getServices(): Promise<ServiceApiResponse[]> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/services`,
@@ -23,7 +26,7 @@ export async function getServices(): Promise<ServiceApiResponse[]> {
       headers: {
         Accept: "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 300 },
     },
   );
 

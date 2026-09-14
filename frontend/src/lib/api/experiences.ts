@@ -1,5 +1,3 @@
-import { API_BASE_URL } from "./config";
-
 export interface ExperienceApiResponse {
   id: number;
   company: string;
@@ -11,8 +9,12 @@ export interface ExperienceApiResponse {
   current: boolean;
   description: string;
   displayOrder: number;
-  cgpa: string | null;
+   cgpa: string | null;
 }
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "http://localhost:8080";
 
 export async function getExperiences(): Promise<
   ExperienceApiResponse[]
@@ -23,7 +25,7 @@ export async function getExperiences(): Promise<
       headers: {
         Accept: "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 300 },
     },
   );
 

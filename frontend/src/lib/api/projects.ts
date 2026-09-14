@@ -1,5 +1,3 @@
-import { API_BASE_URL } from "./config";
-
 export interface ProjectApiResponse {
   id: number;
   title: string;
@@ -23,12 +21,15 @@ interface ProjectApiPage {
   last: boolean;
 }
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+
 export async function getProjects(): Promise<ProjectApiResponse[]> {
   const response = await fetch(`${API_BASE_URL}/api/v1/projects`, {
     headers: {
       Accept: "application/json",
     },
-    cache: "no-store",
+    next: { revalidate: 300 },
   });
 
   if (!response.ok) {
