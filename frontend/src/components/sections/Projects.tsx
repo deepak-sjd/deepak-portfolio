@@ -224,7 +224,9 @@ function ProjectVisual({
   project: Project;
   featured?: boolean;
 }) {
-  if (project.imageUrl) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (project.imageUrl && !imageFailed) {
     return (
       <div
         className={`
@@ -238,6 +240,7 @@ function ProjectVisual({
         <img
           src={project.imageUrl}
           alt={project.title}
+          onError={() => setImageFailed(true)}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
@@ -378,6 +381,7 @@ function ProjectCard({
       className="
         group
         flex h-full
+        w-full basis-full flex-shrink-0 flex-grow-0
         flex-col
         overflow-hidden
         rounded-[1.75rem]
@@ -394,6 +398,8 @@ function ProjectCard({
         dark:bg-zinc-900/80
         dark:shadow-none
         dark:hover:border-zinc-700
+        sm:w-[calc(50%-0.625rem)] sm:basis-[calc(50%-0.625rem)]
+        lg:w-[calc(33.333%-0.834rem)] lg:basis-[calc(33.333%-0.834rem)]
         sm:p-6
       "
     >
@@ -820,13 +826,13 @@ export default function Projects() {
             className="
               mt-5
               max-w-4xl
-              text-4xl font-black
-              leading-[1.05]
-              tracking-[-0.035em]
+              text-3xl font-black
+              leading-[1.1]
+              tracking-tight
               text-zinc-950
               dark:text-white
-              sm:text-5xl
-              lg:text-[3.5rem]
+              sm:text-4xl
+              lg:text-5xl
             "
           >
             Engineering ideas into{" "}
@@ -971,7 +977,7 @@ export default function Projects() {
                   </span>
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                <div className="flex flex-wrap justify-center gap-5">
                   {standardProjects.map((project, index) => (
                     <ProjectCard
                       key={project.title}
