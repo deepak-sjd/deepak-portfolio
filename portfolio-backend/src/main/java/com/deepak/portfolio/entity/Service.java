@@ -2,8 +2,8 @@ package com.deepak.portfolio.entity;
 
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "services")
@@ -49,6 +49,12 @@ public class Service {
      * instead of just describing the skill in prose. Unidirectional: Project
      * doesn't need to know which services point at it, so there's no risk
      * of circular JSON serialization.
+     *
+     * Plain Set, not an ordered List: an @OrderColumn here previously caused
+     * Hibernate to pad the collection with null entries whenever a linked
+     * Project was deleted, since it left a gap in the join table's index
+     * sequence. Order was never actually used by the admin UI, so a Set
+     * removes the whole class of bug rather than working around it.
      */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -56,8 +62,7 @@ public class Service {
             joinColumns = @JoinColumn(name = "service_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id")
     )
-    @OrderColumn(name = "display_order")
-    private List<Project> relatedProjects = new ArrayList<>();
+    private Set<Project> relatedProjects = new HashSet<>();
 
     protected Service() {
     }
@@ -138,11 +143,11 @@ public class Service {
         return updatedAt;
     }
 
-    public List<Project> getRelatedProjects() {
+    public Set<Project> getRelatedProjects() {
         return relatedProjects;
     }
 
-    public void setRelatedProjects(List<Project> relatedProjects) {
+    public void setRelatedProjects(Set<Project> relatedProjects) {
         this.relatedProjects = relatedProjects;
     }
 

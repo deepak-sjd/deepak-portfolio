@@ -10,8 +10,10 @@ import com.deepak.portfolio.repository.ServiceRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @org.springframework.stereotype.Service
 public class ServiceService {
@@ -138,11 +140,11 @@ public class ServiceService {
     }
 
     /** Turns a list of Project IDs from the request into actual Project entities. Null/empty -> no linked projects. */
-    private List<Project> resolveProjects(List<Long> projectIds) {
+    private Set<Project> resolveProjects(List<Long> projectIds) {
         if (projectIds == null || projectIds.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        return projectRepository.findAllById(projectIds);
+        return new HashSet<>(projectRepository.findAllById(projectIds));
     }
 
     private ServiceResponse toResponse(

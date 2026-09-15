@@ -18,10 +18,6 @@ import {
 
 import { getRootNotes, NoteSummaryApiResponse } from "@/lib/api/notes";
 
-/**
- * Icons are matched by keyword against the Field title, since Fields are now
- * data-driven (created via the admin tool) rather than a fixed enum.
- */
 function iconForField(title: string): React.ElementType {
   const t = title.toLowerCase();
   if (t.includes("generative")) return FaRobot;
@@ -38,10 +34,6 @@ function iconForField(title: string): React.ElementType {
 }
 
 const MAX_FEATURED_FIELDS = 12;
-
-// Wrapping Next's Link in motion() lets the whole card be a real, single
-// <a> element while still driving hover/tap physics through framer-motion.
-const MotionLink = motion.create(Link);
 
 export default function Notes() {
   const [fields, setFields] = useState<NoteSummaryApiResponse[]>([]);
@@ -179,61 +171,44 @@ export default function Notes() {
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.5, delay: index * 0.06, ease: "easeOut" }}
                   >
-                    <MotionLink
+                    {/*
+                      ONE plain <Link> wraps the entire card — this is the
+                      whole fix. No nested motion.span layers, no variant
+                      propagation to worry about: every pixel inside this
+                      anchor tag is clickable, guaranteed, the same way the
+                      "Explore topics" text always was.
+                    */}
+                    <Link
                       href={`/notes/${field.slug}`}
-                      whileHover="hover"
-                      whileTap={{ scale: 0.985 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 22 }}
                       className="
-                        group relative flex h-full flex-col overflow-hidden
-                        rounded-3xl border border-zinc-200/80 bg-white p-6
-                        shadow-[0_15px_50px_-30px_rgba(24,24,27,0.35)]
-                        outline-none transition-colors duration-300
-                        hover:border-blue-200 focus-visible:ring-2
-                        focus-visible:ring-blue-500 focus-visible:ring-offset-2
+                        group relative flex h-full min-h-[280px] flex-col
+                        overflow-hidden rounded-3xl border border-zinc-200/80
+                        bg-white p-6 shadow-[0_15px_50px_-30px_rgba(24,24,27,0.35)]
+                        outline-none transition-all duration-300
+                        hover:-translate-y-1 hover:border-blue-200
+                        hover:shadow-[0_25px_60px_-30px_rgba(37,99,235,0.3)]
+                        focus-visible:ring-2 focus-visible:ring-blue-500
+                        focus-visible:ring-offset-2
                         dark:border-zinc-800 dark:bg-zinc-900/70
                         dark:hover:border-zinc-700
                         dark:focus-visible:ring-offset-zinc-950
                       "
                     >
-                      {/* Soft gradient glow that fades in behind the content on hover */}
-                      <motion.span
+                      {/* Large tech-stack icon watermark — purely decorative */}
+                      <Icon
                         aria-hidden="true"
-                        variants={{
-                          hover: { opacity: 1 },
-                        }}
-                        initial={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
                         className="
-                          pointer-events-none absolute inset-0
-                          bg-gradient-to-br from-blue-50 via-transparent to-cyan-50
-                          dark:from-blue-500/[0.07] dark:via-transparent dark:to-cyan-500/[0.07]
+                          pointer-events-none absolute -right-6 -top-6
+                          text-[7rem] text-blue-50
+                          transition-transform duration-500 ease-out
+                          group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:rotate-6
+                          dark:text-blue-500/[0.07]
                         "
                       />
 
-                      {/* Card lifts and gains a colored shadow as one motion unit */}
-                      <motion.span
-                        aria-hidden="true"
-                        variants={{
-                          hover: {
-                            boxShadow: "0 25px 60px -30px rgba(37,99,235,0.35)",
-                          },
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className="pointer-events-none absolute inset-0 rounded-3xl"
-                      />
-
-                      <motion.span
-                        variants={{ hover: { y: -6 } }}
-                        transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                        className="relative flex h-full flex-col"
-                      >
+                      <div className="relative z-10 flex flex-1 flex-col">
                         <div className="flex items-center justify-between">
-                          <motion.div
-                            variants={{
-                              hover: { scale: 1.1, rotate: -6 },
-                            }}
-                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          <div
                             className="
                               flex h-11 w-11 items-center justify-center rounded-xl
                               bg-blue-50 text-blue-600 ring-1 ring-blue-100
@@ -244,7 +219,7 @@ export default function Notes() {
                             "
                           >
                             <Icon aria-hidden="true" className="text-base" />
-                          </motion.div>
+                          </div>
 
                           <span className="text-xs font-medium text-zinc-400 dark:text-zinc-600">
                             {String(index + 1).padStart(2, "0")}
@@ -281,8 +256,8 @@ export default function Notes() {
                             />
                           </span>
                         </div>
-                      </motion.span>
-                    </MotionLink>
+                      </div>
+                    </Link>
                   </motion.div>
                 );
               })}
