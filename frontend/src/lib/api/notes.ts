@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 export type ResourceType =
   | "PDF"
   | "DOCX"
@@ -53,8 +55,6 @@ export interface ApiErrorResponse {
   fieldErrors?: { field: string; message: string }[] | null;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {

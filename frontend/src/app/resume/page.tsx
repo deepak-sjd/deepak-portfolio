@@ -1,4 +1,8 @@
+import { API_BASE_URL as BACKEND_URL } from "@/lib/api/config";
+
 "use client";
+
+
 
 import { useEffect, useState } from "react";
 import {
@@ -10,8 +14,7 @@ import {
 
 import { getActiveResume, ResumeApiResponse } from "@/lib/api/resume";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+
 
 function getResumeUrl(fileUrl: string): string {
   if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {

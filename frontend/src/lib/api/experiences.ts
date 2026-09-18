@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "./config";
 export interface ExperienceApiResponse {
   id: number;
   company: string;
@@ -12,9 +13,6 @@ export interface ExperienceApiResponse {
    cgpa: string | null;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "http://localhost:8080";
 
 export async function getExperiences(): Promise<
   ExperienceApiResponse[]

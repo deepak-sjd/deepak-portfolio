@@ -1,3 +1,5 @@
+import { apiFetch } from "./config";
+
 export interface ProjectApiResponse {
   id: number;
   title: string;
@@ -21,22 +23,9 @@ interface ProjectApiPage {
   last: boolean;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
-
 export async function getProjects(): Promise<ProjectApiResponse[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/projects`, {
-    headers: {
-      Accept: "application/json",
-    },
-    next: { revalidate: 300 },
+  const data = await apiFetch<ProjectApiPage>("/api/v1/projects", {
+    revalidate: 300,
   });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch projects: ${response.status}`);
-  }
-
-  const data: ProjectApiPage = await response.json();
-
   return data.content;
 }
