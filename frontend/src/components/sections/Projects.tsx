@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -10,7 +12,7 @@ import { motion } from "framer-motion";
 
 import {
   getProjects,
-  type ProjectApiResponse,
+  type ProjectApiResponse as BaseProjectApiResponse,
 } from "@/lib/api/projects";
 
 import {
@@ -20,165 +22,183 @@ import {
   FaPlay,
 } from "react-icons/fa";
 
+// ---------------------------------------------------------------------------
+// Config — the only values that should ever need a manual edit. Everything
+// else (categories, tag colors, counts) is derived from whatever the API
+// returns, so adding a new project never requires touching this file.
+// ---------------------------------------------------------------------------
+
+const GITHUB_PROFILE_URL = "https://github.com/deepak-sjd";
+
+const DISPLAY_CONFIG = {
+  maxSpotlightProjects: 2,
+  maxVisibleTechnologies: 6,
+} as const;
+
+// `category` and `tagline` are optional here on purpose: if the backend
+// doesn't send them yet, mapApiProject() below derives a sensible fallback
+// instead of requiring a hardcoded, per-title lookup table that someone has
+// to remember to update every time a project is added.
+type ProjectApiResponse = BaseProjectApiResponse & {
+  category?: string;
+  tagline?: string;
+};
+
 type Project = {
   title: string;
   category: string;
-  eyebrow: string;
+  tagline?: string;
   description: string;
   technologies: string[];
   github?: string;
   demo?: string;
   imageUrl?: string;
-  featured?: boolean;
-  status: "Production Focus" | "Engineering Project" | "Concept";
-};
-
-const projectMetadata: Record<
-  string,
-  Pick<Project, "category" | "eyebrow" | "status">
-> = {
-  "Smart Manufacturing Time Study AI": {
-    category: "Computer Vision",
-    eyebrow: "Industrial AI · Activity Recognition",
-    status: "Production Focus",
-  },
-
-  "Enterprise RAG Document Assistant": {
-    category: "Generative AI",
-    eyebrow: "RAG · Enterprise Knowledge",
-    status: "Engineering Project",
-  },
-
-  "AI Fault Investigation Assistant": {
-    category: "Enterprise AI",
-    eyebrow: "RAG · Engineering Intelligence",
-    status: "Engineering Project",
-  },
-
-  "Natural Language → SQL Assistant": {
-    category: "AI + Backend",
-    eyebrow: "LLM · Data Applications",
-    status: "Engineering Project",
-  },
-
-  "AI Customer Support Assistant": {
-    category: "AI + Full Stack",
-    eyebrow: "Conversational AI · Full Stack",
-    status: "Engineering Project",
-  },
-
-  "AI Resume Analyzer": {
-    category: "Generative AI",
-    eyebrow: "NLP · Document Intelligence",
-    status: "Concept",
-  },
-
-  "Invoice Intelligence System": {
-    category: "Document AI",
-    eyebrow: "OCR · Intelligent Extraction",
-    status: "Concept",
-  },
-
-  "Electronic Store": {
-    category: "Java Full Stack",
-    eyebrow: "Backend · E-Commerce",
-    status: "Engineering Project",
-  },
+  featured: boolean;
 };
 
 function mapApiProject(project: ProjectApiResponse): Project {
-  const metadata = projectMetadata[project.title];
-
   return {
     title: project.title,
-
-    category:
-      metadata?.category ?? "Engineering Project",
-
-    eyebrow:
-      metadata?.eyebrow ?? "Software Engineering",
-
-    description:
-      project.description,
-
-    technologies:
-      project.technologies
-        .split(",")
-        .map((technology) => technology.trim())
-        .filter(Boolean),
-
-    github:
-      project.githubUrl || undefined,
-
-    demo:
-      project.liveUrl || undefined,
-
-    imageUrl:
-      project.imageUrl || undefined,
-
-    featured:
-      project.featured,
-
-    status:
-      metadata?.status ?? "Engineering Project",
+    category: project.category?.trim() || "Engineering",
+    tagline: project.tagline?.trim() || undefined,
+    description: project.description,
+    technologies: project.technologies
+      .split(",")
+      .map((technology) => technology.trim())
+      .filter(Boolean),
+    github: project.githubUrl || undefined,
+    demo: project.liveUrl || undefined,
+    imageUrl: project.imageUrl || undefined,
+    featured: Boolean(project.featured),
   };
 }
 
-const categoryStyles: Record<string, string> = {
-  "Computer Vision":
-    "bg-violet-50 text-violet-700 ring-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-500/20",
+// ---------------------------------------------------------------------------
+// Category styling — a fixed palette assigned deterministically by hashing
+// the category name, instead of a `Record<string, string>` that would need
+// a new entry every time a project introduces a new category.
+// ---------------------------------------------------------------------------
 
-  "Generative AI":
-    "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:ring-blue-500/20",
+const CATEGORY_PALETTE = [
+  { dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-300" },
+  { dot: "bg-violet-500", text: "text-violet-700 dark:text-violet-300" },
+  { dot: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-300" },
+  { dot: "bg-amber-500", text: "text-amber-700 dark:text-amber-300" },
+  { dot: "bg-pink-500", text: "text-pink-700 dark:text-pink-300" },
+  { dot: "bg-cyan-500", text: "text-cyan-700 dark:text-cyan-300" },
+  { dot: "bg-indigo-500", text: "text-indigo-700 dark:text-indigo-300" },
+  { dot: "bg-rose-500", text: "text-rose-700 dark:text-rose-300" },
+] as const;
 
-  "Enterprise AI":
-    "bg-cyan-50 text-cyan-700 ring-cyan-200 dark:bg-cyan-500/10 dark:text-cyan-300 dark:ring-cyan-500/20",
+function hashToIndex(value: string, modulo: number): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) % modulo;
+}
 
-  "AI + Backend":
-    "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
+function getCategoryStyle(category: string) {
+  return CATEGORY_PALETTE[hashToIndex(category, CATEGORY_PALETTE.length)];
+}
 
-  "AI + Full Stack":
-    "bg-orange-50 text-orange-700 ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20",
+function CategoryTag({ category }: { category: string }) {
+  const style = getCategoryStyle(category);
+  return (
+    <span className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+      <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} aria-hidden="true" />
+      <span className={style.text}>{category}</span>
+    </span>
+  );
+}
 
-  "Document AI":
-    "bg-pink-50 text-pink-700 ring-pink-200 dark:bg-pink-500/10 dark:text-pink-300 dark:ring-pink-500/20",
+// ---------------------------------------------------------------------------
+// Small shared pieces
+// ---------------------------------------------------------------------------
 
-  "Java Full Stack":
-    "bg-indigo-50 text-indigo-700 ring-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:ring-indigo-500/20",
-};
+function TechList({
+  technologies,
+  limit = DISPLAY_CONFIG.maxVisibleTechnologies,
+}: {
+  technologies: string[];
+  limit?: number;
+}) {
+  const visible = technologies.slice(0, limit);
+  const hidden = technologies.length - visible.length;
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {visible.map((technology) => (
+        <span
+          key={technology}
+          className="rounded-md border border-zinc-200 px-2 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-800 dark:text-zinc-400"
+        >
+          {technology}
+        </span>
+      ))}
+      {hidden > 0 && (
+        <span className="px-2 py-1 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
+          +{hidden} more
+        </span>
+      )}
+    </div>
+  );
+}
 
 function ProjectAction({
   href,
   label,
   icon,
-  primary = false,
   projectTitle,
+  variant = "button",
 }: {
   href?: string;
   label: string;
   icon: ReactNode;
-  primary?: boolean;
   projectTitle: string;
+  variant?: "button" | "primary" | "icon";
 }) {
   const isPlaceholder = !href || href === "#";
+
+  if (variant === "icon") {
+    return (
+      <span
+        aria-disabled={isPlaceholder || undefined}
+        title={isPlaceholder ? `${label} link coming soon` : `${label} — ${projectTitle}`}
+        className={`inline-flex h-9 w-9 items-center justify-center rounded-md border text-sm transition-colors duration-200 ${
+          isPlaceholder
+            ? "cursor-not-allowed border-zinc-200 text-zinc-300 dark:border-zinc-800 dark:text-zinc-700"
+            : "border-zinc-200 text-zinc-600 hover:border-blue-300 hover:text-blue-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-blue-800 dark:hover:text-blue-400"
+        }`}
+      >
+        {isPlaceholder ? (
+          icon
+        ) : (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${label} for ${projectTitle}`}
+            className="flex h-full w-full items-center justify-center"
+          >
+            {icon}
+          </a>
+        )}
+      </span>
+    );
+  }
 
   if (isPlaceholder) {
     return (
       <span
         aria-disabled="true"
         title={`${label} link coming soon`}
-        className={`
-          inline-flex cursor-not-allowed
-          items-center gap-2
-          rounded-xl
-          px-4 py-2.5
-          text-sm font-semibold
-          ${
-            primary
-              ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
-              : "border border-zinc-200 text-zinc-400 dark:border-zinc-800 dark:text-zinc-600"
-          }
-        `}
+        className={`inline-flex cursor-not-allowed items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold ${
+          variant === "primary"
+            ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+            : "border border-zinc-200 text-zinc-400 dark:border-zinc-800 dark:text-zinc-600"
+        }`}
       >
         {icon}
         {label}
@@ -192,24 +212,11 @@ function ProjectAction({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${label} for ${projectTitle}`}
-      className={`
-        group/action
-        inline-flex items-center gap-2
-        rounded-xl
-        px-4 py-2.5
-        text-sm font-semibold
-        transition-all duration-200
-        focus-visible:outline-none
-        focus-visible:ring-2
-        focus-visible:ring-blue-500
-        focus-visible:ring-offset-2
-        dark:focus-visible:ring-offset-zinc-950
-        ${
-          primary
-            ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md"
-            : "border border-zinc-300 text-zinc-800 hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
-        }
-      `}
+      className={`inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950 ${
+        variant === "primary"
+          ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+          : "border border-zinc-300 text-zinc-800 hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+      }`}
     >
       {icon}
       {label}
@@ -217,315 +224,111 @@ function ProjectAction({
   );
 }
 
-function ProjectVisual({
-  project,
-  featured = false,
-}: {
-  project: Project;
-  featured?: boolean;
-}) {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  if (project.imageUrl && !imageFailed) {
-    return (
-      <div
-        className={`
-          relative overflow-hidden rounded-2xl
-          border border-zinc-200/80 bg-zinc-100
-          dark:border-zinc-800 dark:bg-zinc-950
-          ${featured ? "h-48" : "h-36"}
-        `}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={project.imageUrl}
-          alt={project.title}
-          onError={() => setImageFailed(true)}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-      </div>
-    );
-  }
-
-  // Fallback for projects that don't have a real screenshot yet — an
-  // intentional abstract placeholder rather than a broken/empty box.
+// A schematic placeholder for projects without a screenshot yet: corner
+// crop-marks and the category's initial, echoing a technical drawing rather
+// than a generic empty box.
+function ThumbnailFallback({ category, dense = false }: { category: string; dense?: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className={`
-        relative overflow-hidden
-        rounded-2xl
-        border border-zinc-200/80
-        bg-zinc-50
-        dark:border-zinc-800
-        dark:bg-zinc-950
-        ${featured ? "h-48" : "h-36"}
-      `}
+      className="relative h-full w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950"
     >
-      <div
-        className="
-          absolute inset-0
-          opacity-60
-          [background-image:linear-gradient(to_right,rgba(24,24,27,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(24,24,27,0.04)_1px,transparent_1px)]
-          [background-size:32px_32px]
-          dark:opacity-20
-        "
-      />
-
-      <div
-        className="
-          absolute
-          left-1/2 top-1/2
-          h-28 w-28
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-full
-          bg-blue-500/10
-          blur-3xl
-        "
-      />
-
-      <div className="absolute inset-0 flex items-center justify-center px-6">
-        <div className="flex w-full max-w-sm items-center justify-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_14px_rgba(59,130,246,0.6)]" />
-
-          <div className="h-px flex-1 bg-gradient-to-r from-blue-500/60 to-indigo-500/20" />
-
-          <div
-            className="
-              rounded-xl
-              border border-zinc-200
-              bg-white/90
-              px-4 py-3
-              shadow-sm
-              dark:border-zinc-700
-              dark:bg-zinc-900/90
-            "
-          >
-            <p
-              className="
-                font-mono
-                text-[10px]
-                font-semibold
-                uppercase
-                tracking-[0.16em]
-                text-zinc-500
-                dark:text-zinc-400
-              "
-            >
-              {project.category}
-            </p>
-
-            <p
-              className="
-                mt-1
-                font-mono
-                text-xs
-                font-bold
-                text-zinc-800
-                dark:text-zinc-200
-              "
-            >
-              /system
-            </p>
-          </div>
-
-          <div className="h-px flex-1 bg-gradient-to-r from-indigo-500/20 to-blue-500/60" />
-
-          <div className="h-2 w-2 rounded-full bg-indigo-500" />
-        </div>
-      </div>
-
-      <div
-        className="
-          absolute left-4 top-4
-          font-mono text-[10px]
-          font-bold uppercase
-          tracking-[0.15em]
-          text-zinc-400
-        "
+      <span
+        className={`absolute inset-0 flex items-center justify-center font-serif font-light text-zinc-300 dark:text-zinc-700 ${
+          dense ? "text-xl" : "text-4xl"
+        }`}
       >
-        {project.category}
-      </div>
-
-      <div
-        className="
-          absolute bottom-4 right-4
-          h-8 w-8
-          rounded-full
-          border border-blue-500/20
-        "
-      />
+        {category.charAt(0).toUpperCase()}
+      </span>
+      <span className="absolute left-2 top-2 h-2.5 w-2.5 border-l border-t border-zinc-300 dark:border-zinc-700" />
+      <span className="absolute bottom-2 right-2 h-2.5 w-2.5 border-b border-r border-zinc-300 dark:border-zinc-700" />
     </div>
   );
 }
 
-function ProjectCard({
+function Thumbnail({
   project,
-  index,
+  dense = false,
+  className = "",
 }: {
   project: Project;
-  index: number;
+  dense?: boolean;
+  className?: string;
 }) {
+  const [failed, setFailed] = useState(false);
+  const showImage = Boolean(project.imageUrl) && !failed;
+
+  return (
+    <div className={`overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800 ${className}`}>
+      {showImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={project.imageUrl}
+          alt={project.title}
+          onError={() => setFailed(true)}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      ) : (
+        <ThumbnailFallback category={project.category} dense={dense} />
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Spotlight — for the 1-2 projects marked `featured`
+// ---------------------------------------------------------------------------
+
+function SpotlightProject({ project, index }: { project: Project; index: number }) {
+  const reversed = index % 2 === 1;
+
   return (
     <motion.article
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{
-        duration: 0.55,
-        delay: Math.min(index * 0.06, 0.3),
-        ease: "easeOut",
-      }}
-      className="
-        group
-        flex h-full
-        w-full basis-full flex-shrink-0 flex-grow-0
-        flex-col
-        overflow-hidden
-        rounded-[1.75rem]
-        border border-zinc-200/80
-        bg-white/90
-        p-5
-        shadow-[0_12px_45px_-30px_rgba(24,24,27,0.35)]
-        backdrop-blur-xl
-        transition-all duration-500
-        hover:-translate-y-1
-        hover:border-blue-200
-        hover:shadow-[0_25px_70px_-35px_rgba(37,99,235,0.22)]
-        dark:border-zinc-800
-        dark:bg-zinc-900/80
-        dark:shadow-none
-        dark:hover:border-zinc-700
-        sm:w-[calc(50%-0.625rem)] sm:basis-[calc(50%-0.625rem)]
-        lg:w-[calc(33.333%-0.834rem)] lg:basis-[calc(33.333%-0.834rem)]
-        sm:p-6
-      "
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+      className={`group flex flex-col gap-7 border-l-2 border-blue-600 pl-6 dark:border-blue-500 sm:pl-8 lg:flex-row lg:items-stretch ${
+        reversed ? "lg:flex-row-reverse" : ""
+      }`}
     >
-      <ProjectVisual project={project} />
+      <Thumbnail project={project} className="lg:w-[42%]" />
 
-      <div className="mt-6 flex flex-1 flex-col">
-        <div className="flex items-center justify-between gap-3">
-          <span
-            className={`
-              inline-flex rounded-full
-              px-3 py-1.5
-              text-[10px] font-bold
-              tracking-wide
-              ring-1
-              ${
-                categoryStyles[project.category] ??
-                "bg-zinc-100 text-zinc-700 ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-700"
-              }
-            `}
-          >
-            {project.category}
-          </span>
-
-          <span
-            className="
-              font-mono
-              text-[10px]
-              font-bold
-              text-zinc-300
-              transition-colors duration-300
-              group-hover:text-blue-500
-              dark:text-zinc-700
-              dark:group-hover:text-blue-400
-            "
-          >
-            {String(index + 1).padStart(2, "0")}
-          </span>
+      <div className="flex flex-1 flex-col justify-center py-1">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CategoryTag category={project.category} />
+          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">Featured</span>
         </div>
 
-        <h3
-          className="
-            mt-5
-            text-xl font-bold
-            leading-tight
-            tracking-tight
-            text-zinc-950
-            dark:text-white
-          "
-        >
+        <h3 className="mt-4 font-serif text-2xl font-semibold leading-tight text-zinc-950 dark:text-white sm:text-3xl">
           {project.title}
         </h3>
 
-        <p
-          className="
-            mt-4
-            line-clamp-3
-            text-sm
-            leading-7
-            text-zinc-600
-            dark:text-zinc-400
-          "
-        >
+        {project.tagline && (
+          <p className="mt-2 text-sm font-medium text-zinc-500 dark:text-zinc-400">{project.tagline}</p>
+        )}
+
+        <p className="mt-4 max-w-2xl text-[15px] leading-7 text-zinc-600 dark:text-zinc-400">
           {project.description}
         </p>
 
-        <div className="mt-6">
-          <p
-            className="
-              mb-3
-              text-[10px]
-              font-bold
-              uppercase
-              tracking-[0.18em]
-              text-zinc-400
-            "
-          >
-            Technology
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {project.technologies.slice(0, 5).map((technology) => (
-              <span
-                key={technology}
-                className="
-                  rounded-lg
-                  border border-zinc-200
-                  bg-zinc-50
-                  px-2.5 py-1.5
-                  text-[11px]
-                  font-semibold
-                  text-zinc-600
-                  transition-colors duration-200
-                  group-hover:border-blue-100
-                  group-hover:text-blue-600
-                  dark:border-zinc-800
-                  dark:bg-zinc-950
-                  dark:text-zinc-400
-                  dark:group-hover:border-blue-900
-                  dark:group-hover:text-blue-400
-                "
-              >
-                {technology}
-              </span>
-            ))}
-            {project.technologies.length > 5 && (
-              <span className="inline-flex items-center px-2.5 py-1.5 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
-                +{project.technologies.length - 5} more
-              </span>
-            )}
-          </div>
+        <div className="mt-5">
+          <TechList technologies={project.technologies} />
         </div>
 
-        <div className="mt-auto flex flex-wrap gap-3 pt-7">
+        <div className="mt-7 flex flex-wrap gap-3">
           <ProjectAction
             href={project.github}
-            label="GitHub"
+            label="View code"
             icon={<FaGithub aria-hidden="true" />}
             projectTitle={project.title}
           />
-
           <ProjectAction
             href={project.demo}
-            label="Live Demo"
-            icon={<FaPlay aria-hidden="true" />}
-            primary
+            label="View demo"
+            icon={<FaExternalLinkAlt aria-hidden="true" />}
             projectTitle={project.title}
+            variant="primary"
           />
         </div>
       </div>
@@ -533,577 +336,295 @@ function ProjectCard({
   );
 }
 
-function FeaturedProject({
-  project,
-  index,
-}: {
-  project: Project;
-  index: number;
-}) {
+// ---------------------------------------------------------------------------
+// Ledger row — the scalable format for everything else. A dense list reads
+// better than a growing wall of cards once there are a dozen-plus projects.
+// ---------------------------------------------------------------------------
+
+function ProjectRow({ project }: { project: Project }) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.08,
-        ease: "easeOut",
-      }}
-      className="
-        group
-        overflow-hidden
-        rounded-[2rem]
-        border border-zinc-200/80
-        bg-white/90
-        p-5
-        shadow-[0_18px_70px_-35px_rgba(24,24,27,0.3)]
-        backdrop-blur-xl
-        transition-all duration-500
-        hover:-translate-y-1
-        hover:border-blue-200
-        hover:shadow-[0_30px_90px_-40px_rgba(37,99,235,0.25)]
-        dark:border-zinc-800
-        dark:bg-zinc-900/85
-        dark:shadow-none
-        dark:hover:border-zinc-700
-        sm:p-6
-        lg:p-7
-      "
-    >
-      <div className="grid items-stretch gap-7 lg:grid-cols-[1fr_1.05fr]">
-        <ProjectVisual project={project} featured />
+    <div className="group flex items-center gap-5 py-5">
+      <Thumbnail project={project} dense className="h-16 w-16 flex-shrink-0 sm:h-20 sm:w-20" />
 
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between gap-4">
-            <span
-              className={`
-                inline-flex rounded-full
-                px-3 py-1.5
-                text-[10px] font-bold
-                tracking-wide
-                ring-1
-                ${
-                  categoryStyles[project.category] ??
-                  "bg-zinc-100 text-zinc-700 ring-zinc-200"
-                }
-              `}
-            >
-              {project.category}
-            </span>
-
-            <span
-              className="
-                inline-flex items-center gap-2
-                text-[10px] font-bold
-                uppercase tracking-[0.15em]
-                text-emerald-600
-                dark:text-emerald-400
-              "
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              Featured
-            </span>
-          </div>
-
-          <h3
-            className="
-              mt-6
-              text-2xl
-              font-black
-              leading-tight
-              tracking-tight
-              text-zinc-950
-              dark:text-white
-              sm:text-3xl
-            "
-          >
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h4 className="font-serif text-lg font-semibold text-zinc-950 dark:text-white">
             {project.title}
-          </h3>
+          </h4>
+          <CategoryTag category={project.category} />
+        </div>
 
-          <p
-            className="
-              mt-5
-              line-clamp-4
-              max-w-2xl
-              text-sm
-              leading-7
-              text-zinc-600
-              dark:text-zinc-400
-              sm:text-[15px]
-            "
-          >
-            {project.description}
-          </p>
+        <p className="mt-1 line-clamp-1 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+          {project.tagline || project.description}
+        </p>
 
-          <div className="mt-6">
-            <p
-              className="
-                mb-3
-                text-[10px]
-                font-bold
-                uppercase
-                tracking-[0.18em]
-                text-zinc-400
-              "
-            >
-              Technology
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.slice(0, 6).map((technology) => (
-                <span
-                  key={technology}
-                  className="
-                    rounded-lg
-                    border border-zinc-200
-                    bg-zinc-50
-                    px-2.5 py-1.5
-                    text-[11px]
-                    font-semibold
-                    text-zinc-600
-                    dark:border-zinc-800
-                    dark:bg-zinc-950
-                    dark:text-zinc-400
-                  "
-                >
-                  {technology}
-                </span>
-              ))}
-              {project.technologies.length > 6 && (
-                <span className="inline-flex items-center px-2.5 py-1.5 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
-                  +{project.technologies.length - 6} more
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-auto flex flex-wrap gap-3 pt-7">
-            <ProjectAction
-              href={project.github}
-              label="View GitHub"
-              icon={<FaGithub aria-hidden="true" />}
-              projectTitle={project.title}
-            />
-
-            <ProjectAction
-              href={project.demo}
-              label="View Demo"
-              icon={<FaExternalLinkAlt aria-hidden="true" />}
-              primary
-              projectTitle={project.title}
-            />
-          </div>
+        <div className="mt-2.5 hidden sm:block">
+          <TechList technologies={project.technologies} limit={4} />
         </div>
       </div>
-    </motion.article>
+
+      <div className="flex flex-shrink-0 gap-2">
+        <ProjectAction
+          href={project.github}
+          label="Code"
+          icon={<FaGithub aria-hidden="true" />}
+          projectTitle={project.title}
+          variant="icon"
+        />
+        <ProjectAction
+          href={project.demo}
+          label="Demo"
+          icon={<FaPlay aria-hidden="true" />}
+          projectTitle={project.title}
+          variant="icon"
+        />
+      </div>
+    </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Filter bar — options are read from the data, never a fixed list
+// ---------------------------------------------------------------------------
+
+function FilterBar({
+  categories,
+  active,
+  onChange,
+}: {
+  categories: string[];
+  active: string | null;
+  onChange: (category: string | null) => void;
+}) {
+  if (categories.length < 2) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Filter projects by category">
+      <button
+        type="button"
+        onClick={() => onChange(null)}
+        className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors duration-150 ${
+          active === null
+            ? "bg-blue-600 text-white"
+            : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700"
+        }`}
+      >
+        All
+      </button>
+      {categories.map((category) => (
+        <button
+          key={category}
+          type="button"
+          onClick={() => onChange(category)}
+          className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors duration-150 ${
+            active === category
+              ? "bg-blue-600 text-white"
+              : "border border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700"
+          }`}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Skeleton
+// ---------------------------------------------------------------------------
+
+function RowSkeleton() {
+  return (
+    <div className="flex animate-pulse items-center gap-5 py-5">
+      <div className="h-16 w-16 flex-shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-900 sm:h-20 sm:w-20" />
+      <div className="flex-1 space-y-2.5">
+        <div className="h-4 w-1/3 rounded bg-zinc-100 dark:bg-zinc-900" />
+        <div className="h-3 w-2/3 rounded bg-zinc-100 dark:bg-zinc-900" />
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Section
+// ---------------------------------------------------------------------------
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadProjects() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const data = await getProjects();
-
-        setProjects(data.map(mapApiProject));
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to load projects."
-        );
-      } finally {
-        setLoading(false);
-      }
+  const loadProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getProjects();
+      setProjects(data.map(mapApiProject));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong loading these.");
+    } finally {
+      setLoading(false);
     }
-
-    loadProjects();
   }, []);
 
-  // A "featured" spotlight is meant to highlight your 1-2 best projects, not
-  // become the whole page if more than that get marked featured. Cap it so
-  // adding a 10th featured project doesn't turn into 10 stacked giant rows —
-  // anything past the cap falls back into the normal compact grid below.
-  const MAX_SPOTLIGHT_PROJECTS = 2;
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
 
-  const featuredProjects: Project[] = [];
-  const standardProjects: Project[] = [];
+  const categories = useMemo(
+    () => Array.from(new Set(projects.map((project) => project.category))).sort(),
+    [projects]
+  );
 
-  for (const project of projects) {
-    if (project.featured && featuredProjects.length < MAX_SPOTLIGHT_PROJECTS) {
-      featuredProjects.push(project);
-    } else {
-      standardProjects.push(project);
+  useEffect(() => {
+    if (activeCategory && !categories.includes(activeCategory)) {
+      setActiveCategory(null);
     }
-  }
+  }, [categories, activeCategory]);
+
+  const filteredProjects = useMemo(
+    () =>
+      activeCategory
+        ? projects.filter((project) => project.category === activeCategory)
+        : projects,
+    [projects, activeCategory]
+  );
+
+  const { featuredProjects, standardProjects } = useMemo(() => {
+    const featured: Project[] = [];
+    const standard: Project[] = [];
+    for (const project of filteredProjects) {
+      if (project.featured && featured.length < DISPLAY_CONFIG.maxSpotlightProjects) {
+        featured.push(project);
+      } else {
+        standard.push(project);
+      }
+    }
+    return { featuredProjects: featured, standardProjects: standard };
+  }, [filteredProjects]);
 
   return (
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="
-        relative overflow-hidden
-        border-t border-zinc-100
-        bg-zinc-50/50
-        py-24
-        dark:border-zinc-900
-        dark:bg-zinc-950
-        sm:py-28
-        lg:py-32
-      "
+      className="border-t border-zinc-100 bg-white py-24 dark:border-zinc-900 dark:bg-zinc-950 sm:py-28 lg:py-32"
     >
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none absolute
-          left-1/2 top-0
-          h-[500px] w-[800px]
-          -translate-x-1/2
-          rounded-full
-          bg-blue-500/[0.035]
-          blur-[130px]
-          dark:bg-blue-500/[0.045]
-        "
-      />
-
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none absolute inset-0
-          opacity-[0.25]
-          [background-image:linear-gradient(to_right,rgba(24,24,27,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(24,24,27,0.03)_1px,transparent_1px)]
-          [background-size:64px_64px]
-          dark:opacity-0
-        "
-      />
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-
+      <div className="mx-auto max-w-5xl px-6 lg:px-8">
         {/* HEADER */}
-
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{
-            duration: 0.6,
-            ease: "easeOut",
-          }}
-          className="max-w-3xl"
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
         >
-          <div className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="
-                h-px w-9
-                bg-blue-600
-                dark:bg-blue-400
-              "
-            />
-
-            <span
-              className="
-                text-xs font-bold
-                uppercase tracking-[0.22em]
-                text-blue-600
-                dark:text-blue-400
-              "
+          <div className="max-w-xl">
+            <h2
+              id="projects-heading"
+              className="font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
             >
-              Selected Projects
-            </span>
+              Projects
+            </h2>
+            <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-400">
+              {loading
+                ? "Loading a working record of what I've built —"
+                : `${projects.length} project${projects.length === 1 ? "" : "s"}, `}
+              spanning computer vision, applied LLMs, and full-stack systems.
+            </p>
           </div>
 
-          <h2
-            id="projects-heading"
-            className="
-              mt-5
-              max-w-4xl
-              text-3xl font-black
-              leading-[1.1]
-              tracking-tight
-              text-zinc-950
-              dark:text-white
-              sm:text-4xl
-              lg:text-5xl
-            "
-          >
-            Engineering ideas into{" "}
-            <span
-              className="
-                bg-gradient-to-r
-                from-blue-600
-                via-indigo-600
-                to-cyan-600
-                bg-clip-text
-                text-transparent
-                dark:from-blue-400
-                dark:via-indigo-400
-                dark:to-cyan-400
-              "
-            >
-              working systems.
-            </span>
-          </h2>
-
-          <p
-            className="
-              mt-6
-              max-w-2xl
-              text-base
-              leading-8
-              text-zinc-600
-              dark:text-zinc-400
-              md:text-lg
-            "
-          >
-            A selection of AI, backend, and full-stack projects focused on
-            solving practical problems through thoughtful engineering,
-            intelligent automation, and reliable software systems.
-          </p>
+          {!loading && !error && (
+            <FilterBar categories={categories} active={activeCategory} onChange={setActiveCategory} />
+          )}
         </motion.div>
 
         {/* LOADING */}
-
         {loading && (
-          <div
-            className="
-              mt-14
-              rounded-2xl
-              border border-zinc-200
-              bg-white
-              p-8
-              text-center
-              text-sm
-              text-zinc-500
-              dark:border-zinc-800
-              dark:bg-zinc-900
-              dark:text-zinc-400
-            "
-          >
-            Loading projects...
+          <div className="mt-14 divide-y divide-zinc-100 dark:divide-zinc-900">
+            {[0, 1, 2, 3].map((i) => (
+              <RowSkeleton key={i} />
+            ))}
           </div>
         )}
 
         {/* ERROR */}
-
         {!loading && error && (
-          <div
-            className="
-              mt-14
-              rounded-2xl
-              border border-red-200
-              bg-red-50
-              p-8
-              text-center
-              text-sm
-              text-red-600
-              dark:border-red-900/50
-              dark:bg-red-950/20
-              dark:text-red-400
-            "
-          >
-            {error}
+          <div className="mt-14 rounded-lg border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/50 dark:bg-red-950/20">
+            <p className="text-sm text-red-600 dark:text-red-400">Couldn&apos;t load projects — {error}</p>
+            <button
+              type="button"
+              onClick={loadProjects}
+              className="mt-4 rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/40"
+            >
+              Try again
+            </button>
           </div>
         )}
 
-        {/* PROJECT CONTENT */}
-
+        {/* CONTENT */}
         {!loading && !error && (
           <>
-            {/* FEATURED PROJECTS */}
-
             {featuredProjects.length > 0 && (
-              <div className="mt-14 space-y-6 lg:mt-16">
+              <div className="mt-16 space-y-14">
                 {featuredProjects.map((project, index) => (
-                  <FeaturedProject
-                    key={project.title}
-                    project={project}
-                    index={index}
-                  />
+                  <SpotlightProject key={project.title} project={project} index={index} />
                 ))}
               </div>
             )}
 
-            {/* OTHER PROJECTS */}
-
             {standardProjects.length > 0 && (
-              <div className="mt-16">
-                <div className="mb-7 flex items-end justify-between gap-5">
-                  <div>
-                    <p
-                      className="
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-[0.2em]
-                        text-zinc-400
-                      "
-                    >
-                      More Engineering Work
-                    </p>
-
-                    <h3
-                      className="
-                        mt-2
-                        text-2xl
-                        font-bold
-                        tracking-tight
-                        text-zinc-950
-                        dark:text-white
-                      "
-                    >
-                      Other projects
-                    </h3>
-                  </div>
-
-                  <span
-                    className="
-                      hidden
-                      text-xs
-                      font-medium
-                      text-zinc-400
-                      sm:block
-                    "
-                  >
-                    {standardProjects.length} projects
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-5">
-                  {standardProjects.map((project, index) => (
-                    <ProjectCard
-                      key={project.title}
-                      project={project}
-                      index={index}
-                    />
-                  ))}
-                </div>
+              <div
+                className={`divide-y divide-zinc-100 dark:divide-zinc-900 ${
+                  featuredProjects.length > 0 ? "mt-16 border-t border-zinc-100 dark:border-zinc-900" : "mt-16"
+                }`}
+              >
+                {standardProjects.map((project) => (
+                  <ProjectRow key={project.title} project={project} />
+                ))}
               </div>
             )}
 
-            {/* EMPTY STATE */}
+            {filteredProjects.length === 0 && projects.length > 0 && (
+              <div className="mt-14 rounded-lg border border-zinc-200 p-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                Nothing filed under &quot;{activeCategory}&quot; yet.
+              </div>
+            )}
 
             {projects.length === 0 && (
-              <div
-                className="
-                  mt-14
-                  rounded-2xl
-                  border border-zinc-200
-                  bg-white
-                  p-8
-                  text-center
-                  text-sm
-                  text-zinc-500
-                  dark:border-zinc-800
-                  dark:bg-zinc-900
-                  dark:text-zinc-400
-                "
-              >
-                No projects available.
+              <div className="mt-14 rounded-lg border border-zinc-200 p-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                No projects yet — check back soon.
               </div>
             )}
           </>
         )}
 
         {/* BOTTOM CTA */}
-
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{
-            duration: 0.55,
-            delay: 0.1,
-          }}
-          className="
-            mt-14
-            flex flex-col
-            items-start
-            justify-between
-            gap-5
-            rounded-[1.5rem]
-            border border-zinc-200/80
-            bg-white/80
-            p-6
-            shadow-sm
-            backdrop-blur
-            dark:border-zinc-800
-            dark:bg-zinc-900/60
-            sm:flex-row
-            sm:items-center
-            sm:p-7
-          "
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mt-16 flex flex-col items-start justify-between gap-5 rounded-lg border border-zinc-200/80 bg-zinc-50/60 p-6 dark:border-zinc-800 dark:bg-zinc-900/40 sm:flex-row sm:items-center sm:p-7"
         >
           <div>
-            <p
-              className="
-                text-sm font-bold
-                text-zinc-950
-                dark:text-white
-              "
-            >
-              Want to see the implementation?
-            </p>
-
-            <p
-              className="
-                mt-1.5
-                text-sm
-                leading-6
-                text-zinc-500
-                dark:text-zinc-400
-              "
-            >
-              Explore the source code, architecture, and technical decisions
-              behind my projects.
+            <p className="text-sm font-bold text-zinc-950 dark:text-white">Want to see the implementation?</p>
+            <p className="mt-1.5 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+              Explore the source code, architecture, and technical decisions behind these projects.
             </p>
           </div>
 
           <a
-            href="https://github.com/deepak-sjd"
+            href={GITHUB_PROFILE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#ffffff" }}
-            className="
-              group
-              inline-flex shrink-0
-              items-center gap-2
-              rounded-xl
-              bg-zinc-900
-              px-5 py-3
-              text-sm font-semibold
-              shadow-sm
-              transition-all duration-300
-              hover:-translate-y-0.5
-              hover:bg-zinc-700
-              hover:shadow-md
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-blue-500
-              focus-visible:ring-offset-2
-              dark:focus-visible:ring-offset-zinc-950
-            "
+            className="group inline-flex shrink-0 items-center gap-2 rounded-md bg-zinc-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950"
           >
-            <FaGithub aria-hidden="true" style={{ color: "#ffffff" }} />
-
-            <span style={{ color: "#ffffff" }}>View GitHub</span>
-
+            <FaGithub aria-hidden="true" />
+            <span>View GitHub</span>
             <FaArrowRight
               aria-hidden="true"
-              style={{ color: "#ffffff" }}
-              className="
-                text-xs
-                transition-transform duration-300
-                group-hover:translate-x-1
-              "
+              className="text-xs transition-transform duration-300 group-hover:translate-x-1"
             />
           </a>
         </motion.div>
