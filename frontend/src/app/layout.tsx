@@ -62,6 +62,16 @@ export const metadata: Metadata = {
     description:
       "AI Engineer and Java Full Stack Developer building intelligent applications and production-oriented software systems.",
     siteName: "Deepak Kumar",
+    // Shown as the link preview thumbnail on LinkedIn/Twitter/Slack/etc.
+    // Add a 1200x630 image at public/og-image.png (or swap this path).
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Deepak Kumar — AI Engineer & Full Stack Developer",
+      },
+    ],
   },
 
   twitter: {
@@ -69,6 +79,7 @@ export const metadata: Metadata = {
     title: "Deepak Kumar | AI Engineer & Full Stack Developer",
     description:
       "AI Engineer and Java Full Stack Developer building intelligent applications and production-oriented software systems.",
+    images: ["/og-image.png"],
   },
 };
 

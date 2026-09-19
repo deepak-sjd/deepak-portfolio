@@ -1,15 +1,16 @@
 package com.deepak.portfolio.controller;
+
 import com.deepak.portfolio.dto.request.ProjectRequest;
+import com.deepak.portfolio.dto.response.PageResponse;
 import com.deepak.portfolio.dto.response.ProjectResponse;
 import com.deepak.portfolio.service.ProjectService;
+import com.deepak.portfolio.service.FileStorageService;
 
 import jakarta.validation.Valid;
 
-import com.deepak.portfolio.dto.response.PageResponse;
-
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,16 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/projects")
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final FileStorageService fileStorageService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService, FileStorageService fileStorageService) {
         this.projectService = projectService;
+        this.fileStorageService = fileStorageService;
     }
 
     // ============================================================
@@ -49,19 +52,19 @@ public class ProjectController {
     // READ ALL
     // ============================================================
 
-   @GetMapping
-public PageResponse<ProjectResponse> getAllProjects(
-        @RequestParam(required = false) Boolean featured,
-        @PageableDefault(
-                size = 10,
-                page = 0,
-                sort = "displayOrder",
-                direction = Sort.Direction.ASC
-        )
-        Pageable pageable
-) {
-    return projectService.getAllProjects(featured, pageable);
-}
+    @GetMapping
+    public PageResponse<ProjectResponse> getAllProjects(
+            @RequestParam(required = false) Boolean featured,
+            @PageableDefault(
+                    size = 10,
+                    page = 0,
+                    sort = "displayOrder",
+                    direction = Sort.Direction.ASC
+            )
+            Pageable pageable
+    ) {
+        return projectService.getAllProjects(featured, pageable);
+    }
 
     // ============================================================
     // READ BY ID
@@ -84,6 +87,18 @@ public PageResponse<ProjectResponse> getAllProjects(
             @Valid @RequestBody ProjectRequest request
     ) {
         return projectService.updateProject(id, request);
+    }
+
+    // ============================================================
+    // UPLOAD IMAGE
+    // ============================================================
+
+    @PostMapping(value = "/{id}/image", consumes = "multipart/form-data")
+    public ProjectResponse uploadProjectImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return projectService.updateProjectImage(id, file);
     }
 
     // ============================================================

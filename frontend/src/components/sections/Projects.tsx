@@ -1,5 +1,7 @@
 "use client";
 
+import { resolveFileUrl } from "@/lib/api/config";
+
 import {
   useCallback,
   useEffect,
@@ -9,6 +11,7 @@ import {
 } from "react";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import {
   getProjects,
@@ -68,7 +71,7 @@ function mapApiProject(project: ProjectApiResponse): Project {
       .filter(Boolean),
     github: project.githubUrl || undefined,
     demo: project.liveUrl || undefined,
-    imageUrl: project.imageUrl || undefined,
+    imageUrl: project.imageUrl ? resolveFileUrl(project.imageUrl) : undefined,
     featured: Boolean(project.featured),
   };
 }
@@ -256,17 +259,21 @@ function Thumbnail({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
+  const imageUrl = project.imageUrl;
   const showImage = Boolean(project.imageUrl) && !failed;
 
   return (
-    <div className={`overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800 ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800 ${className}`}>
       {showImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={project.imageUrl}
+        // Requires the backend's image host to be listed under
+        // `images.remotePatterns` in next.config — see the comment there.
+        <Image
+          src={imageUrl!}
           alt={project.title}
+          fill
+          sizes="(min-width: 1024px) 33vw, 100vw"
           onError={() => setFailed(true)}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
       ) : (
         <ThumbnailFallback category={project.category} dense={dense} />

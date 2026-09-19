@@ -1,5 +1,5 @@
+import { apiFetch } from "./config";
 
-import { API_BASE_URL } from "./config";
 export interface ResumeApiResponse {
   id: number;
   title: string;
@@ -11,22 +11,5 @@ export interface ResumeApiResponse {
 }
 
 export async function getActiveResume(): Promise<ResumeApiResponse> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/resume`,
-    {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      next: { revalidate: 300 },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch resume: ${response.status}`
-    );
-  }
-
-  return response.json();
+  return apiFetch<ResumeApiResponse>("/api/v1/resume", { revalidate: 300 });
 }

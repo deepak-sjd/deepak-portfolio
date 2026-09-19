@@ -7,10 +7,12 @@ import com.deepak.portfolio.entity.Project;
 import com.deepak.portfolio.exception.ResourceNotFoundException;
 import com.deepak.portfolio.repository.ProjectRepository;
 import com.deepak.portfolio.repository.ServiceRepository;
+import com.deepak.portfolio.service.FileStorageService.StoredFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,10 +21,12 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ServiceRepository serviceRepository;
+    private final FileStorageService fileStorageService;
 
-    public ProjectService(ProjectRepository projectRepository, ServiceRepository serviceRepository) {
+    public ProjectService(ProjectRepository projectRepository, ServiceRepository serviceRepository, FileStorageService fileStorageService) {
         this.projectRepository = projectRepository;
         this.serviceRepository = serviceRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     // ============================================================
@@ -129,6 +133,28 @@ public class ProjectService {
         project.setVideoUrl(request.videoUrl());
         project.setFeatured(request.featured());
         project.setDisplayOrder(request.displayOrder());
+
+        Project updatedProject = projectRepository.save(project);
+
+        return toResponse(updatedProject);
+    }
+
+    // ============================================================
+    // UPLOAD IMAGE
+    // ============================================================
+
+    @Transactional
+    public ProjectResponse updateProjectImage(Long id, MultipartFile file) {
+
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Project not found with id: " + id
+                        )
+                );
+
+        StoredFile stored = fileStorageService.store(file, "projects");
+        project.setImageUrl(stored.publicUrl());
 
         Project updatedProject = projectRepository.save(project);
 

@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config";
+import { apiFetch } from "./config";
 import type { ProjectApiResponse } from "./projects";
 
 export interface ServiceApiResponse {
@@ -16,24 +16,8 @@ export interface ServiceApiResponse {
   relatedProjects: ProjectApiResponse[];
 }
 
-
-
 export async function getServices(): Promise<ServiceApiResponse[]> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/services`,
-    {
-      headers: {
-        Accept: "application/json",
-      },
-      next: { revalidate: 300 },
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch services: ${response.status}`,
-    );
-  }
-
-  return response.json();
+  return apiFetch<ServiceApiResponse[]>("/api/v1/services", {
+    revalidate: 300,
+  });
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { fadeUp, fadeUpSm, viewportOnce } from "@/lib/animations";
 import {
   FaAws,
   FaDatabase,
@@ -422,10 +423,10 @@ export default function Skills() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          variants={fadeUp}
+          initial="initial"
+          whileInView="animate"
+          viewport={viewportOnce}
           className="max-w-4xl"
         >
           <div className="flex items-center gap-3">
@@ -468,8 +469,9 @@ export default function Skills() {
         {/* Interactive stack */}
         {!loading && !error && categoriesWithCounts.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            variants={fadeUpSm}
+            initial="initial"
+            whileInView="animate"
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-8"
@@ -601,10 +603,10 @@ export default function Skills() {
 
         {/* Closing statement */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={fadeUpSm}
+          initial="initial"
+          whileInView="animate"
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5 }}
           className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800"
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

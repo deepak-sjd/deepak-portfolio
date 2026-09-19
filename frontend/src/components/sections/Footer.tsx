@@ -1,5 +1,6 @@
 "use client";
 
+import WeatherWidget from "@/components/shared/WeatherWidget";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -28,25 +29,8 @@ const navigation = {
     { name: "Notes", href: "/#notes" },
     { name: "Contact", href: "/#contact" },
   ],
-
-  connect: [
-    {
-      name: "GitHub",
-      href: "https://github.com/deepak-sjd",
-      external: true,
-    },
-    {
-      name: "LinkedIn",
-      href: "https://linkedin.com/in/deepak-sjd",
-      external: true,
-    },
-    {
-      name: "Instagram",
-      href: "https://www.instagram.com/gupta_deepak_74/",
-      external: true,
-    },
-  ],
-};
+    
+}
 
 /* -------------------------------------------------------------------------- */
 /* Social Links                                                               */
@@ -469,7 +453,9 @@ export default function Footer() {
               ))}
             </ul>
 
-            {/* Connect */}
+                        {/* Live weather — small human touch, doesn't depend on your
+                backend so it can't break at deploy the way the old images
+                once did. */}
             <div className="mt-8">
               <h2
                 className="
@@ -480,16 +466,12 @@ export default function Footer() {
                   text-zinc-200
                 "
               >
-                Connect
+                Right now
               </h2>
 
-              <ul className="mt-5 space-y-3">
-                {navigation.connect.map((link) => (
-                  <li key={link.name}>
-                    <FooterLink {...link} />
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-5">
+                <WeatherWidget />
+              </div>
             </div>
           </motion.div>
         </div>

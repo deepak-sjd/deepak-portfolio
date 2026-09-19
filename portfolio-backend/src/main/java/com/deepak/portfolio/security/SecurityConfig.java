@@ -75,8 +75,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
 
-                        // Publicly downloadable files (resume PDF, note attachments).
+                                               // Publicly downloadable files (resume PDF, note attachments).
                         .requestMatchers(HttpMethod.GET, "/files/**").permitAll()
+
+                        // API documentation — not sensitive, useful to keep browsable.
 
                         // API documentation — not sensitive, useful to keep browsable.
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()

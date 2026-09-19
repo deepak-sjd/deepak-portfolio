@@ -1,4 +1,5 @@
-import { API_BASE_URL } from "./config";
+import { apiFetch } from "./config";
+
 export interface ExperienceApiResponse {
   id: number;
   company: string;
@@ -10,28 +11,11 @@ export interface ExperienceApiResponse {
   current: boolean;
   description: string;
   displayOrder: number;
-   cgpa: string | null;
+  cgpa: string | null;
 }
 
-
-export async function getExperiences(): Promise<
-  ExperienceApiResponse[]
-> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/experiences`,
-    {
-      headers: {
-        Accept: "application/json",
-      },
-      next: { revalidate: 300 },
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch experiences: ${response.status}`,
-    );
-  }
-
-  return response.json();
+export async function getExperiences(): Promise<ExperienceApiResponse[]> {
+  return apiFetch<ExperienceApiResponse[]>("/api/v1/experiences", {
+    revalidate: 300,
+  });
 }

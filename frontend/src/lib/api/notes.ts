@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config";
+import { apiFetch, resolveFileUrl } from "./config";
 
 export type ResourceType =
   | "PDF"
@@ -46,49 +46,13 @@ export interface NoteApiResponse {
   children: NoteSummaryApiResponse[];
 }
 
-export interface ApiErrorResponse {
-  timestamp: string;
-  status: number;
-  error: string;
-  message: string;
-  path: string;
-  fieldErrors?: { field: string; message: string }[] | null;
-}
-
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      ...init?.headers,
-    },
-    next: { revalidate: 300 },
-  });
-
-  if (!response.ok) {
-    let message = `Request failed: ${response.status}`;
-    try {
-      const errorBody = (await response.json()) as ApiErrorResponse;
-      message = errorBody.message ?? message;
-    } catch {
-      // Non-JSON error response — fall back to the status-based message.
-    }
-    throw new Error(message);
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json();
-}
-
 /**
  * Top-level Field cards (Generative AI, Backend, etc.) for the main Notes page.
  */
 export async function getRootNotes(): Promise<NoteSummaryApiResponse[]> {
-  return request<NoteSummaryApiResponse[]>("/api/v1/notes");
+  return apiFetch<NoteSummaryApiResponse[]>("/api/v1/notes", {
+    revalidate: 300,
+  });
 }
 
 /**
@@ -96,12 +60,14 @@ export async function getRootNotes(): Promise<NoteSummaryApiResponse[]> {
  * Used for every level: Field, Topic, and leaf Subtopic pages.
  */
 export async function getNoteBySlug(slug: string): Promise<NoteApiResponse> {
-  return request<NoteApiResponse>(`/api/v1/notes/${encodeURIComponent(slug)}`);
+  return apiFetch<NoteApiResponse>(
+    `/api/v1/notes/${encodeURIComponent(slug)}`,
+    { revalidate: 300 },
+  );
 }
 
-export function resolveResourceUrl(url: string): string {
-  return url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
-}
+/** Resolves a resource's (possibly relative) URL to an absolute one. */
+export const resolveResourceUrl = resolveFileUrl;
 
 export function formatFileSize(bytes: number | null): string | null {
   if (bytes === null) return null;
@@ -130,7 +96,7 @@ export async function uploadNoteResource(
   formData.append("type", type);
   formData.append("label", label);
 
-  return request<NoteResourceApiResponse>(
+  return apiFetch<NoteResourceApiResponse>(
     `/api/v1/notes/${noteId}/resources/upload`,
     { method: "POST", body: formData },
   );
@@ -142,7 +108,7 @@ export async function addNoteLinkResource(
   label: string,
   url: string,
 ): Promise<NoteResourceApiResponse> {
-  return request<NoteResourceApiResponse>(
+  return apiFetch<NoteResourceApiResponse>(
     `/api/v1/notes/${noteId}/resources/link`,
     {
       method: "POST",
@@ -156,7 +122,7 @@ export async function deleteNoteResource(
   noteId: number,
   resourceId: number,
 ): Promise<void> {
-  await request<void>(`/api/v1/notes/${noteId}/resources/${resourceId}`, {
+  await apiFetch<void>(`/api/v1/notes/${noteId}/resources/${resourceId}`, {
     method: "DELETE",
   });
 }

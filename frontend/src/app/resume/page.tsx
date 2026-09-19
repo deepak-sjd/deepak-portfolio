@@ -1,8 +1,8 @@
-import { API_BASE_URL as BACKEND_URL } from "@/lib/api/config";
+
 
 "use client";
 
-
+import { API_BASE_URL as BACKEND_URL } from "@/lib/api/config";
 
 import { useEffect, useState } from "react";
 import {
