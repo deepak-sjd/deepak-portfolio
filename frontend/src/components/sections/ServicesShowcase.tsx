@@ -358,8 +358,7 @@ export default function ServicesShowcase() {
   };
 
   return (
-    <section className="relative isolate overflow-hidden border-t border-zinc-200/70 bg-white py-20 dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-950 dark:via-[#0a1128] dark:to-slate-950 sm:py-24">
-      {/* Ambient glow accents — subtle in light mode, richer in dark mode */}
+    <section aria-labelledby="services-heading" className="relative isolate overflow-hidden border-t border-zinc-200/70 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-950 sm:py-24">      {/* Ambient glow accents — subtle in light mode, richer in dark mode */}
       <div aria-hidden="true" className="pointer-events-none absolute -top-32 right-0 h-[32rem] w-[32rem] rounded-full bg-blue-200/40 blur-[120px] dark:bg-blue-600/20" />
       <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-96 w-96 rounded-full bg-indigo-100/40 blur-[120px] dark:bg-indigo-600/15" />
 
@@ -371,12 +370,21 @@ export default function ServicesShowcase() {
               Services
             </span>
           </div>
-          <h1 className="mt-6 text-4xl font-black leading-[1.06] tracking-[-0.035em] text-zinc-950 dark:text-white sm:text-5xl">
-            Engineering solutions for
-            <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
+                    <h2
+            id="services-heading"
+            className="mt-5 font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
+          >
+            Engineering solutions for{" "}
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
               real-world problems.
             </span>
-          </h1>
+          </h2>
+
+          <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-400">
+            {loading
+              ? "Loading what I can offer —"
+              : `${services.length} service${services.length === 1 ? "" : "s"}, from prototype to production.`}
+          </p>
         </div>
 
         {loading && (

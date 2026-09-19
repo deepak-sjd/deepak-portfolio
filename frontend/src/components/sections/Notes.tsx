@@ -101,11 +101,11 @@ export default function Notes() {
             </span>
           </div>
 
-          <h2
+                    <h2
             id="notes-heading"
             className="
-              mt-6 text-4xl font-black leading-[1.06] tracking-[-0.035em]
-              text-zinc-950 dark:text-white sm:text-5xl md:text-6xl
+              mt-5 font-serif text-3xl font-semibold leading-tight tracking-tight
+              text-zinc-950 dark:text-white sm:text-4xl
             "
           >
             Engineering knowledge,
@@ -120,8 +120,7 @@ export default function Notes() {
             </span>
           </h2>
 
-          <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 dark:text-zinc-400 md:text-lg">
-            A structured knowledge base of everything I work with — organized
+          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">            A structured knowledge base of everything I work with — organized
             by field, broken down topic by topic, with references and videos
             attached where useful.
           </p>
@@ -226,9 +225,9 @@ export default function Notes() {
                           </span>
                         </div>
 
-                        <h3
+                                               <h3
                           className="
-                            mt-6 text-xl font-bold tracking-tight text-zinc-950
+                            mt-6 font-serif text-xl font-semibold leading-tight text-zinc-950
                             transition-colors duration-300 group-hover:text-blue-600
                             dark:text-white dark:group-hover:text-blue-400
                           "

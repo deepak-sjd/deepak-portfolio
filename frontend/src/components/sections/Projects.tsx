@@ -25,23 +25,12 @@ import {
   FaPlay,
 } from "react-icons/fa";
 
-// ---------------------------------------------------------------------------
-// Config — the only values that should ever need a manual edit. Everything
-// else (categories, tag colors, counts) is derived from whatever the API
-// returns, so adding a new project never requires touching this file.
-// ---------------------------------------------------------------------------
-
 const GITHUB_PROFILE_URL = "https://github.com/deepak-sjd";
 
 const DISPLAY_CONFIG = {
-  maxSpotlightProjects: 2,
-  maxVisibleTechnologies: 6,
+  maxVisibleTechnologies: 4,
 } as const;
 
-// `category` and `tagline` are optional here on purpose: if the backend
-// doesn't send them yet, mapApiProject() below derives a sensible fallback
-// instead of requiring a hardcoded, per-title lookup table that someone has
-// to remember to update every time a project is added.
 type ProjectApiResponse = BaseProjectApiResponse & {
   category?: string;
   tagline?: string;
@@ -71,54 +60,78 @@ function mapApiProject(project: ProjectApiResponse): Project {
       .filter(Boolean),
     github: project.githubUrl || undefined,
     demo: project.liveUrl || undefined,
-    imageUrl: project.imageUrl ? resolveFileUrl(project.imageUrl) : undefined,
+    imageUrl: project.imageUrl
+      ? resolveFileUrl(project.imageUrl)
+      : undefined,
     featured: Boolean(project.featured),
   };
 }
 
-// ---------------------------------------------------------------------------
-// Category styling — a fixed palette assigned deterministically by hashing
-// the category name, instead of a `Record<string, string>` that would need
-// a new entry every time a project introduces a new category.
-// ---------------------------------------------------------------------------
-
 const CATEGORY_PALETTE = [
-  { dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-300" },
-  { dot: "bg-violet-500", text: "text-violet-700 dark:text-violet-300" },
-  { dot: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-300" },
-  { dot: "bg-amber-500", text: "text-amber-700 dark:text-amber-300" },
-  { dot: "bg-pink-500", text: "text-pink-700 dark:text-pink-300" },
-  { dot: "bg-cyan-500", text: "text-cyan-700 dark:text-cyan-300" },
-  { dot: "bg-indigo-500", text: "text-indigo-700 dark:text-indigo-300" },
-  { dot: "bg-rose-500", text: "text-rose-700 dark:text-rose-300" },
+  {
+    dot: "bg-blue-500",
+    text: "text-blue-700 dark:text-blue-300",
+  },
+  {
+    dot: "bg-violet-500",
+    text: "text-violet-700 dark:text-violet-300",
+  },
+  {
+    dot: "bg-emerald-500",
+    text: "text-emerald-700 dark:text-emerald-300",
+  },
+  {
+    dot: "bg-amber-500",
+    text: "text-amber-700 dark:text-amber-300",
+  },
+  {
+    dot: "bg-pink-500",
+    text: "text-pink-700 dark:text-pink-300",
+  },
+  {
+    dot: "bg-cyan-500",
+    text: "text-cyan-700 dark:text-cyan-300",
+  },
+  {
+    dot: "bg-indigo-500",
+    text: "text-indigo-700 dark:text-indigo-300",
+  },
+  {
+    dot: "bg-rose-500",
+    text: "text-rose-700 dark:text-rose-300",
+  },
 ] as const;
 
 function hashToIndex(value: string, modulo: number): number {
   let hash = 0;
+
   for (let i = 0; i < value.length; i += 1) {
     hash = (hash << 5) - hash + value.charCodeAt(i);
     hash |= 0;
   }
+
   return Math.abs(hash) % modulo;
 }
 
 function getCategoryStyle(category: string) {
-  return CATEGORY_PALETTE[hashToIndex(category, CATEGORY_PALETTE.length)];
+  return CATEGORY_PALETTE[
+    hashToIndex(category, CATEGORY_PALETTE.length)
+  ];
 }
 
 function CategoryTag({ category }: { category: string }) {
   const style = getCategoryStyle(category);
+
   return (
     <span className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-      <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} aria-hidden="true" />
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${style.dot}`}
+        aria-hidden="true"
+      />
       <span className={style.text}>{category}</span>
     </span>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Small shared pieces
-// ---------------------------------------------------------------------------
 
 function TechList({
   technologies,
@@ -140,6 +153,7 @@ function TechList({
           {technology}
         </span>
       ))}
+
       {hidden > 0 && (
         <span className="px-2 py-1 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
           +{hidden} more
@@ -168,7 +182,11 @@ function ProjectAction({
     return (
       <span
         aria-disabled={isPlaceholder || undefined}
-        title={isPlaceholder ? `${label} link coming soon` : `${label} — ${projectTitle}`}
+        title={
+          isPlaceholder
+            ? `${label} link coming soon`
+            : `${label} — ${projectTitle}`
+        }
         className={`inline-flex h-9 w-9 items-center justify-center rounded-md border text-sm transition-colors duration-200 ${
           isPlaceholder
             ? "cursor-not-allowed border-zinc-200 text-zinc-300 dark:border-zinc-800 dark:text-zinc-700"
@@ -227,109 +245,90 @@ function ProjectAction({
   );
 }
 
-// A schematic placeholder for projects without a screenshot yet: corner
-// crop-marks and the category's initial, echoing a technical drawing rather
-// than a generic empty box.
-function ThumbnailFallback({ category, dense = false }: { category: string; dense?: boolean }) {
+function ThumbnailFallback({ category }: { category: string }) {
   return (
     <div
       aria-hidden="true"
       className="relative h-full w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950"
     >
-      <span
-        className={`absolute inset-0 flex items-center justify-center font-serif font-light text-zinc-300 dark:text-zinc-700 ${
-          dense ? "text-xl" : "text-4xl"
-        }`}
-      >
+      <span className="absolute inset-0 flex items-center justify-center font-serif text-4xl font-light text-zinc-300 dark:text-zinc-700">
         {category.charAt(0).toUpperCase()}
       </span>
+
       <span className="absolute left-2 top-2 h-2.5 w-2.5 border-l border-t border-zinc-300 dark:border-zinc-700" />
+
       <span className="absolute bottom-2 right-2 h-2.5 w-2.5 border-b border-r border-zinc-300 dark:border-zinc-700" />
     </div>
   );
 }
 
-function Thumbnail({
+function ProjectCard({
   project,
-  dense = false,
-  className = "",
+  index,
 }: {
   project: Project;
-  dense?: boolean;
-  className?: string;
+  index: number;
 }) {
   const [failed, setFailed] = useState(false);
-  const imageUrl = project.imageUrl;
+
   const showImage = Boolean(project.imageUrl) && !failed;
-
-  return (
-    <div className={`relative overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800 ${className}`}>
-      {showImage ? (
-        // Requires the backend's image host to be listed under
-        // `images.remotePatterns` in next.config — see the comment there.
-        <Image
-          src={imageUrl!}
-          alt={project.title}
-          fill
-          sizes="(min-width: 1024px) 33vw, 100vw"
-          onError={() => setFailed(true)}
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-        />
-      ) : (
-        <ThumbnailFallback category={project.category} dense={dense} />
-      )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Spotlight — for the 1-2 projects marked `featured`
-// ---------------------------------------------------------------------------
-
-function SpotlightProject({ project, index }: { project: Project; index: number }) {
-  const reversed = index % 2 === 1;
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-      className={`group flex flex-col gap-7 border-l-2 border-blue-600 pl-6 dark:border-blue-500 sm:pl-8 lg:flex-row lg:items-stretch ${
-        reversed ? "lg:flex-row-reverse" : ""
-      }`}
+      transition={{
+        duration: 0.5,
+        delay: (index % 6) * 0.06,
+        ease: "easeOut",
+      }}
+      className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800"
     >
-      <Thumbnail project={project} className="lg:w-[42%]" />
+      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+        {showImage ? (
+          <Image
+            src={project.imageUrl!}
+            alt={project.title}
+            fill
+            sizes="(min-width: 1024px) 33vw, 100vw"
+            onError={() => setFailed(true)}
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <ThumbnailFallback category={project.category} />
+        )}
 
-      <div className="flex flex-1 flex-col justify-center py-1">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <CategoryTag category={project.category} />
-          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">Featured</span>
-        </div>
+        {project.featured && (
+          <span className="absolute right-3 top-3 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">
+            Featured
+          </span>
+        )}
+      </div>
 
-        <h3 className="mt-4 font-serif text-2xl font-semibold leading-tight text-zinc-950 dark:text-white sm:text-3xl">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <CategoryTag category={project.category} />
+
+        <h3 className="mt-3 font-serif text-xl font-semibold leading-tight text-zinc-950 dark:text-white">
           {project.title}
         </h3>
 
-        {project.tagline && (
-          <p className="mt-2 text-sm font-medium text-zinc-500 dark:text-zinc-400">{project.tagline}</p>
-        )}
-
-        <p className="mt-4 max-w-2xl text-[15px] leading-7 text-zinc-600 dark:text-zinc-400">
-          {project.description}
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          {project.tagline || project.description}
         </p>
 
-        <div className="mt-5">
+        <div className="mt-4">
           <TechList technologies={project.technologies} />
         </div>
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-wrap gap-2.5 pt-1">
           <ProjectAction
             href={project.github}
             label="View code"
             icon={<FaGithub aria-hidden="true" />}
             projectTitle={project.title}
           />
+
           <ProjectAction
             href={project.demo}
             label="View demo"
@@ -343,57 +342,6 @@ function SpotlightProject({ project, index }: { project: Project; index: number 
   );
 }
 
-// ---------------------------------------------------------------------------
-// Ledger row — the scalable format for everything else. A dense list reads
-// better than a growing wall of cards once there are a dozen-plus projects.
-// ---------------------------------------------------------------------------
-
-function ProjectRow({ project }: { project: Project }) {
-  return (
-    <div className="group flex items-center gap-5 py-5">
-      <Thumbnail project={project} dense className="h-16 w-16 flex-shrink-0 sm:h-20 sm:w-20" />
-
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h4 className="font-serif text-lg font-semibold text-zinc-950 dark:text-white">
-            {project.title}
-          </h4>
-          <CategoryTag category={project.category} />
-        </div>
-
-        <p className="mt-1 line-clamp-1 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-          {project.tagline || project.description}
-        </p>
-
-        <div className="mt-2.5 hidden sm:block">
-          <TechList technologies={project.technologies} limit={4} />
-        </div>
-      </div>
-
-      <div className="flex flex-shrink-0 gap-2">
-        <ProjectAction
-          href={project.github}
-          label="Code"
-          icon={<FaGithub aria-hidden="true" />}
-          projectTitle={project.title}
-          variant="icon"
-        />
-        <ProjectAction
-          href={project.demo}
-          label="Demo"
-          icon={<FaPlay aria-hidden="true" />}
-          projectTitle={project.title}
-          variant="icon"
-        />
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Filter bar — options are read from the data, never a fixed list
-// ---------------------------------------------------------------------------
-
 function FilterBar({
   categories,
   active,
@@ -406,7 +354,11 @@ function FilterBar({
   if (categories.length < 2) return null;
 
   return (
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Filter projects by category">
+    <div
+      className="flex flex-wrap gap-2"
+      role="group"
+      aria-label="Filter projects by category"
+    >
       <button
         type="button"
         onClick={() => onChange(null)}
@@ -418,6 +370,7 @@ function FilterBar({
       >
         All
       </button>
+
       {categories.map((category) => (
         <button
           key={category}
@@ -436,26 +389,6 @@ function FilterBar({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Skeleton
-// ---------------------------------------------------------------------------
-
-function RowSkeleton() {
-  return (
-    <div className="flex animate-pulse items-center gap-5 py-5">
-      <div className="h-16 w-16 flex-shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-900 sm:h-20 sm:w-20" />
-      <div className="flex-1 space-y-2.5">
-        <div className="h-4 w-1/3 rounded bg-zinc-100 dark:bg-zinc-900" />
-        <div className="h-3 w-2/3 rounded bg-zinc-100 dark:bg-zinc-900" />
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Section
-// ---------------------------------------------------------------------------
-
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -466,10 +399,27 @@ export default function Projects() {
     try {
       setLoading(true);
       setError(null);
+
       const data = await getProjects();
-      setProjects(data.map(mapApiProject));
+
+      // Remove duplicate projects by title.
+      // The first occurrence is kept.
+      const uniqueProjects = Array.from(
+        new Map(
+          data.map((project) => [
+            project.title.trim().toLowerCase(),
+            project,
+          ])
+        ).values()
+      );
+
+      setProjects(uniqueProjects.map(mapApiProject));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong loading these.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong loading these."
+      );
     } finally {
       setLoading(false);
     }
@@ -480,7 +430,10 @@ export default function Projects() {
   }, [loadProjects]);
 
   const categories = useMemo(
-    () => Array.from(new Set(projects.map((project) => project.category))).sort(),
+    () =>
+      Array.from(
+        new Set(projects.map((project) => project.category))
+      ).sort(),
     [projects]
   );
 
@@ -493,32 +446,20 @@ export default function Projects() {
   const filteredProjects = useMemo(
     () =>
       activeCategory
-        ? projects.filter((project) => project.category === activeCategory)
+        ? projects.filter(
+            (project) => project.category === activeCategory
+          )
         : projects,
     [projects, activeCategory]
   );
-
-  const { featuredProjects, standardProjects } = useMemo(() => {
-    const featured: Project[] = [];
-    const standard: Project[] = [];
-    for (const project of filteredProjects) {
-      if (project.featured && featured.length < DISPLAY_CONFIG.maxSpotlightProjects) {
-        featured.push(project);
-      } else {
-        standard.push(project);
-      }
-    }
-    return { featuredProjects: featured, standardProjects: standard };
-  }, [filteredProjects]);
 
   return (
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="border-t border-zinc-100 bg-white py-24 dark:border-zinc-900 dark:bg-zinc-950 sm:py-28 lg:py-32"
-    >
-      <div className="mx-auto max-w-5xl px-6 lg:px-8">
-        {/* HEADER */}
+      className="border-t border-zinc-100 bg-white pb-24 pt-24 dark:border-zinc-900 dark:bg-zinc-950 sm:pb-28 sm:pt-28 lg:pb-32 lg:pt-32"      >
+
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -533,32 +474,50 @@ export default function Projects() {
             >
               Projects
             </h2>
-            <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-400">
+
+              <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-400">
               {loading
                 ? "Loading a working record of what I've built —"
-                : `${projects.length} project${projects.length === 1 ? "" : "s"}, `}
-              spanning computer vision, applied LLMs, and full-stack systems.
+                : categories.length > 1
+                  ? `${projects.length} projects, spanning ${categories.slice(0, -1).join(", ")} and ${categories[categories.length - 1]}.`
+                  : `${projects.length} project${projects.length === 1 ? "" : "s"} — a working record of what I've built.`}
             </p>
           </div>
 
           {!loading && !error && (
-            <FilterBar categories={categories} active={activeCategory} onChange={setActiveCategory} />
+            <FilterBar
+              categories={categories}
+              active={activeCategory}
+              onChange={setActiveCategory}
+            />
           )}
         </motion.div>
 
-        {/* LOADING */}
         {loading && (
-          <div className="mt-14 divide-y divide-zinc-100 dark:divide-zinc-900">
-            {[0, 1, 2, 3].map((i) => (
-              <RowSkeleton key={i} />
+          <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="animate-pulse overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800"
+              >
+                <div className="aspect-[16/10] bg-zinc-100 dark:bg-zinc-900" />
+
+                <div className="space-y-2.5 p-5 sm:p-6">
+                  <div className="h-3 w-1/4 rounded bg-zinc-100 dark:bg-zinc-900" />
+                  <div className="h-4 w-2/3 rounded bg-zinc-100 dark:bg-zinc-900" />
+                  <div className="h-3 w-full rounded bg-zinc-100 dark:bg-zinc-900" />
+                </div>
+              </div>
             ))}
           </div>
         )}
 
-        {/* ERROR */}
         {!loading && error && (
           <div className="mt-14 rounded-lg border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/50 dark:bg-red-950/20">
-            <p className="text-sm text-red-600 dark:text-red-400">Couldn&apos;t load projects — {error}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">
+              Couldn&apos;t load projects — {error}
+            </p>
+
             <button
               type="button"
               onClick={loadProjects}
@@ -569,25 +528,16 @@ export default function Projects() {
           </div>
         )}
 
-        {/* CONTENT */}
         {!loading && !error && (
           <>
-            {featuredProjects.length > 0 && (
-              <div className="mt-16 space-y-14">
-                {featuredProjects.map((project, index) => (
-                  <SpotlightProject key={project.title} project={project} index={index} />
-                ))}
-              </div>
-            )}
-
-            {standardProjects.length > 0 && (
-              <div
-                className={`divide-y divide-zinc-100 dark:divide-zinc-900 ${
-                  featuredProjects.length > 0 ? "mt-16 border-t border-zinc-100 dark:border-zinc-900" : "mt-16"
-                }`}
-              >
-                {standardProjects.map((project) => (
-                  <ProjectRow key={project.title} project={project} />
+            {filteredProjects.length > 0 && (
+              <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredProjects.map((project, index) => (
+                  <ProjectCard
+                    key={project.title}
+                    project={project}
+                    index={index}
+                  />
                 ))}
               </div>
             )}
@@ -606,7 +556,6 @@ export default function Projects() {
           </>
         )}
 
-        {/* BOTTOM CTA */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -615,20 +564,27 @@ export default function Projects() {
           className="mt-16 flex flex-col items-start justify-between gap-5 rounded-lg border border-zinc-200/80 bg-zinc-50/60 p-6 dark:border-zinc-800 dark:bg-zinc-900/40 sm:flex-row sm:items-center sm:p-7"
         >
           <div>
-            <p className="text-sm font-bold text-zinc-950 dark:text-white">Want to see the implementation?</p>
+            <p className="text-sm font-bold text-zinc-950 dark:text-white">
+              Want to see the implementation?
+            </p>
+
             <p className="mt-1.5 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-              Explore the source code, architecture, and technical decisions behind these projects.
+              Explore the source code, architecture, and technical decisions
+              behind these projects.
             </p>
           </div>
 
           <a
+                     
             href={GITHUB_PROFILE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex shrink-0 items-center gap-2 rounded-md bg-zinc-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950"
+            className="group inline-flex shrink-0 items-center gap-2 rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950"
           >
             <FaGithub aria-hidden="true" />
+
             <span>View GitHub</span>
+
             <FaArrowRight
               aria-hidden="true"
               className="text-xs transition-transform duration-300 group-hover:translate-x-1"

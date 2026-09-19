@@ -191,20 +191,19 @@ export default function Contact() {
             </span>
           </div>
 
-          <h2
+                   <h2
             id="contact-heading"
             className="
-              mt-6
+              mt-5
               max-w-4xl
-              text-4xl
-              font-black
-              leading-[1.06]
-              tracking-[-0.035em]
+              font-serif
+              text-3xl
+              font-semibold
+              leading-tight
+              tracking-tight
               text-zinc-950
               dark:text-white
-              sm:text-5xl
-              md:text-6xl
-              lg:text-[4rem]
+              sm:text-4xl
             "
           >
             Let&apos;s build something
@@ -226,8 +225,7 @@ export default function Contact() {
             </span>
           </h2>
 
-          <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 dark:text-zinc-400 md:text-lg">
-            Have an opportunity, a product idea, an AI challenge, or simply
+          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">            Have an opportunity, a product idea, an AI challenge, or simply
             want to connect? I&apos;m always open to thoughtful conversations
             around technology, engineering, and building useful software.
           </p>
@@ -549,8 +547,7 @@ export default function Contact() {
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-400">
                     Start a conversation
                   </p>
-
-                  <h3 className="mt-2 text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
+                  <h3 className="mt-2 font-serif text-2xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white">
                     Tell me what you&apos;re building.
                   </h3>
 

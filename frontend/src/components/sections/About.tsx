@@ -94,9 +94,9 @@ export default function About() {
         >
           {/* Intro */}
           <div className="lg:col-span-7">
-            <h2
+                        <h2
               id="about-heading"
-              className="max-w-xl text-3xl font-black leading-[1.15] tracking-tight text-zinc-950 dark:text-white sm:text-4xl lg:text-[2.75rem]"
+              className="max-w-xl font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
             >
               Engineering AI systems{" "}
               <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">

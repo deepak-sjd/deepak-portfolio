@@ -214,14 +214,14 @@ export default function Experience() {
             id="experience-heading"
             className="
               mt-5
-              max-w-4xl
+              max-w-3xl
               text-4xl font-black
               leading-[1.05]
               tracking-[-0.035em]
               text-zinc-950
               dark:text-white
-              sm:text-5xl
-              lg:text-[3.5rem]
+              sm:text-4xl
+              lg:text-5xl
             "
           >
             Building experience through{" "}
