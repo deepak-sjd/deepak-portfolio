@@ -436,9 +436,9 @@ export default function Skills() {
             </span>
           </div>
 
-          <h2
+                    <h2
             id="skills-heading"
-            className="mt-4 max-w-4xl text-3xl font-black leading-[1.1] tracking-tight text-zinc-950 dark:text-white sm:text-4xl lg:text-5xl"
+            className="mt-4 max-w-4xl font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
           >
             Technologies I use to{" "}
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
@@ -446,8 +446,7 @@ export default function Skills() {
             </span>
           </h2>
 
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-600 dark:text-zinc-400 md:text-base">
-            A practical engineering stack spanning AI applications, backend
+          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">  A practical engineering stack spanning AI applications, backend
             services, modern web development, data systems and infrastructure.
           </p>
         </motion.div>

@@ -210,18 +210,17 @@ export default function Experience() {
             </span>
           </div>
 
-          <h2
+                   <h2
             id="experience-heading"
             className="
               mt-5
               max-w-3xl
-              text-4xl font-black
-              leading-[1.05]
-              tracking-[-0.035em]
+              font-serif text-3xl font-semibold
+              leading-tight
+              tracking-tight
               text-zinc-950
               dark:text-white
               sm:text-4xl
-              lg:text-5xl
             "
           >
             Building experience through{" "}
@@ -242,14 +241,13 @@ export default function Experience() {
             </span>
           </h2>
 
-          <p
+                    <p
             className="
-              mt-6
+              mt-3
               max-w-2xl
-              text-base leading-8
+              text-base leading-7
               text-zinc-600
               dark:text-zinc-400
-              md:text-lg
             "
           >
             A snapshot of the professional experience and
@@ -813,10 +811,10 @@ function ExperienceCard({
       {/* TITLE */}
       {/* ======================================================= */}
 
-      <h3
+            <h3
         className="
           mt-5
-          text-xl font-bold
+          font-serif text-xl font-semibold
           leading-tight
           tracking-tight
           text-zinc-950
@@ -907,12 +905,11 @@ function ExperienceCard({
       {/* DESCRIPTION */}
       {/* ======================================================= */}
 
-      <p
+            <p
         className="
-          text-sm leading-7
+          text-sm leading-6
           text-zinc-600
           dark:text-zinc-400
-          md:text-[15px]
         "
       >
         {item.description}
