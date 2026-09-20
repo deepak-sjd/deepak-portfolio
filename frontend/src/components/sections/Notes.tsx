@@ -73,25 +73,15 @@ export default function Notes() {
     <section
       id="notes"
       aria-labelledby="notes-heading"
-      className="
-        relative
-        border-t
-        border-zinc-200/70
-        bg-white
-        py-24
-        dark:border-zinc-800
-        dark:bg-zinc-950
-        sm:py-28
-        lg:py-32
-      "
+      className="relative border-t border-zinc-100 bg-white py-24 dark:border-zinc-900 dark:bg-zinc-950 sm:py-28 lg:py-32"
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* HEADER */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.65, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           className="max-w-3xl"
         >
           <div className="flex items-center gap-3">
@@ -101,39 +91,31 @@ export default function Notes() {
             </span>
           </div>
 
-                    <h2
+          <h2
             id="notes-heading"
-            className="
-              mt-5 font-serif text-3xl font-semibold leading-tight tracking-tight
-              text-zinc-950 dark:text-white sm:text-4xl
-            "
+            className="mt-5 font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
           >
-            Engineering knowledge,
-            <span
-              className="
-                block bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600
-                bg-clip-text text-transparent
-                dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400
-              "
-            >
+            Engineering knowledge,{" "}
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
               documented.
             </span>
           </h2>
 
-          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">            A structured knowledge base of everything I work with — organized
+          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">
+            A structured knowledge base of everything I work with — organized
             by field, broken down topic by topic, with references and videos
             attached where useful.
           </p>
         </motion.div>
 
         {/* CONTENT */}
-        <div className="mt-12">
+        <div className="mt-14">
           {loading && (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[1, 2, 3].map((item) => (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
-                  className="h-[220px] animate-pulse rounded-3xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="h-[176px] animate-pulse rounded-xl border border-zinc-200/80 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900"
                 />
               ))}
             </div>
@@ -142,15 +124,15 @@ export default function Notes() {
           {!loading && error && (
             <div
               role="alert"
-              className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+              className="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400"
             >
               Unable to load notes right now.
             </div>
           )}
 
           {!loading && !error && fields.length === 0 && (
-            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-10 text-center dark:border-zinc-800 dark:bg-zinc-900">
-              <FaBookOpen aria-hidden="true" className="mx-auto text-2xl text-zinc-400 dark:text-zinc-600" />
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-10 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
+              <FaBookOpen aria-hidden="true" className="mx-auto text-2xl text-zinc-300 dark:text-zinc-700" />
               <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
                 No published fields yet.
               </p>
@@ -158,104 +140,79 @@ export default function Notes() {
           )}
 
           {!loading && !error && visibleFields.length > 0 && (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {visibleFields.map((field, index) => {
                 const Icon = iconForField(field.title);
 
                 return (
                   <motion.div
                     key={field.id}
-                    initial={{ opacity: 0, y: 24 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.5, delay: index * 0.06, ease: "easeOut" }}
+                    transition={{ duration: 0.45, delay: (index % 8) * 0.05, ease: "easeOut" }}
                   >
-                    {/*
-                      ONE plain <Link> wraps the entire card — this is the
-                      whole fix. No nested motion.span layers, no variant
-                      propagation to worry about: every pixel inside this
-                      anchor tag is clickable, guaranteed, the same way the
-                      "Explore topics" text always was.
-                    */}
+                    {/* One plain <Link> wraps the whole card — every pixel
+                        inside is clickable, no nested-element quirks. */}
                     <Link
                       href={`/notes/${field.slug}`}
                       className="
-                        group relative flex h-full min-h-[280px] flex-col
-                        overflow-hidden rounded-3xl border border-zinc-200/80
-                        bg-white p-6 shadow-[0_15px_50px_-30px_rgba(24,24,27,0.35)]
+                        group relative flex h-full min-h-[176px] flex-col
+                        rounded-xl border border-zinc-200/80 bg-white p-5
                         outline-none transition-all duration-300
-                        hover:-translate-y-1 hover:border-blue-200
-                        hover:shadow-[0_25px_60px_-30px_rgba(37,99,235,0.3)]
+                        hover:-translate-y-0.5 hover:border-blue-300
+                        hover:shadow-[0_20px_45px_-30px_rgba(37,99,235,0.3)]
                         focus-visible:ring-2 focus-visible:ring-blue-500
                         focus-visible:ring-offset-2
-                        dark:border-zinc-800 dark:bg-zinc-900/70
+                        dark:border-zinc-800 dark:bg-zinc-900/60
                         dark:hover:border-zinc-700
                         dark:focus-visible:ring-offset-zinc-950
                       "
                     >
-                      {/* Large tech-stack icon watermark — purely decorative */}
-                      <Icon
+                      {/* Corner marks — same crop-mark motif used on Project
+                          thumbnails, tying this card visually back to the
+                          rest of the site instead of a generic icon-card. */}
+                      <span
                         aria-hidden="true"
-                        className="
-                          pointer-events-none absolute -right-6 -top-6
-                          text-[7rem] text-blue-50
-                          transition-transform duration-500 ease-out
-                          group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:rotate-6
-                          dark:text-blue-500/[0.07]
-                        "
+                        className="absolute left-2.5 top-2.5 h-2.5 w-2.5 border-l border-t border-zinc-200 transition-colors duration-300 group-hover:border-blue-300 dark:border-zinc-700 dark:group-hover:border-blue-800"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="absolute bottom-2.5 right-2.5 h-2.5 w-2.5 border-b border-r border-zinc-200 transition-colors duration-300 group-hover:border-blue-300 dark:border-zinc-700 dark:group-hover:border-blue-800"
                       />
 
-                      <div className="relative z-10 flex flex-1 flex-col">
-                        <div className="flex items-center justify-between">
-                          <div
-                            className="
-                              flex h-11 w-11 items-center justify-center rounded-xl
-                              bg-blue-50 text-blue-600 ring-1 ring-blue-100
-                              transition-colors duration-300
-                              group-hover:bg-blue-600 group-hover:text-white
-                              group-hover:ring-blue-600
-                              dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
-                            "
-                          >
-                            <Icon aria-hidden="true" className="text-base" />
-                          </div>
-
-                          <span className="text-xs font-medium text-zinc-400 dark:text-zinc-600">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-                        </div>
-
-                                               <h3
+                      <div className="flex items-center justify-between">
+                        <div
                           className="
-                            mt-6 font-serif text-xl font-semibold leading-tight text-zinc-950
-                            transition-colors duration-300 group-hover:text-blue-600
-                            dark:text-white dark:group-hover:text-blue-400
+                            flex h-9 w-9 items-center justify-center rounded-lg
+                            bg-blue-50 text-blue-600 transition-colors duration-300
+                            group-hover:bg-blue-600 group-hover:text-white
+                            dark:bg-blue-950/50 dark:text-blue-400
                           "
                         >
-                          {field.title}
-                        </h3>
-
-                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                          {field.summary}
-                        </p>
-
-                        <div className="mt-auto pt-7">
-                          <span
-                            className="
-                              inline-flex items-center gap-2 text-sm font-bold
-                              text-blue-600 transition-colors duration-300
-                              group-hover:text-blue-700
-                              dark:text-blue-400 dark:group-hover:text-blue-300
-                            "
-                          >
-                            Explore topics
-                            <FaArrowRight
-                              aria-hidden="true"
-                              className="text-xs transition-transform duration-300 group-hover:translate-x-1.5"
-                            />
-                          </span>
+                          <Icon aria-hidden="true" className="text-sm" />
                         </div>
+
+                        <span className="font-mono text-[11px] text-zinc-300 dark:text-zinc-700">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
                       </div>
+
+                      <h3 className="mt-4 font-serif text-lg font-semibold leading-tight text-zinc-950 transition-colors duration-300 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                        {field.title}
+                      </h3>
+
+                      <p className="mt-2 line-clamp-2 flex-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                        {field.summary}
+                      </p>
+
+                      <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 transition-colors duration-300 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300">
+                        Explore topics
+                        <FaArrowRight
+                          aria-hidden="true"
+                          className="text-[10px] transition-transform duration-300 group-hover:translate-x-1"
+                        />
+                      </span>
                     </Link>
                   </motion.div>
                 );
