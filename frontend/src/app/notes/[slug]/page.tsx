@@ -117,7 +117,7 @@ export default async function NotePage({ params }: NotePageProps) {
 
   const isBrowseNode = note.children.length > 0;
   const isStudyPage = !isBrowseNode && !!note.content;
-  const backHref = note.parentSlug ? `/notes/${note.parentSlug}` : "/#notes";
+  const backHref = note.parentSlug ? `/notes/${note.parentSlug}` : "/notes";
   const backLabel = note.parentTitle ? `Back to ${note.parentTitle}` : "Back to Notes";
   const readingMinutes = estimateReadingMinutes(note.content);
   const toc = isStudyPage ? extractHeadings(note.content) : [];

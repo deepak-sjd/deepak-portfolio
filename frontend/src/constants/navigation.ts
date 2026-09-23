@@ -16,10 +16,10 @@ export interface NavItem {
 }
 
 /**
- * Skills / Experience / Projects / Services / Notes are all facets of "what
- * I can do and have done" — grouping them under one "Work" item keeps the
- * top-level nav to 4 items instead of 8, which reads as considered rather
- * than busy.
+ * Skills and Projects are top-level nav items that jump to their homepage
+ * sections (/#skills, /#projects) rather than separate pages. Experience,
+ * Services, and Notes don't live on the homepage, so they stay grouped
+ * under "Work" as their own standalone pages.
  */
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -31,14 +31,20 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/#about",
   },
   {
+    label: "Skills",
+    href: "/#skills",
+  },
+  {
+    label: "Projects",
+    href: "/#projects",
+  },
+  {
     label: "Work",
-    href: "/projects",
+    href: "/experience",
     children: [
-      { label: "Skills", href: "/skills" },
       { label: "Experience", href: "/experience" },
-      { label: "Projects", href: "/projects" },
       { label: "Services", href: "/services" },
-      { label: "Notes", href: "/#notes" },
+      { label: "Notes", href: "/notes" },
     ],
   },
   {

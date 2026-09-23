@@ -57,7 +57,7 @@ export default function About() {
     <section
       id="about"
       aria-labelledby="about-heading"
-      className="relative overflow-hidden py-20 sm:py-24 lg:py-28"
+      className="relative overflow-hidden py-16 sm:py-20 lg:py-24"
     >
       {/* Ambient background — matches Skills/Schedule/Hero */}
       <div

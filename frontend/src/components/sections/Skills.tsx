@@ -408,7 +408,7 @@ export default function Skills() {
     <section
       id="skills"
       aria-labelledby="skills-heading"
-      className="relative overflow-hidden py-14 sm:py-16 lg:py-20"
+      className="relative overflow-hidden py-16 sm:py-20 lg:py-24"
     >
       {/* Ambient background */}
       <div

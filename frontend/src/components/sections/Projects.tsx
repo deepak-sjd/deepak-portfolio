@@ -457,7 +457,7 @@ export default function Projects() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="border-t border-zinc-100 bg-white pb-24 pt-24 dark:border-zinc-900 dark:bg-zinc-950 sm:pb-28 sm:pt-28 lg:pb-32 lg:pt-32"      >
+      className="border-t border-zinc-100 bg-white pb-16 pt-16 dark:border-zinc-900 dark:bg-zinc-950 sm:pb-20 sm:pt-20 lg:pb-24 lg:pt-24"      >
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div

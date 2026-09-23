@@ -112,11 +112,11 @@ export default function Contact() {
         border-t
         border-zinc-200/70
         bg-white
-        py-24
+        py-16
         dark:border-zinc-800
         dark:bg-zinc-950
-        sm:py-28
-        lg:py-32
+        sm:py-20
+        lg:py-24
       "
     >
       {/* ========================================================= */}
