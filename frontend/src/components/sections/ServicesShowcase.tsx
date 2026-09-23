@@ -151,8 +151,9 @@ function ExtraProjectRow({ project }: { project: ProjectApiResponse }) {
 function ServicePanel({ service }: { service: ServiceApiResponse }) {
   const Icon = getServiceIcon(service.icon ?? "brain");
   const technologies = parseTechnologies(service.technologies);
-  const visibleTech = technologies.slice(0, 6);
-  const extraTechCount = technologies.length - visibleTech.length;
+  const [techExpanded, setTechExpanded] = useState(false);
+  const visibleTech = techExpanded ? technologies : technologies.slice(0, 6);
+  const extraTechCount = technologies.length - Math.min(technologies.length, 6);
 
   const [featured, ...rest] = service.relatedProjects;
 
@@ -209,9 +210,13 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
               </span>
             ))}
             {extraTechCount > 0 && (
-              <span className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-zinc-400 dark:text-slate-500">
-                +{extraTechCount} more
-              </span>
+              <button
+                type="button"
+                onClick={() => setTechExpanded((prev) => !prev)}
+                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-blue-600 underline-offset-2 hover:underline dark:text-blue-400"
+              >
+                {techExpanded ? "Show less" : `+${extraTechCount} more`}
+              </button>
             )}
           </div>
         )}

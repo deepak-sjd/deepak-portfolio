@@ -140,11 +140,13 @@ function TechList({
   technologies: string[];
   limit?: number;
 }) {
-  const visible = technologies.slice(0, limit);
-  const hidden = technologies.length - visible.length;
+  const [expanded, setExpanded] = useState(false);
+
+  const hiddenCount = technologies.length - limit;
+  const visible = expanded ? technologies : technologies.slice(0, limit);
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap items-center gap-1.5">
       {visible.map((technology) => (
         <span
           key={technology}
@@ -154,10 +156,18 @@ function TechList({
         </span>
       ))}
 
-      {hidden > 0 && (
-        <span className="px-2 py-1 text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
-          +{hidden} more
-        </span>
+      {hiddenCount > 0 && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setExpanded((prev) => !prev);
+          }}
+          className="rounded-md px-2 py-1 text-[11px] font-semibold text-blue-600 underline-offset-2 hover:underline dark:text-blue-400"
+        >
+          {expanded ? "Show less" : `+${hiddenCount} more`}
+        </button>
       )}
     </div>
   );
