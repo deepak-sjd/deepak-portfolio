@@ -121,7 +121,6 @@ export default async function NotePage({ params }: NotePageProps) {
   const backLabel = note.parentTitle ? `Back to ${note.parentTitle}` : "Back to Notes";
   const readingMinutes = estimateReadingMinutes(note.content);
   const toc = isStudyPage ? extractHeadings(note.content) : [];
-  const hasToc = toc.length >= 3; // not worth a sidebar for a couple of headings
 
   // Matches each rendered <h2>/<h3> to its pre-computed TOC slug, in document
   // order — react-markdown renders headings in the same order they appear
@@ -141,7 +140,7 @@ export default async function NotePage({ params }: NotePageProps) {
         className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-blue-500/[0.07] blur-[120px] dark:bg-blue-500/[0.12]"
       />
 
-      <article className={`relative mx-auto px-6 pb-24 pt-20 sm:pt-24 lg:px-8 ${isBrowseNode ? "max-w-7xl" : hasToc ? "max-w-6xl" : "max-w-4xl"}`}>
+      <article className={`relative mx-auto px-6 pb-24 pt-10 sm:pt-12 lg:px-8 ${isBrowseNode ? "max-w-7xl" : "max-w-5xl"}`}>
 
         {/* Back link */}
         <Link
@@ -162,42 +161,42 @@ export default async function NotePage({ params }: NotePageProps) {
         </Link>
 
         {/* Header */}
-        <header className="mt-6 max-w-3xl">
+        <header className="mt-5 max-w-3xl">
           <div
             className="
-              flex h-12 w-12 items-center justify-center rounded-xl
+              flex h-9 w-9 items-center justify-center rounded-lg
               bg-blue-50 text-blue-600 ring-1 ring-blue-100
               dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
             "
           >
             {isBrowseNode ? (
-              <FaFolder aria-hidden="true" className="text-sm" />
+              <FaFolder aria-hidden="true" className="text-xs" />
             ) : (
-              <FaBookOpen aria-hidden="true" className="text-sm" />
+              <FaBookOpen aria-hidden="true" className="text-xs" />
             )}
           </div>
 
           {note.category && (
-            <p className="mt-7 text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
+            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
               {note.category}
             </p>
           )}
 
           <h1
             className="
-              mt-3 text-4xl font-black leading-[1.08] tracking-[-0.035em]
-              text-zinc-950 dark:text-white sm:text-5xl md:text-6xl
+              mt-2 text-3xl font-extrabold leading-[1.15] tracking-[-0.025em]
+              text-zinc-950 dark:text-white sm:text-4xl md:text-[2.75rem]
             "
           >
             {note.title}
           </h1>
 
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-600 dark:text-zinc-400">
             {note.summary}
           </p>
 
           {isStudyPage && (
-            <p className="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-400 dark:text-zinc-600">
+            <p className="mt-3 flex items-center gap-2 text-xs font-medium text-zinc-400 dark:text-zinc-600">
               <FaClock aria-hidden="true" />
               {readingMinutes} min read
             </p>
@@ -211,76 +210,27 @@ export default async function NotePage({ params }: NotePageProps) {
           </div>
         )}
 
-        {/* Mobile "On this page" — collapsible, only shown when there's a TOC and on small screens */}
-        {hasToc && (
-          <details className="mt-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 lg:hidden dark:border-zinc-800 dark:bg-zinc-900">
-            <summary className="cursor-pointer text-sm font-bold text-zinc-900 dark:text-white">
-              On this page
-            </summary>
-            <nav className="mt-3 flex flex-col gap-2">
-              {toc.map((item) => (
-                <a
-                  key={item.slug}
-                  href={`#${item.slug}`}
-                  className={`text-sm text-zinc-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 ${item.level === 3 ? "pl-4" : ""}`}
-                >
-                  {item.text}
-                </a>
-              ))}
-            </nav>
-          </details>
-        )}
-
         {/* Divider */}
-        <div className="my-8 h-px bg-zinc-200 dark:bg-zinc-800" />
+        <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
 
-        {/* Content row: optional sticky TOC sidebar + the study content */}
-        <div className={hasToc ? "lg:flex lg:items-start lg:gap-12" : ""}>
-
-          {hasToc && (
-            <nav
-              aria-label="Table of contents"
-              className="hidden shrink-0 lg:sticky lg:top-24 lg:block lg:w-56"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-600">
-                On this page
-              </p>
-              <ul className="mt-4 space-y-1 border-l border-zinc-200 dark:border-zinc-800">
-                {toc.map((item) => (
-                  <li key={item.slug}>
-                    <a
-                      href={`#${item.slug}`}
-                      className={`
-                        block border-l-2 border-transparent py-1 text-sm text-zinc-500
-                        transition-colors hover:border-blue-500 hover:text-blue-600
-                        dark:text-zinc-400 dark:hover:text-blue-400
-                        ${item.level === 3 ? "pl-8" : "pl-4"}
-                      `}
-                    >
-                      {item.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
+        {/* Content: no TOC sidebar anymore — study content gets the article's full width */}
+        <div>
 
         {/*
-          Two different jobs, two different widths: a real study article is
-          long-form reading and stays capped at 70ch for readability. A
-          browse-node's content (like this "Fundamentals" intro) is just a
-          couple of sentences before the Topics grid below it — capping that
-          to 70ch made it look like a stray narrow column instead of an
-          intentional intro, so it gets the wider max-w-3xl the header
-          summary already uses, staying visually consistent with it.
+          Two different jobs, two different widths: a browse-node's content
+          (like this "Fundamentals" intro) is just a couple of sentences
+          before the Topics grid below it, so it gets the narrower max-w-3xl
+          the header summary already uses. A real study article now uses the
+          full article width (max-w-5xl above) instead of being capped to a
+          narrow reading column, since there's no TOC column to share space with.
         */}
         {note.content && (
-          <div className={isBrowseNode ? "max-w-3xl" : "mx-auto max-w-[70ch] flex-1 lg:mx-0"}>
-            <div className="text-base leading-8 text-zinc-700 dark:text-zinc-300 sm:text-lg">
+          <div className={isBrowseNode ? "max-w-3xl" : "w-full"}>
+            <div className="text-base leading-7 text-zinc-700 dark:text-zinc-300">
               <ReactMarkdown
                 components={{
                   h1: ({ children }) => (
-                    <h2 className="mb-4 mt-12 border-l-[3px] border-blue-500 pl-4 text-xl font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-2xl">
+                    <h2 className="mb-3 mt-10 border-l-[3px] border-blue-500 pl-4 text-lg font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-xl">
                       {children}
                     </h2>
                   ),
@@ -288,7 +238,7 @@ export default async function NotePage({ params }: NotePageProps) {
                     const text = String(children);
                     const id = nextHeadingId(text);
                     return (
-                      <h2 id={id} className="mb-4 mt-12 scroll-mt-24 border-l-[3px] border-blue-500 pl-4 text-xl font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-2xl">
+                      <h2 id={id} className="mb-3 mt-10 scroll-mt-24 border-l-[3px] border-blue-500 pl-4 text-lg font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-xl">
                         {children}
                       </h2>
                     );
@@ -297,7 +247,7 @@ export default async function NotePage({ params }: NotePageProps) {
                     const text = String(children);
                     const id = nextHeadingId(text);
                     return (
-                      <h3 id={id} className="mb-3 mt-8 scroll-mt-24 pl-4 text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-200 sm:text-lg">
+                      <h3 id={id} className="mb-2 mt-6 scroll-mt-24 pl-4 text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-200">
                         {children}
                       </h3>
                     );

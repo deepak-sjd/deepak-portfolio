@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 import Hero from "./Hero";
 import About from "./About";
+import Skills from "./Skills";
+import Projects from "./Projects";
 import Notes from "./Notes";
 import Contact from "./Contact";
 import Footer from "./Footer";
@@ -83,6 +85,8 @@ export default function Home() {
     <>
       <Hero />
       <About />
+      <Skills />
+      <Projects />
       <Notes />
       <Contact />
       <Footer />

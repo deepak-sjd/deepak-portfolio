@@ -16,9 +16,10 @@ export interface NavItem {
 }
 
 /**
- * Skills / Experience / Projects / Services are all facets of "what I can
- * do and have done" — grouping them under one "Work" item keeps the top-level
- * nav to 5 items instead of 8, which reads as considered rather than busy.
+ * Skills / Experience / Projects / Services / Notes are all facets of "what
+ * I can do and have done" — grouping them under one "Work" item keeps the
+ * top-level nav to 4 items instead of 8, which reads as considered rather
+ * than busy.
  */
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -37,11 +38,8 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "Experience", href: "/experience" },
       { label: "Projects", href: "/projects" },
       { label: "Services", href: "/services" },
+      { label: "Notes", href: "/#notes" },
     ],
-  },
-  {
-    label: "Notes",
-    href: "/#notes",
   },
   {
     label: "Contact",
