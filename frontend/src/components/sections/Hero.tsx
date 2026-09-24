@@ -275,27 +275,30 @@ export default function Hero() {
             variants={item}
             className="relative lg:sticky lg:top-28"
           >
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            {/* Soft ambient glow behind the portrait — keeps it grounded
+                on the page without drawing a hard box around it. */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-x-8 -inset-y-8 rounded-[3rem] bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-transparent blur-3xl dark:from-blue-500/20 dark:via-indigo-500/10"
+            />
+
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem]">
               <Image
-                src="/images/profile.jpg"
+                src="/images/profile.png"
                 alt="Portrait of Deepak Kumar"
                 fill
                 sizes="(min-width: 1024px) 380px, 100vw"
                 priority
-                className="object-cover"
+                className="object-cover dark:brightness-[0.92] dark:contrast-[1.04]"
               />
 
-              {/* Corner marks — solid accent color so they read as an
-                  intentional framing device rather than fading into
-                  whatever tone the photo happens to have at the edges. */}
-              <span
+              {/* Edge fade — dissolves the photo's own flat backdrop into
+                  the page background color at the edges (instead of a
+                  visible card boundary), so it reads as part of the
+                  page in both themes rather than a pasted rectangle. */}
+              <div
                 aria-hidden="true"
-                className="absolute left-3 top-3 h-4 w-4 border-l-2 border-t-2 border-blue-500 dark:border-blue-400"
-              />
-
-              <span
-                aria-hidden="true"
-                className="absolute bottom-3 right-3 h-4 w-4 border-b-2 border-r-2 border-blue-500 dark:border-blue-400"
+                className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_38%,transparent_38%,rgba(255,255,255,0.94)_92%)] dark:[background:radial-gradient(circle_at_50%_38%,transparent_34%,rgba(9,9,11,0.96)_92%)]"
               />
             </div>
           </motion.div>
