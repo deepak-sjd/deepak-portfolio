@@ -142,7 +142,7 @@ export default function Navbar() {
                     href={item.href}
                     onClick={(e) => handleHashLinkClick(e, item.href)}
                     aria-current={isActive ? "page" : undefined}
-                    className={`relative rounded-md py-2 text-sm font-semibold transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950 ${
+                    className={`group relative inline-block rounded-md py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950 ${
                       isActive
                         ? "text-blue-600 dark:text-blue-400"
                         : "text-zinc-700 hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
@@ -151,8 +151,8 @@ export default function Navbar() {
                     {item.label}
                     <span
                       aria-hidden="true"
-                      className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-blue-600 transition-all duration-300 dark:bg-blue-400 ${
-                        isActive ? "w-full" : "w-0"
+                      className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-blue-600 transition-all duration-300 ease-out dark:bg-blue-400 ${
+                        isActive ? "w-full" : "w-0 group-hover:w-full"
                       }`}
                     />
                   </Link>
@@ -177,7 +177,7 @@ export default function Navbar() {
                   }
                   aria-haspopup="true"
                   aria-expanded={isDropdownOpen}
-                  className={`relative flex items-center gap-1 rounded-md py-2 text-sm font-semibold transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950 ${
+                  className={`group relative flex items-center gap-1 rounded-md py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950 ${
                     isActive
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-zinc-700 hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
@@ -191,8 +191,8 @@ export default function Navbar() {
                   />
                   <span
                     aria-hidden="true"
-                    className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-blue-600 transition-all duration-300 dark:bg-blue-400 ${
-                      isActive ? "w-full" : "w-0"
+                    className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-blue-600 transition-all duration-300 ease-out dark:bg-blue-400 ${
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
                     }`}
                   />
                 </button>

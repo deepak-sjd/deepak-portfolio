@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -161,31 +162,33 @@ export default async function NotePage({ params }: NotePageProps) {
         </Link>
 
         {/* Header */}
-        <header className="mt-5 max-w-3xl">
-          <div
-            className="
-              flex h-9 w-9 items-center justify-center rounded-lg
-              bg-blue-50 text-blue-600 ring-1 ring-blue-100
-              dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
-            "
-          >
-            {isBrowseNode ? (
-              <FaFolder aria-hidden="true" className="text-xs" />
-            ) : (
-              <FaBookOpen aria-hidden="true" className="text-xs" />
+        <header className="mt-5">
+          <div className="flex items-center gap-3">
+            <div
+              className="
+                flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                bg-blue-50 text-blue-600 ring-1 ring-blue-100
+                dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
+              "
+            >
+              {isBrowseNode ? (
+                <FaFolder aria-hidden="true" className="text-xs" />
+              ) : (
+                <FaBookOpen aria-hidden="true" className="text-xs" />
+              )}
+            </div>
+
+            {note.category && (
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
+                {note.category}
+              </p>
             )}
           </div>
 
-          {note.category && (
-            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
-              {note.category}
-            </p>
-          )}
-
           <h1
             className="
-              mt-2 text-3xl font-extrabold leading-[1.15] tracking-[-0.025em]
-              text-zinc-950 dark:text-white sm:text-4xl md:text-[2.75rem]
+              mt-3 text-2xl font-extrabold leading-[1.2] tracking-[-0.02em]
+              text-zinc-950 dark:text-white sm:text-3xl md:text-[2.25rem]
             "
           >
             {note.title}
@@ -228,6 +231,7 @@ export default async function NotePage({ params }: NotePageProps) {
           <div className={isBrowseNode ? "max-w-3xl" : "w-full"}>
             <div className="text-base leading-7 text-zinc-700 dark:text-zinc-300">
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   h1: ({ children }) => (
                     <h2 className="mb-3 mt-10 border-l-[3px] border-blue-500 pl-4 text-lg font-bold tracking-tight text-zinc-900 first:mt-0 dark:text-white sm:text-xl">
@@ -305,6 +309,36 @@ export default async function NotePage({ params }: NotePageProps) {
                   ),
                   hr: () => (
                     <hr className="my-8 border-zinc-200 dark:border-zinc-800" />
+                  ),
+                  table: ({ children }) => (
+                    <div className="mb-6 overflow-x-auto rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                      <table className="w-full min-w-[520px] border-collapse text-sm">
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  thead: ({ children }) => (
+                    <thead className="bg-zinc-50 dark:bg-zinc-900">{children}</thead>
+                  ),
+                  tbody: ({ children }) => (
+                    <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                      {children}
+                    </tbody>
+                  ),
+                  tr: ({ children }) => (
+                    <tr className="divide-x divide-zinc-200 dark:divide-zinc-800">
+                      {children}
+                    </tr>
+                  ),
+                  th: ({ children }) => (
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children }) => (
+                    <td className="px-4 py-3 align-top text-zinc-700 dark:text-zinc-300">
+                      {children}
+                    </td>
                   ),
                 }}
               >
