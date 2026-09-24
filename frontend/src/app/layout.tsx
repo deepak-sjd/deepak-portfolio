@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Dancing_Script, Geist, Geist_Mono } from "next/font/google";
 
 import ThemeProvider from "@/components/providers/ThemeProvider";
 import HashScrollHandler from "@/components/common/HashScrollHandler";
@@ -13,6 +13,14 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// Flowing script font used only for the small signature-style "D" mark next
+// to the wordmark in the navbar logo — not for body text anywhere.
+const signature = Dancing_Script({
+  variable: "--font-signature",
+  weight: ["700"],
   subsets: ["latin"],
 });
 
@@ -92,7 +100,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${signature.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <ThemeProvider>
