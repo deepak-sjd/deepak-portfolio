@@ -101,7 +101,7 @@ export default function Hero() {
           variants={container}
           initial="initial"
           animate="animate"
-          className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start xl:grid-cols-[minmax(0,1fr)_380px]"
+          className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center xl:grid-cols-[minmax(0,1fr)_380px]"
         >
           {/* ===================================================== */}
           {/* LEFT — INTRODUCTION */}
@@ -273,33 +273,41 @@ export default function Hero() {
 
           <motion.div
             variants={item}
-            className="relative lg:sticky lg:top-28"
+            className="relative flex justify-center lg:sticky lg:top-28 lg:justify-end"
           >
-            {/* Soft ambient glow behind the portrait — keeps it grounded
-                on the page without drawing a hard box around it. */}
+            {/* Ambient glow behind the circle */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -inset-x-8 -inset-y-8 rounded-[3rem] bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-transparent blur-3xl dark:from-blue-500/20 dark:via-indigo-500/10"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-blue-500/25 via-indigo-500/15 to-transparent blur-3xl dark:from-blue-500/30 dark:via-indigo-500/20 sm:h-[390px] sm:w-[390px]"
             />
 
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem]">
-              <Image
-                src="/images/profile.png"
-                alt="Portrait of Deepak Kumar"
-                fill
-                sizes="(min-width: 1024px) 380px, 100vw"
-                priority
-                className="object-cover dark:brightness-[0.92] dark:contrast-[1.04]"
-              />
+            <div className="relative">
+              <div className="relative h-[260px] w-[260px] overflow-hidden rounded-full ring-2 ring-white shadow-[0_20px_60px_-15px_rgba(24,24,27,0.25)] dark:ring-zinc-900 dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] sm:h-[310px] sm:w-[310px] lg:h-[330px] lg:w-[330px]">
+                <Image
+                  src="/images/profile.png"
+                  alt="Portrait of Deepak Kumar"
+                  fill
+                  sizes="(min-width: 1024px) 300px, 240px"
+                  priority
+                  className="object-cover object-[50%_18%] dark:brightness-[0.94] dark:contrast-[1.03]"
+                />
+              </div>
 
-              {/* Edge fade — dissolves the photo's own flat backdrop into
-                  the page background color at the edges (instead of a
-                  visible card boundary), so it reads as part of the
-                  page in both themes rather than a pasted rectangle. */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_50%_38%,transparent_38%,rgba(255,255,255,0.94)_92%)] dark:[background:radial-gradient(circle_at_50%_38%,transparent_34%,rgba(9,9,11,0.96)_92%)]"
-              />
+              {/* Floating status chip */}
+              <div className="absolute -bottom-2 -right-2 flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 sm:-bottom-3 sm:-right-3">
+                <span
+                  aria-hidden="true"
+                  className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.15)]"
+                />
+                <div className="leading-tight">
+                  <p className="text-[11px] font-semibold text-zinc-900 dark:text-white">
+                    Open to work
+                  </p>
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                    AI Engineer
+                  </p>
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>
