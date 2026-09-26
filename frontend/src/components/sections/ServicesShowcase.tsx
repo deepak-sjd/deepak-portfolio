@@ -175,15 +175,22 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
     <div className="grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-16">
       {/* Left — pitch */}
       <div>
-        <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-blue-600 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-1 dark:ring-inset dark:ring-blue-400/20">
+        <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-blue-600 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-1 dark:ring-inset dark:ring-blue-400/20">
           Featured Service
         </span>
 
-        <div className="mt-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20">
-            <Icon aria-hidden="true" className="text-xl" />
+        {/*
+          Title sits clearly below the section heading now: text-lg/xl
+          instead of text-2xl/3xl, font-extrabold instead of font-black.
+          The section heading above (font-black, larger) is unambiguously
+          the biggest, boldest text on the page; this is one clear step
+          down, not competing with it.
+        */}
+        <div className="mt-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/20">
+            <Icon aria-hidden="true" className="text-base" />
           </div>
-          <h2 className="text-2xl font-black leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-3xl">
+          <h2 className="text-lg font-extrabold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-xl">
             {service.title.split(" ").map((word, i) => (
               <span key={i} className={i === 0 ? "" : "text-blue-600 dark:text-blue-400"}>
                 {word}{" "}
@@ -192,7 +199,7 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
           </h2>
         </div>
 
-        <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600 dark:text-slate-400 sm:text-base">
+        <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-600 dark:text-slate-400">
           {service.description}
         </p>
 
@@ -244,18 +251,21 @@ function ServicePanel({ service }: { service: ServiceApiResponse }) {
             {featured ? (
               <>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/20">
-                    <FaFolderOpen aria-hidden="true" className="text-lg" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/20">
+                    <FaFolderOpen aria-hidden="true" className="text-base" />
                   </div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-slate-500">
                     Proof of Work
                   </p>
                 </div>
 
-                <h3 className="mt-5 text-xl font-black leading-tight text-zinc-950 dark:text-white">
+                {/* One clear step below the service title (text-lg/xl above),
+                    so the tier order reads: section heading > service title
+                    > proof-of-work title > body text. */}
+                <h3 className="mt-5 text-base font-extrabold leading-tight text-zinc-950 dark:text-white sm:text-lg">
                   {featured.title}
                 </h3>
-                <p className="mt-3 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-slate-400 sm:text-base">
+                <p className="mt-3 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-slate-400">
                   {featured.description}
                 </p>
 
@@ -363,7 +373,8 @@ export default function ServicesShowcase() {
   };
 
   return (
-    <section aria-labelledby="services-heading" className="relative isolate overflow-hidden border-t border-zinc-200/70 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-950 sm:py-24">      {/* Ambient glow accents — subtle in light mode, richer in dark mode */}
+    <section aria-labelledby="services-heading" className="relative isolate overflow-hidden border-t border-zinc-200/70 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-950 sm:py-24">
+      {/* Ambient glow accents — subtle in light mode, richer in dark mode */}
       <div aria-hidden="true" className="pointer-events-none absolute -top-32 right-0 h-[32rem] w-[32rem] rounded-full bg-blue-200/40 blur-[120px] dark:bg-blue-600/20" />
       <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-96 w-96 rounded-full bg-indigo-100/40 blur-[120px] dark:bg-indigo-600/15" />
 
@@ -375,9 +386,18 @@ export default function ServicesShowcase() {
               Services
             </span>
           </div>
-                    <h2
+
+          {/*
+            Now unambiguously the largest, boldest text in this section:
+            font-black (900) instead of font-semibold, and clearly larger
+            than the service title below it (text-lg/xl) and the
+            proof-of-work title (text-base/lg). Kept the serif treatment
+            since that's this section's distinct identity, just gave it
+            the weight to actually lead the hierarchy.
+          */}
+          <h2
             id="services-heading"
-            className="mt-5 font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
+            className="mt-5 font-serif text-3xl font-black leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
           >
             Engineering solutions for{" "}
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400">
@@ -385,7 +405,7 @@ export default function ServicesShowcase() {
             </span>
           </h2>
 
-          <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-400 sm:text-base">
             {loading
               ? "Loading what I can offer —"
               : `${services.length} service${services.length === 1 ? "" : "s"}, from prototype to production.`}
