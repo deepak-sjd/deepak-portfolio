@@ -19,17 +19,17 @@ const navigation = {
   explore: [
     { name: "Home", href: "/#home" },
     { name: "About", href: "/#about" },
-    { name: "Notes", href: "/#notes" },
+    { name: "Skills", href: "/#skills" },
+    { name: "Projects", href: "/#projects" },
     { name: "Contact", href: "/#contact" },
   ],
 
   work: [
-    { name: "Projects", href: "/projects" },
-    { name: "Skills", href: "/skills" },
-    { name: "Services", href: "/services" },
     { name: "Experience", href: "/experience" },
+    { name: "Services", href: "/services" },
+    { name: "Notes", href: "/notes" },
   ],
-}
+};
 
 /* -------------------------------------------------------------------------- */
 /* Social Links                                                               */
