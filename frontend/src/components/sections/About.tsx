@@ -30,14 +30,19 @@ const principles = [
 
 const links = [
   {
-    label: "Skills",
-    description: "Languages, frameworks, and the tools I actually use day to day.",
-    href: "/skills",
+    label: "Experience",
+    description: "Where I've worked, what I owned, and what shipped because of it.",
+    href: "/experience",
   },
   {
-    label: "Projects",
-    description: "Real systems I've designed, built, and shipped end to end.",
-    href: "/projects",
+    label: "Services",
+    description: "What I can help you build, from prototype to production.",
+    href: "/services",
+  },
+  {
+    label: "Notes",
+    description: "A structured knowledge base of everything I study and work with.",
+    href: "/notes",
   },
   {
     label: "Resume",
@@ -170,7 +175,7 @@ export default function About() {
 
           {/* Links — a minimal nav row instead of duplicate bordered cards */}
           <div className="lg:col-span-12 border-t border-zinc-200 pt-10 dark:border-zinc-800">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
               {links.map((link) => (
                 <a
                   key={link.label}
