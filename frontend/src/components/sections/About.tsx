@@ -1,7 +1,13 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { FaArrowRight } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaBriefcase,
+  FaBook,
+  FaFileAlt,
+  FaTools,
+} from "react-icons/fa";
 
 /* ==========================================================================
    Content
@@ -9,45 +15,34 @@ import { FaArrowRight } from "react-icons/fa";
 
 const domainTags = ["AI Engineering", "Backend Systems", "Product Thinking"];
 
-const principles = [
-  {
-    title: "Keep it working",
-    description: "Code that actually runs beats code that just looks clever.",
-  },
-  {
-    title: "Keep it simple",
-    description: "Simple solutions are easier to build on later.",
-  },
-  {
-    title: "AI as a tool",
-    description: "It should help the product, not be the whole point.",
-  },
-  {
-    title: "Learn by building",
-    description: "I pick things up fastest by actually shipping them.",
-  },
-];
-
+/*
+ * Each of these is a real destination page, not homepage content — so they
+ * render as proper button-style cards below, each with its own icon.
+ */
 const links = [
   {
-    label: "Experience",
-    description: "Where I've worked, what I owned, and what shipped because of it.",
+    label: "Experience & Education",
+    description: "Where I've worked and studied — roles, degree, and what came of each.",
     href: "/experience",
+    icon: FaBriefcase,
   },
   {
     label: "Services",
     description: "What I can help you build, from prototype to production.",
     href: "/services",
+    icon: FaTools,
   },
   {
     label: "Notes",
     description: "A structured knowledge base of everything I study and work with.",
     href: "/notes",
+    icon: FaBook,
   },
   {
     label: "Resume",
     description: "Want the full picture? Grab the PDF or reach out directly.",
     href: "/resume",
+    icon: FaFileAlt,
   },
 ];
 
@@ -99,7 +94,7 @@ export default function About() {
         >
           {/* Intro */}
           <div className="lg:col-span-7">
-                        <h2
+            <h2
               id="about-heading"
               className="max-w-xl font-serif text-3xl font-semibold leading-tight tracking-tight text-zinc-950 dark:text-white sm:text-4xl"
             >
@@ -126,7 +121,9 @@ export default function About() {
               ))}
             </div>
 
-            {/* Currently — folded into the intro instead of a duplicate bordered box */}
+            {/* Currently — this comes from the admin/backend content, kept
+                as the single place this fact is stated (not repeated in the
+                profile card on the right) */}
             <div className="mt-8 flex items-center gap-2.5 border-t border-zinc-200 pt-6 dark:border-zinc-800">
               <motion.span
                 aria-hidden="true"
@@ -139,63 +136,55 @@ export default function About() {
                 and backend systems.
               </p>
             </div>
+
+            {/* Pull-quote */}
+            <p className="mt-7 border-l-[3px] border-blue-500 pl-4 text-lg font-semibold italic leading-7 text-zinc-700 dark:text-zinc-300">
+              &ldquo;I care more about building things that actually work than
+              things that just look good in a demo.&rdquo;
+            </p>
           </div>
 
-          {/* Quote — the one bold, deliberate accent in the section */}
+          {/* Links — a compact vertical list filling the space beside the
+              intro text, instead of a separate full-width row that pushed
+              the section taller than one screen */}
           <div className="lg:col-span-5">
-            <div className="relative flex h-full min-h-[220px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 p-8 dark:from-blue-500 dark:to-indigo-600">
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -right-3 -top-10 text-[10rem] font-black leading-none text-white/10"
-              >
-                &rdquo;
-              </span>
-              <p className="relative text-xl font-bold leading-8 text-white sm:text-[1.375rem] sm:leading-9">
-                I care more about building things that actually work than
-                things that just look good in a demo.
-              </p>
-            </div>
-          </div>
+            <div className="flex flex-col divide-y divide-zinc-200 rounded-2xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+              {links.map((link) => {
+                const Icon = link.icon;
 
-          {/* Principles — an editorial list, not four repeated cards */}
-          <div className="lg:col-span-12 border-t border-zinc-200 pt-10 dark:border-zinc-800">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-              {principles.map((principle) => (
-                <div key={principle.title}>
-                  <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                    {principle.title}
-                  </h3>
-                  <p className="mt-2 text-[13px] leading-5 text-zinc-500 dark:text-zinc-500">
-                    {principle.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="group flex items-center gap-4 p-4 transition-colors duration-300 hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
+                  >
+                    <div
+                      className="
+                        flex h-10 w-10 shrink-0 items-center justify-center rounded-xl
+                        bg-blue-50 text-blue-600 ring-1 ring-blue-100 transition-colors duration-300
+                        group-hover:bg-blue-600 group-hover:text-white group-hover:ring-blue-600
+                        dark:bg-blue-950/50 dark:text-blue-400 dark:ring-blue-900/50
+                      "
+                    >
+                      <Icon aria-hidden="true" className="text-sm" />
+                    </div>
 
-          {/* Links — a minimal nav row instead of duplicate bordered cards */}
-          <div className="lg:col-span-12 border-t border-zinc-200 pt-10 dark:border-zinc-800">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-              {links.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="group flex items-start justify-between gap-3"
-                >
-                  <div>
-                    <h3 className="text-sm font-bold text-zinc-950 transition-colors duration-300 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-                      {link.label}
-                    </h3>
-                    <p className="mt-1.5 text-[13px] leading-5 text-zinc-500 dark:text-zinc-500">
-                      {link.description}
-                    </p>
-                  </div>
-                  <FaArrowRight
-                    aria-hidden="true"
-                    className="mt-0.5 shrink-0 text-xs text-zinc-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-blue-500 dark:text-zinc-700 dark:group-hover:text-blue-400"
-                  />
-                </a>
-              ))}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-zinc-950 transition-colors duration-300 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                        {link.label}
+                      </h3>
+                      <p className="mt-0.5 truncate text-[13px] leading-5 text-zinc-500 dark:text-zinc-500">
+                        {link.description}
+                      </p>
+                    </div>
+
+                    <FaArrowRight
+                      aria-hidden="true"
+                      className="shrink-0 text-xs text-zinc-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-blue-500 dark:text-zinc-700"
+                    />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </motion.div>
