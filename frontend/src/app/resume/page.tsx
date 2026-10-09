@@ -13,6 +13,8 @@ import {
 } from "react-icons/fa";
 
 import { getActiveResume, ResumeApiResponse } from "@/lib/api/resume";
+import Navbar from "@/components/layout/Navbar";
+import ScrollProgress from "@/components/common/ScrollProgress";
 
 
 
@@ -75,6 +77,9 @@ export default function ResumePage() {
 
   if (loading) {
     return (
+      <>
+      <ScrollProgress />
+      <Navbar />
       <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-6 pb-24 pt-28 lg:px-8">
           <div
@@ -108,6 +113,7 @@ export default function ResumePage() {
           </div>
         </div>
       </main>
+      </>
     );
   }
 
@@ -117,6 +123,9 @@ export default function ResumePage() {
 
   if (error || !resume) {
     return (
+      <>
+      <ScrollProgress />
+      <Navbar />
       <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <div className="mx-auto max-w-4xl px-6 pb-24 pt-28 lg:px-8">
           <a
@@ -162,12 +171,16 @@ export default function ResumePage() {
           </div>
         </div>
       </main>
+      </>
     );
   }
 
   const resumeUrl = getResumeUrl(resume.fileUrl);
 
   return (
+    <>
+    <ScrollProgress />
+    <Navbar />
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <div className="mx-auto max-w-7xl px-6 pb-24 pt-28 lg:px-8">
 
@@ -214,94 +227,57 @@ export default function ResumePage() {
             HEADER
         ====================================================== */}
 
-        <header className="mt-12 max-w-4xl">
+        <header className="mt-6 max-w-4xl">
 
-          {/* PDF icon */}
-          <div
-            className="
-              flex
-              h-12
-              w-12
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-red-200
-              bg-red-50
-              text-red-600
-              shadow-sm
-              dark:border-red-900/50
-              dark:bg-red-950/40
-              dark:text-red-400
-            "
-          >
-            <FaFilePdf
-              aria-hidden="true"
-              className="text-lg"
-            />
-          </div>
-
-          {/* Section label */}
-          <div className="mt-7 flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="h-px w-9 bg-blue-600 dark:bg-blue-400"
-            />
-
-            <span
+          {/* Icon + small heading, side by side. The name/role headline was
+              removed on purpose: About already says who you are, so repeating
+              it here as a giant title read as showing off. */}
+          <div className="flex items-center gap-3">
+            <div
               className="
-                text-xs
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-red-200
+                bg-red-50
+                text-red-600
+                dark:border-red-900/50
+                dark:bg-red-950/40
+                dark:text-red-400
+              "
+            >
+              <FaFilePdf
+                aria-hidden="true"
+                className="text-sm"
+              />
+            </div>
+
+            <h1
+              className="
+                text-2xl
                 font-bold
-                uppercase
-                tracking-[0.22em]
-                text-blue-600
-                dark:text-blue-400
+                tracking-tight
+                text-zinc-950
+                dark:text-white
+                sm:text-3xl
               "
             >
               Resume
-            </span>
+            </h1>
           </div>
-
-          {/* Main heading */}
-          <h1
-            className="
-              mt-5
-              max-w-3xl
-              text-4xl
-              font-black
-              leading-[1.05]
-              tracking-[-0.04em]
-              text-zinc-950
-              dark:text-white
-              sm:text-5xl
-              lg:text-6xl
-          "
-          >
-            Deepak Kumar —{" "}
-            <span
-              className="
-                bg-gradient-to-r
-                from-blue-600
-                via-indigo-600
-                to-cyan-600
-                bg-clip-text
-                text-transparent
-                dark:from-blue-400
-                dark:via-indigo-400
-                dark:to-cyan-400
-              "
-            >
-              AI Engineer & Full-Stack Developer
-            </span>
-          </h1>
 
           {/* Description */}
           <p
             className="
-              mt-6
+              mt-3
               max-w-2xl
-              text-base
-              leading-7
+              text-sm
+              leading-6
               text-zinc-600
               dark:text-zinc-400
             "
@@ -313,7 +289,7 @@ export default function ResumePage() {
           {/* Metadata */}
           <div
             className="
-              mt-6
+              mt-3
               flex
               flex-wrap
               items-center
@@ -358,7 +334,7 @@ export default function ResumePage() {
             ACTIONS
         ====================================================== */}
 
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-wrap gap-3">
 
           {/* Open PDF */}
           <a
@@ -441,7 +417,7 @@ export default function ResumePage() {
             PDF PREVIEW HEADER
         ====================================================== */}
 
-        <div className="mt-14 flex items-end justify-between gap-6 border-b border-zinc-200 pb-5 dark:border-zinc-800">
+        <div className="mt-8 flex items-end justify-between gap-6 border-b border-zinc-200 pb-4 dark:border-zinc-800">
           <div>
             <h2
               className="
@@ -465,32 +441,6 @@ export default function ResumePage() {
               Review the current version directly in the portfolio.
             </p>
           </div>
-
-          <a
-            href={resumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="
-              hidden
-              items-center
-              gap-2
-              text-sm
-              font-semibold
-              text-zinc-600
-              transition-colors
-              hover:text-blue-600
-              dark:text-zinc-400
-              dark:hover:text-blue-400
-              sm:inline-flex
-            "
-          >
-            Open full PDF
-
-            <FaExternalLinkAlt
-              aria-hidden="true"
-              className="text-[10px]"
-            />
-          </a>
         </div>
 
         {/* ======================================================
@@ -559,5 +509,6 @@ export default function ResumePage() {
 
       </div>
     </main>
+    </>
   );
 }
